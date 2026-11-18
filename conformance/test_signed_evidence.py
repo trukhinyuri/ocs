@@ -1,8 +1,11 @@
 """Portable real-signature controls using a synthetic stand and a frozen Git test edition."""
 
+import base64
 import copy
+import hashlib
 import json
 import shutil
+import ssl
 import subprocess
 import sys
 import tempfile
@@ -281,6 +284,44 @@ def example(policy, revision, public):
         "target": target,
         "stand": stand,
     }
+
+
+class EnrollmentTests(unittest.TestCase):
+    def test_read_public_pem_enrollment(self):
+        sys.path.insert(0, str(ROOT / "stand/kubernetes"))
+        from deploy import create_identity
+        from enroll_receipt import public_tls
+
+        class RecordedPublicProjection:
+            namespace = "exercise"
+
+            def owned(self, kind, name):
+                return None
+
+            def command(self, verb, *args, data=None):
+                if verb == "create":
+                    self.secret = json.loads(data)
+                    return subprocess.CompletedProcess([], 0, b"", b"")
+                self_select = self.secret["data"]
+                projection = "\n".join(
+                    [
+                        "ocs-qualification",
+                        *(self_select[k] for k in ("ca.crt", "tls.crt", "relay.crt")),
+                    ]
+                )
+                return subprocess.CompletedProcess([], 0, projection.encode(), b"")
+
+        cluster = RecordedPublicProjection()
+        create_identity(cluster)
+        pins, der = public_tls(cluster)
+        pem = base64.b64decode(cluster.secret["data"]["tls.crt"], validate=True)
+        self.assertEqual(pins["serverCertificateSha256"], hashlib.sha256(pem).hexdigest())
+        self.assertEqual(
+            der, hashlib.sha256(ssl.PEM_cert_to_DER_cert(pem.decode("ascii"))).hexdigest()
+        )
+        cluster.secret["data"]["tls.crt"] = cluster.secret["data"]["relay.crt"]
+        with self.assertRaises(ValueError):
+            public_tls(cluster)
 
 
 class SignedEvidenceTests(unittest.TestCase):

@@ -72,7 +72,8 @@ def public_tls(cluster):
         )
     )
     leaf = re.search(
-        r"-----BEGIN CERTIFICATE-----[\\s\\S]+?-----END CERTIFICATE-----", public[1].decode("ascii")
+        r"-----BEGIN CERTIFICATE-----\r?\n[A-Za-z0-9+/=\r\n]+-----END CERTIFICATE-----",
+        public[1].decode("ascii"),
     )
     require(leaf is not None, "invalid deployed public leaf PEM")
     return pins, digest(ssl.PEM_cert_to_DER_cert(leaf.group()))
