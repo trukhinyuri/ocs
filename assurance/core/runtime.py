@@ -13,6 +13,7 @@ import subprocess
 import sys
 import time
 from concurrent.futures import ThreadPoolExecutor
+from pathlib import Path
 from urllib import error, request
 from zipfile import ZipFile
 
