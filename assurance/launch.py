@@ -69,6 +69,19 @@ def main():
             pointer = output / (".latest-" + run_dir.name)
             pointer.symlink_to(run_dir.relative_to(output))
             pointer.replace(output / "latest")
+            # Preserve the established report paths. Qualification itself consumes
+            # only the independently regenerated run-local copies.
+            for original in (run_dir / "reference").rglob("*.json"):
+                relative = original.relative_to(run_dir / "reference")
+                legacy = root / "out" / relative
+                legacy.parent.mkdir(parents=True, exist_ok=True)
+                with tempfile.NamedTemporaryFile(dir=legacy.parent, delete=False) as f:
+                    f.write(original.read_bytes())
+                    staged = Path(f.name)
+                try:
+                    staged.replace(legacy)
+                finally:
+                    staged.unlink(missing_ok=True)
             print("Qualification dossier", output / "latest/report.json", flush=True)
         return result.returncode
 
