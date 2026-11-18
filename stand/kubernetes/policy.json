@@ -1,0 +1,49 @@
+{
+  "format": "ocs.stand/1",
+  "target": "repo-built Kubernetes service",
+  "local": {
+    "upstream": "v1.37.2",
+    "distribution": "v1.37.2+k3s1",
+    "image": "docker.io/rancher/k3s:v1.37.2-k3s1@sha256:21ea6e0fac4e3930c2ce8aa40ddd41a8b18cb3e9a0222c030dc005e7e88c4332",
+    "container": "ocs-qualification-k3s",
+    "port": 16443
+  },
+  "workload": {
+    "namespace": "ocs-qualification",
+    "ownedLabel": "app.kubernetes.io/part-of=ocs-qualification",
+    "model": "reference-colour",
+    "account": "qualification-account",
+    "route": "local-primary",
+    "replicates": 32,
+    "concurrency": 4,
+    "p95LimitMs": 2000,
+    "requestDeadlineMs": 5000,
+    "recoveryLimitSeconds": 120,
+    "minimumCorrect": 7,
+    "qualitySamples": 8,
+    "maximumReceiptAgeSeconds": 86400,
+    "terms": "Observe the live hosted reference product terms. The trial price and reset charge are distinct from the organization list price. Underlying cluster infrastructure costs are outside the provider bill.",
+    "publishedListPrice": "2.50",
+    "accountPrice": "0",
+    "currency": "USD",
+    "billingBasis": "organization/30 days",
+    "resetCharge": "0"
+  },
+  "deploymentClaims": [
+    "W-08.tls",
+    "B-07.domain",
+    "A-02.probe",
+    "Q-01.reobserve",
+    "Q-02.read-only",
+    "P-03.basis",
+    "M-01.axes",
+    "M-02.response",
+    "G-04.comparison",
+    "U-03.accessibility",
+    "L-01.policy",
+    "L-04.tail",
+    "L-06.terms",
+    "L-06.recovery"
+  ],
+  "permissions": "Namespace-scoped service installation, test accounts, authenticated qualification reads, synthetic idempotent writes, failure/recovery of owned resources. Local cluster bootstrap is separate from remote application deployment."
+}

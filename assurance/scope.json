@@ -7,7 +7,7 @@
   "populations": {
     "standard": "Every normative paragraph, numbered rule, operation registry entry and schema assertion in version.json.",
     "reference": "Local author, kernel, caller, executor, peer, operator and domain adapter. Independent Python/Go reference paths on the POSIX machine, persistent fixture stores, stdio and isolated network transport.",
-    "deployment": "A distinct owner-selected real stand. Obtain its authorized identity, route, workload, failure assumptions, thresholds and expiry before measurement. A synthetic account or loopback receipt cannot satisfy this scope."
+    "deployment": "Owner-selected real Kubernetes stand, deployed from this checkout; actual API server, pods, persistent storage, service identity and observations, local and explicitly addressed remote cluster. Provider accounts and training inputs remain synthetic. No commercial upstream or hard real-time target is claimed."
   },
   "assurance": {
     "model": "Kernel-checked statement of a selected invariant, realizability, refinement, or conditional progress. Freeze formal type and semantic definitions and audit all transitive axioms.",
@@ -39,10 +39,10 @@
       "hardTiming": "Admission must refuse an unqualified hard-deadline target; a p99 observation is insufficient."
     },
     "stand": {
-      "role": "separately authorized real stand",
-      "target": null,
-      "thresholds": null,
-      "initialStatus": "awaiting-owner-target"
+      "role": "Kubernetes operator and hosted reference service",
+      "target": "repository-built Kubernetes stand on the local computer; same workload on an operator-selected remote Kubernetes",
+      "conditions": "stand/kubernetes/policy.json",
+      "initialStatus": "applicable"
     }
   }
 }
