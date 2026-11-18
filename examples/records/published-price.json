@@ -1,0 +1,17 @@
+{
+  "planId": "fixture-plus",
+  "status": "published",
+  "price": {
+    "amount": "19.95",
+    "currency": "USD"
+  },
+  "region": "test-region",
+  "period": "P1M",
+  "basis": "seat",
+  "tax": "unknown",
+  "evidence": {
+    "source": "https://example.invalid/terms",
+    "observedAt": "2030-01-01T00:00:00.000Z",
+    "status": "reported"
+  }
+}

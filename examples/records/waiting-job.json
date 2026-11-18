@@ -1,0 +1,11 @@
+{
+  "jobId": "j1",
+  "state": "waiting-authority",
+  "revision": 2,
+  "scope": {
+    "kind": "account",
+    "id": "fixture-account"
+  },
+  "updatedAt": "2030-01-01T00:00:00.000Z",
+  "reason": "Approval needed."
+}

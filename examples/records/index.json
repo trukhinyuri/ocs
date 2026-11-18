@@ -1,0 +1,17 @@
+{
+  "known-quota.json": "quotaWindow",
+  "exhausted-quota.json": "quotaWindow",
+  "unknown-quota.json": "quotaWindow",
+  "reset.json": "resetGrant",
+  "published-price.json": "price",
+  "account.json": "account",
+  "catalog.json": "catalog",
+  "message.json": "message",
+  "event.json": "event",
+  "waiting-job.json": "job",
+  "uncertain-effect.json": "effectReceipt",
+  "surface.json": "surface",
+  "resource.json": "resource",
+  "usage.json": "usage",
+  "platform.json": "platform"
+}

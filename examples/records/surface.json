@@ -1,0 +1,35 @@
+{
+  "id": "example.status.panel",
+  "slot": "service.detail",
+  "kind": "declarative",
+  "operations": [
+    "example.status.read"
+  ],
+  "view": {
+    "title": "Resource status",
+    "dataSchema": {
+      "type": "object",
+      "properties": {
+        "state": {
+          "type": "string",
+          "title": "State",
+          "readOnly": true
+        }
+      },
+      "required": [
+        "state"
+      ],
+      "additionalProperties": false
+    },
+    "values": {
+      "state": "ready"
+    },
+    "actions": [
+      {
+        "operation": "example.status.read",
+        "version": "1.0.0",
+        "label": "Refresh"
+      }
+    ]
+  }
+}

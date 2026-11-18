@@ -1,0 +1,1050 @@
+[
+  {
+    "id": "negotiation",
+    "rule": "W-05",
+    "steps": [
+      {
+        "method": "ocs.describe",
+        "params": {
+          "protocols": [
+            "0.1"
+          ],
+          "requiredFeatures": [],
+          "meta": {
+            "deadline": "${deadline}"
+          }
+        },
+        "expect": {
+          "result": {
+            "protocol": "0.1",
+            "packageId": "${packageId}",
+            "packageVersion": "${packageVersion}",
+            "manifestDigest": "${manifestDigest}"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "status-read",
+    "rule": "W-06",
+    "steps": [
+      {
+        "method": "ocs.describe",
+        "params": {
+          "protocols": [
+            "0.1"
+          ],
+          "requiredFeatures": [],
+          "meta": {
+            "deadline": "${deadline}"
+          }
+        },
+        "expect": {
+          "result": {
+            "protocol": "0.1",
+            "packageId": "${packageId}",
+            "packageVersion": "${packageVersion}",
+            "manifestDigest": "${manifestDigest}"
+          }
+        }
+      },
+      {
+        "method": "tool.call",
+        "params": {
+          "operation": "example.status.read",
+          "version": "1.0.0",
+          "input": {
+            "resourceId": "demo"
+          },
+          "meta": {
+            "deadline": "${deadline}",
+            "protocol": "0.1",
+            "manifestDigest": "${manifestDigest}"
+          }
+        },
+        "expect": {
+          "result": {
+            "data": {
+              "resourceId": "demo",
+              "state": "ready"
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "ordered-versions",
+    "rule": "W-05",
+    "steps": [
+      {
+        "method": "ocs.describe",
+        "params": {
+          "protocols": [
+            "9.0",
+            "0.1"
+          ],
+          "requiredFeatures": [],
+          "meta": {
+            "deadline": "${deadline}"
+          }
+        },
+        "expect": {
+          "result": {
+            "protocol": "0.1",
+            "packageId": "${packageId}",
+            "packageVersion": "${packageVersion}",
+            "manifestDigest": "${manifestDigest}"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "no-version",
+    "rule": "W-05",
+    "steps": [
+      {
+        "method": "ocs.describe",
+        "params": {
+          "protocols": [
+            "9.0"
+          ],
+          "requiredFeatures": [],
+          "meta": {
+            "deadline": "${deadline}"
+          }
+        },
+        "expect": {
+          "error": {
+            "code": -33008,
+            "data": {
+              "kind": "incompatible"
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "unknown-feature",
+    "rule": "C-06",
+    "steps": [
+      {
+        "method": "ocs.describe",
+        "params": {
+          "protocols": [
+            "0.1"
+          ],
+          "requiredFeatures": [
+            "private.unsupported/9.0"
+          ],
+          "meta": {
+            "deadline": "${deadline}"
+          }
+        },
+        "expect": {
+          "error": {
+            "code": -33008,
+            "data": {
+              "kind": "incompatible"
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "call-before-negotiation",
+    "rule": "W-08",
+    "steps": [
+      {
+        "method": "tool.call",
+        "params": {
+          "operation": "example.status.read",
+          "version": "1.0.0",
+          "input": {
+            "resourceId": "demo"
+          },
+          "meta": {
+            "deadline": "${deadline}",
+            "protocol": "0.1",
+            "manifestDigest": "${manifestDigest}"
+          }
+        },
+        "expect": {
+          "error": {
+            "code": -33008,
+            "data": {
+              "kind": "incompatible"
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "wrong-descriptor",
+    "rule": "W-05",
+    "steps": [
+      {
+        "method": "ocs.describe",
+        "params": {
+          "protocols": [
+            "0.1"
+          ],
+          "requiredFeatures": [],
+          "meta": {
+            "deadline": "${deadline}"
+          }
+        },
+        "expect": {
+          "result": {
+            "protocol": "0.1",
+            "packageId": "${packageId}",
+            "packageVersion": "${packageVersion}",
+            "manifestDigest": "${manifestDigest}"
+          }
+        }
+      },
+      {
+        "method": "tool.call",
+        "params": {
+          "operation": "example.status.read",
+          "version": "1.0.0",
+          "input": {
+            "resourceId": "demo"
+          },
+          "meta": {
+            "deadline": "${deadline}",
+            "protocol": "0.1",
+            "manifestDigest": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+          }
+        },
+        "expect": {
+          "error": {
+            "code": -33014,
+            "data": {
+              "kind": "pin"
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "wrong-contract",
+    "rule": "C-03",
+    "steps": [
+      {
+        "method": "ocs.describe",
+        "params": {
+          "protocols": [
+            "0.1"
+          ],
+          "requiredFeatures": [],
+          "meta": {
+            "deadline": "${deadline}"
+          }
+        },
+        "expect": {
+          "result": {
+            "protocol": "0.1",
+            "packageId": "${packageId}",
+            "packageVersion": "${packageVersion}",
+            "manifestDigest": "${manifestDigest}"
+          }
+        }
+      },
+      {
+        "method": "tool.call",
+        "params": {
+          "operation": "example.status.read",
+          "version": "2.0.0",
+          "input": {
+            "resourceId": "demo"
+          },
+          "meta": {
+            "deadline": "${deadline}",
+            "protocol": "0.1",
+            "manifestDigest": "${manifestDigest}"
+          }
+        },
+        "expect": {
+          "error": {
+            "code": -33008,
+            "data": {
+              "kind": "incompatible"
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "denied-resource",
+    "rule": "C-07",
+    "steps": [
+      {
+        "method": "ocs.describe",
+        "params": {
+          "protocols": [
+            "0.1"
+          ],
+          "requiredFeatures": [],
+          "meta": {
+            "deadline": "${deadline}"
+          }
+        },
+        "expect": {
+          "result": {
+            "protocol": "0.1",
+            "packageId": "${packageId}",
+            "packageVersion": "${packageVersion}",
+            "manifestDigest": "${manifestDigest}"
+          }
+        }
+      },
+      {
+        "method": "tool.call",
+        "params": {
+          "operation": "example.status.read",
+          "version": "1.0.0",
+          "input": {
+            "resourceId": "private"
+          },
+          "meta": {
+            "deadline": "${deadline}",
+            "protocol": "0.1",
+            "manifestDigest": "${manifestDigest}"
+          }
+        },
+        "expect": {
+          "error": {
+            "code": -33001,
+            "data": {
+              "kind": "denied"
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "wrong-type",
+    "rule": "C-05",
+    "steps": [
+      {
+        "method": "ocs.describe",
+        "params": {
+          "protocols": [
+            "0.1"
+          ],
+          "requiredFeatures": [],
+          "meta": {
+            "deadline": "${deadline}"
+          }
+        },
+        "expect": {
+          "result": {
+            "protocol": "0.1",
+            "packageId": "${packageId}",
+            "packageVersion": "${packageVersion}",
+            "manifestDigest": "${manifestDigest}"
+          }
+        }
+      },
+      {
+        "method": "tool.call",
+        "params": {
+          "operation": "example.status.read",
+          "version": "1.0.0",
+          "input": {
+            "resourceId": 4
+          },
+          "meta": {
+            "deadline": "${deadline}",
+            "protocol": "0.1",
+            "manifestDigest": "${manifestDigest}"
+          }
+        },
+        "expect": {
+          "error": {
+            "code": -33009,
+            "data": {
+              "kind": "input",
+              "path": "/resourceId"
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "missing-input-member",
+    "rule": "C-05",
+    "steps": [
+      {
+        "method": "ocs.describe",
+        "params": {
+          "protocols": [
+            "0.1"
+          ],
+          "requiredFeatures": [],
+          "meta": {
+            "deadline": "${deadline}"
+          }
+        },
+        "expect": {
+          "result": {
+            "protocol": "0.1",
+            "packageId": "${packageId}",
+            "packageVersion": "${packageVersion}",
+            "manifestDigest": "${manifestDigest}"
+          }
+        }
+      },
+      {
+        "method": "tool.call",
+        "params": {
+          "operation": "example.status.read",
+          "version": "1.0.0",
+          "input": {},
+          "meta": {
+            "deadline": "${deadline}",
+            "protocol": "0.1",
+            "manifestDigest": "${manifestDigest}"
+          }
+        },
+        "expect": {
+          "error": {
+            "code": -33009,
+            "data": {
+              "kind": "input",
+              "path": "/resourceId"
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "expired-deadline",
+    "rule": "W-04",
+    "steps": [
+      {
+        "method": "ocs.describe",
+        "params": {
+          "protocols": [
+            "0.1"
+          ],
+          "requiredFeatures": [],
+          "meta": {
+            "deadline": "${deadline}"
+          }
+        },
+        "expect": {
+          "result": {
+            "protocol": "0.1",
+            "packageId": "${packageId}",
+            "packageVersion": "${packageVersion}",
+            "manifestDigest": "${manifestDigest}"
+          }
+        }
+      },
+      {
+        "method": "tool.call",
+        "params": {
+          "operation": "example.status.read",
+          "version": "1.0.0",
+          "input": {
+            "resourceId": "demo"
+          },
+          "meta": {
+            "deadline": "${past}",
+            "protocol": "0.1",
+            "manifestDigest": "${manifestDigest}"
+          }
+        },
+        "expect": {
+          "error": {
+            "code": -33005,
+            "data": {
+              "kind": "deadline"
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "unknown-method",
+    "rule": "W-07",
+    "steps": [
+      {
+        "method": "ocs.describe",
+        "params": {
+          "protocols": [
+            "0.1"
+          ],
+          "requiredFeatures": [],
+          "meta": {
+            "deadline": "${deadline}"
+          }
+        },
+        "expect": {
+          "result": {
+            "protocol": "0.1",
+            "packageId": "${packageId}",
+            "packageVersion": "${packageVersion}",
+            "manifestDigest": "${manifestDigest}"
+          }
+        }
+      },
+      {
+        "method": "fixture.unknown",
+        "params": {},
+        "expect": {
+          "error": {
+            "code": -32601,
+            "data": {
+              "kind": "method"
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "broken-json",
+    "rule": "W-01",
+    "steps": [
+      {
+        "raw": "{",
+        "responseId": null,
+        "expect": {
+          "error": {
+            "code": -32700,
+            "data": {
+              "kind": "parse"
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "duplicate-key",
+    "rule": "W-01",
+    "steps": [
+      {
+        "raw": "{\"jsonrpc\":\"2.0\",\"id\":\"x\",\"id\":\"y\",\"method\":\"ocs.describe\",\"params\":{}}",
+        "responseId": null,
+        "expect": {
+          "error": {
+            "code": -32700,
+            "data": {
+              "kind": "parse"
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "invalid-envelope",
+    "rule": "W-02",
+    "steps": [
+      {
+        "raw": "{\"jsonrpc\":\"2.0\",\"id\":9,\"method\":\"ocs.describe\",\"params\":{}}",
+        "responseId": null,
+        "expect": {
+          "error": {
+            "code": -32600,
+            "data": {
+              "kind": "request"
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "no-batch",
+    "rule": "W-01",
+    "steps": [
+      {
+        "raw": "[]",
+        "responseId": null,
+        "expect": {
+          "error": {
+            "code": -32600,
+            "data": {
+              "kind": "request"
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "no-surrogate",
+    "rule": "W-01",
+    "steps": [
+      {
+        "raw": "{\"jsonrpc\":\"2.0\",\"id\":\"\\ud800\",\"method\":\"ocs.describe\",\"params\":{}}",
+        "responseId": null,
+        "expect": {
+          "error": {
+            "code": -32700,
+            "data": {
+              "kind": "parse"
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "recover-after-input-error",
+    "rule": "W-06",
+    "steps": [
+      {
+        "method": "ocs.describe",
+        "params": {
+          "protocols": [
+            "0.1"
+          ],
+          "requiredFeatures": [],
+          "meta": {
+            "deadline": "${deadline}"
+          }
+        },
+        "expect": {
+          "result": {
+            "protocol": "0.1",
+            "packageId": "${packageId}",
+            "packageVersion": "${packageVersion}",
+            "manifestDigest": "${manifestDigest}"
+          }
+        }
+      },
+      {
+        "method": "tool.call",
+        "params": {
+          "operation": "example.status.read",
+          "version": "1.0.0",
+          "input": {
+            "resourceId": false
+          },
+          "meta": {
+            "deadline": "${deadline}",
+            "protocol": "0.1",
+            "manifestDigest": "${manifestDigest}"
+          }
+        },
+        "expect": {
+          "error": {
+            "code": -33009,
+            "data": {
+              "kind": "input"
+            }
+          }
+        }
+      },
+      {
+        "method": "tool.call",
+        "params": {
+          "operation": "example.status.read",
+          "version": "1.0.0",
+          "input": {
+            "resourceId": "demo"
+          },
+          "meta": {
+            "deadline": "${deadline}",
+            "protocol": "0.1",
+            "manifestDigest": "${manifestDigest}"
+          }
+        },
+        "expect": {
+          "result": {
+            "data": {
+              "resourceId": "demo",
+              "state": "ready"
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "empty-trace",
+    "rule": "W-05",
+    "steps": [
+      {
+        "method": "ocs.describe",
+        "params": {
+          "protocols": [
+            "0.1"
+          ],
+          "requiredFeatures": [],
+          "meta": {
+            "deadline": "${deadline}",
+            "traceId": ""
+          }
+        },
+        "expect": {
+          "error": {
+            "code": -32602,
+            "data": {
+              "kind": "params"
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "invalid-feature-id",
+    "rule": "W-05",
+    "steps": [
+      {
+        "method": "ocs.describe",
+        "params": {
+          "protocols": [
+            "0.1"
+          ],
+          "requiredFeatures": [
+            "not-a-feature"
+          ],
+          "meta": {
+            "deadline": "${deadline}"
+          }
+        },
+        "expect": {
+          "error": {
+            "code": -32602,
+            "data": {
+              "kind": "params"
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "calendar-date",
+    "rule": "W-04",
+    "steps": [
+      {
+        "method": "ocs.describe",
+        "params": {
+          "protocols": [
+            "0.1"
+          ],
+          "requiredFeatures": [],
+          "meta": {
+            "deadline": "2030-02-30T23:59:00.000Z"
+          }
+        },
+        "expect": {
+          "error": {
+            "code": -32602,
+            "data": {
+              "kind": "params"
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "invalid-call-correlation",
+    "rule": "W-06",
+    "steps": [
+      {
+        "method": "ocs.describe",
+        "params": {
+          "protocols": [
+            "0.1"
+          ],
+          "requiredFeatures": [],
+          "meta": {
+            "deadline": "${deadline}"
+          }
+        },
+        "expect": {
+          "result": {
+            "protocol": "0.1",
+            "packageId": "${packageId}",
+            "packageVersion": "${packageVersion}",
+            "manifestDigest": "${manifestDigest}"
+          }
+        }
+      },
+      {
+        "method": "tool.call",
+        "params": {
+          "operation": "example.status.read",
+          "version": "1.0.0",
+          "input": {
+            "resourceId": "demo"
+          },
+          "meta": {
+            "deadline": "${deadline}",
+            "protocol": "0.1",
+            "manifestDigest": "${manifestDigest}",
+            "parentCallId": false
+          }
+        },
+        "expect": {
+          "error": {
+            "code": -32602,
+            "data": {
+              "kind": "params"
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "malformed-pin",
+    "rule": "W-06",
+    "steps": [
+      {
+        "method": "ocs.describe",
+        "params": {
+          "protocols": [
+            "0.1"
+          ],
+          "requiredFeatures": [],
+          "meta": {
+            "deadline": "${deadline}"
+          }
+        },
+        "expect": {
+          "result": {
+            "protocol": "0.1",
+            "packageId": "${packageId}",
+            "packageVersion": "${packageVersion}",
+            "manifestDigest": "${manifestDigest}"
+          }
+        }
+      },
+      {
+        "method": "tool.call",
+        "params": {
+          "operation": "example.status.read",
+          "version": "1.0.0",
+          "input": {
+            "resourceId": "demo"
+          },
+          "meta": {
+            "deadline": "${deadline}",
+            "protocol": "0.1",
+            "manifestDigest": "abc"
+          }
+        },
+        "expect": {
+          "error": {
+            "code": -32602,
+            "data": {
+              "kind": "params"
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "malformed-version",
+    "rule": "C-03",
+    "steps": [
+      {
+        "method": "ocs.describe",
+        "params": {
+          "protocols": [
+            "0.1"
+          ],
+          "requiredFeatures": [],
+          "meta": {
+            "deadline": "${deadline}"
+          }
+        },
+        "expect": {
+          "result": {
+            "protocol": "0.1",
+            "packageId": "${packageId}",
+            "packageVersion": "${packageVersion}",
+            "manifestDigest": "${manifestDigest}"
+          }
+        }
+      },
+      {
+        "method": "tool.call",
+        "params": {
+          "operation": "example.status.read",
+          "version": "1.0.0-01",
+          "input": {
+            "resourceId": "demo"
+          },
+          "meta": {
+            "deadline": "${deadline}",
+            "protocol": "0.1",
+            "manifestDigest": "${manifestDigest}"
+          }
+        },
+        "expect": {
+          "error": {
+            "code": -32602,
+            "data": {
+              "kind": "params"
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "renegotiation-invalidates-session",
+    "rule": "W-05",
+    "steps": [
+      {
+        "method": "ocs.describe",
+        "params": {
+          "protocols": [
+            "0.1"
+          ],
+          "requiredFeatures": [],
+          "meta": {
+            "deadline": "${deadline}"
+          }
+        },
+        "expect": {
+          "result": {
+            "protocol": "0.1",
+            "packageId": "${packageId}",
+            "packageVersion": "${packageVersion}",
+            "manifestDigest": "${manifestDigest}"
+          }
+        }
+      },
+      {
+        "method": "ocs.describe",
+        "params": {
+          "protocols": [
+            "9.0"
+          ],
+          "requiredFeatures": [],
+          "meta": {
+            "deadline": "${deadline}"
+          }
+        },
+        "expect": {
+          "error": {
+            "code": -33008,
+            "data": {
+              "kind": "incompatible"
+            }
+          }
+        }
+      },
+      {
+        "method": "tool.call",
+        "params": {
+          "operation": "example.status.read",
+          "version": "1.0.0",
+          "input": {
+            "resourceId": "demo"
+          },
+          "meta": {
+            "deadline": "${deadline}",
+            "protocol": "0.1",
+            "manifestDigest": "${manifestDigest}"
+          }
+        },
+        "expect": {
+          "error": {
+            "code": -33008,
+            "data": {
+              "kind": "incompatible"
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "unnegotiated-notification",
+    "rule": "W-02",
+    "steps": [
+      {
+        "method": "ocs.describe",
+        "params": {
+          "protocols": [
+            "0.1"
+          ],
+          "requiredFeatures": [],
+          "meta": {
+            "deadline": "${deadline}"
+          }
+        },
+        "expect": {
+          "result": {
+            "protocol": "0.1",
+            "packageId": "${packageId}",
+            "packageVersion": "${packageVersion}",
+            "manifestDigest": "${manifestDigest}"
+          }
+        }
+      },
+      {
+        "raw": "{\"jsonrpc\":\"2.0\",\"method\":\"ocs.cancel\",\"params\":{\"requestId\":\"unknown\"}}",
+        "noReply": true
+      },
+      {
+        "method": "tool.call",
+        "params": {
+          "operation": "example.status.read",
+          "version": "1.0.0",
+          "input": {
+            "resourceId": "demo"
+          },
+          "meta": {
+            "deadline": "${deadline}",
+            "protocol": "0.1",
+            "manifestDigest": "${manifestDigest}"
+          }
+        },
+        "expect": {
+          "result": {
+            "data": {
+              "resourceId": "demo",
+              "state": "ready"
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "nonportable-exponent",
+    "rule": "W-01",
+    "steps": [
+      {
+        "raw": "{\"jsonrpc\":\"2.0\",\"id\":\"q\",\"method\":\"tool.call\",\"params\":{\"input\":1e80}}",
+        "responseId": null,
+        "expect": {
+          "error": {
+            "code": -32700,
+            "data": {
+              "kind": "parse"
+            }
+          }
+        }
+      }
+    ]
+  }
+]

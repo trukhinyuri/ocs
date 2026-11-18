@@ -1,0 +1,149 @@
+{
+  "schemaRevision": "0.1.0-draft.1",
+  "profiles": [
+    {
+      "id": "ocs.stream/0.1",
+      "document": "interaction.md",
+      "controlMethods": [
+        "stream.open",
+        "ocs.credit",
+        "ocs.chunk",
+        "ocs.cancel"
+      ],
+      "domainOperations": [],
+      "records": []
+    },
+    {
+      "id": "ocs.events/0.1",
+      "document": "interaction.md",
+      "controlMethods": [],
+      "domainOperations": [
+        "events.subscribe",
+        "events.ack",
+        "events.resume"
+      ],
+      "records": [
+        "event",
+        "artifact"
+      ]
+    },
+    {
+      "id": "ocs.artifacts/0.1",
+      "document": "interaction.md",
+      "controlMethods": [],
+      "domainOperations": [
+        "artifact.read"
+      ],
+      "records": [
+        "artifact"
+      ]
+    },
+    {
+      "id": "ocs.effects/0.1",
+      "document": "effects-and-jobs.md",
+      "controlMethods": [
+        "effect.prepare",
+        "effect.commit",
+        "effect.readback"
+      ],
+      "domainOperations": [],
+      "records": [
+        "effectReceipt"
+      ]
+    },
+    {
+      "id": "ocs.jobs/0.1",
+      "document": "effects-and-jobs.md",
+      "controlMethods": [
+        "job.status",
+        "job.cancel",
+        "job.continue"
+      ],
+      "domainOperations": [],
+      "records": [
+        "job"
+      ]
+    },
+    {
+      "id": "ocs.providers/0.1",
+      "document": "providers.md",
+      "controlMethods": [],
+      "domainOperations": [
+        "provider.describe",
+        "account.list",
+        "account.connect",
+        "account.continue",
+        "account.reauthenticate",
+        "account.enable",
+        "account.signout",
+        "account.remove",
+        "limits.read",
+        "quota.reset",
+        "plans.price",
+        "model.list",
+        "model.generate",
+        "usage.read"
+      ],
+      "records": [
+        "account",
+        "quotaWindow",
+        "resetGrant",
+        "price",
+        "model",
+        "catalog",
+        "usage"
+      ]
+    },
+    {
+      "id": "ocs.agents/0.1",
+      "document": "agents.md",
+      "controlMethods": [],
+      "domainOperations": [
+        "agent.exchange"
+      ],
+      "records": [
+        "message",
+        "artifact"
+      ]
+    },
+    {
+      "id": "ocs.presentation/0.1",
+      "document": "presentation.md",
+      "controlMethods": [],
+      "domainOperations": [
+        "surface.open",
+        "surface.event"
+      ],
+      "records": [
+        "surface"
+      ]
+    },
+    {
+      "id": "ocs.cloud/0.1",
+      "document": "platforms.md",
+      "controlMethods": [],
+      "domainOperations": [
+        "resource.observe"
+      ],
+      "records": [
+        "resource"
+      ]
+    },
+    {
+      "id": "ocs.platform/0.1",
+      "document": "platforms.md",
+      "controlMethods": [],
+      "domainOperations": [],
+      "records": [
+        "platform"
+      ]
+    },
+    {
+      "id": "ocs.peers/0.1",
+      "document": "../composition.md",
+      "controlMethods": [],
+      "domainOperations": [],
+      "records": []
+    }
+  ]
+}

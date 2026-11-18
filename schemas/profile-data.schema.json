@@ -1,0 +1,1535 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:uuid:381a8b66-f9da-576c-93ec-9b2db63266db",
+  "title": "OCS profile record vocabulary",
+  "$defs": {
+    "scope": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "enum": [
+            "account",
+            "organization",
+            "pool",
+            "product",
+            "model",
+            "model-group",
+            "mode",
+            "resource",
+            "tenant"
+          ]
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "kind",
+        "id"
+      ],
+      "additionalProperties": false
+    },
+    "evidence": {
+      "type": "object",
+      "properties": {
+        "source": {
+          "type": "string",
+          "minLength": 1
+        },
+        "observedAt": {
+          "$ref": "urn:uuid:f646f495-f214-5389-8f70-75f3114ee703#/$defs/timestamp"
+        },
+        "status": {
+          "enum": [
+            "reported",
+            "verified",
+            "stale",
+            "unknown",
+            "unsupported",
+            "denied"
+          ]
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "source",
+        "observedAt",
+        "status"
+      ],
+      "additionalProperties": false
+    },
+    "money": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "$ref": "urn:uuid:f646f495-f214-5389-8f70-75f3114ee703#/$defs/decimal"
+        },
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$"
+        }
+      },
+      "required": [
+        "amount",
+        "currency"
+      ],
+      "additionalProperties": false
+    },
+    "artifact": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "mediaType": {
+          "type": "string",
+          "minLength": 1
+        },
+        "digest": {
+          "$ref": "urn:uuid:f646f495-f214-5389-8f70-75f3114ee703#/$defs/digest"
+        },
+        "revision": {
+          "type": "string",
+          "minLength": 1
+        },
+        "bytes": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "expiresAt": {
+          "$ref": "urn:uuid:f646f495-f214-5389-8f70-75f3114ee703#/$defs/timestamp"
+        },
+        "scope": {
+          "$ref": "#/$defs/scope"
+        }
+      },
+      "required": [
+        "id",
+        "mediaType",
+        "scope"
+      ],
+      "additionalProperties": false,
+      "anyOf": [
+        {
+          "required": [
+            "revision"
+          ]
+        },
+        {
+          "required": [
+            "digest"
+          ]
+        }
+      ]
+    },
+    "effectReceipt": {
+      "type": "object",
+      "properties": {
+        "operationId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "intentDigest": {
+          "$ref": "urn:uuid:f646f495-f214-5389-8f70-75f3114ee703#/$defs/digest"
+        },
+        "state": {
+          "enum": [
+            "not-applied",
+            "applied",
+            "unknown"
+          ]
+        },
+        "observedAt": {
+          "$ref": "urn:uuid:f646f495-f214-5389-8f70-75f3114ee703#/$defs/timestamp"
+        },
+        "scope": {
+          "$ref": "#/$defs/scope"
+        },
+        "evidence": {
+          "$ref": "#/$defs/evidence"
+        },
+        "refreshError": {
+          "type": "string",
+          "minLength": 1
+        },
+        "result": {
+          "$ref": "urn:uuid:831ca4af-a462-5244-afc1-718a1d9346c1#/$defs/callResult"
+        }
+      },
+      "required": [
+        "operationId",
+        "intentDigest",
+        "state",
+        "observedAt",
+        "scope"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "required": [
+              "result"
+            ]
+          },
+          "then": {
+            "properties": {
+              "state": {
+                "const": "applied"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "job": {
+      "type": "object",
+      "properties": {
+        "jobId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "state": {
+          "enum": [
+            "queued",
+            "running",
+            "waiting-input",
+            "waiting-authority",
+            "waiting-retry",
+            "succeeded",
+            "failed",
+            "cancelled"
+          ]
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "scope": {
+          "$ref": "#/$defs/scope"
+        },
+        "updatedAt": {
+          "$ref": "urn:uuid:f646f495-f214-5389-8f70-75f3114ee703#/$defs/timestamp"
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        },
+        "artifacts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/artifact"
+          }
+        },
+        "operationId": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "jobId",
+        "state",
+        "revision",
+        "scope",
+        "updatedAt"
+      ],
+      "additionalProperties": false
+    },
+    "event": {
+      "type": "object",
+      "properties": {
+        "eventId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "type": {
+          "$ref": "urn:uuid:f646f495-f214-5389-8f70-75f3114ee703#/$defs/name"
+        },
+        "source": {
+          "type": "string",
+          "minLength": 1
+        },
+        "scope": {
+          "$ref": "#/$defs/scope"
+        },
+        "observedAt": {
+          "$ref": "urn:uuid:f646f495-f214-5389-8f70-75f3114ee703#/$defs/timestamp"
+        },
+        "cursor": {
+          "type": "string",
+          "minLength": 1
+        },
+        "data": {}
+      },
+      "required": [
+        "eventId",
+        "type",
+        "source",
+        "scope",
+        "observedAt",
+        "data"
+      ],
+      "additionalProperties": false
+    },
+    "quotaWindow": {
+      "type": "object",
+      "properties": {
+        "windowId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "scope": {
+          "$ref": "#/$defs/scope"
+        },
+        "unit": {
+          "type": "string",
+          "minLength": 1
+        },
+        "period": {
+          "type": "string",
+          "minLength": 1
+        },
+        "total": {
+          "$ref": "urn:uuid:f646f495-f214-5389-8f70-75f3114ee703#/$defs/decimal"
+        },
+        "remaining": {
+          "$ref": "urn:uuid:f646f495-f214-5389-8f70-75f3114ee703#/$defs/decimal"
+        },
+        "remainingPercent": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "state": {
+          "enum": [
+            "known",
+            "unlimited",
+            "unknown",
+            "stale",
+            "unsupported"
+          ]
+        },
+        "resetAt": {
+          "$ref": "urn:uuid:f646f495-f214-5389-8f70-75f3114ee703#/$defs/timestamp"
+        },
+        "evidence": {
+          "$ref": "#/$defs/evidence"
+        },
+        "models": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "windowId",
+        "scope",
+        "unit",
+        "state",
+        "evidence"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "state": {
+                "const": "known"
+              }
+            }
+          },
+          "then": {
+            "anyOf": [
+              {
+                "required": [
+                  "remaining"
+                ]
+              },
+              {
+                "required": [
+                  "remainingPercent"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "state": {
+                "enum": [
+                  "unlimited",
+                  "unknown",
+                  "unsupported"
+                ]
+              }
+            }
+          },
+          "then": {
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "total"
+                  ]
+                },
+                {
+                  "required": [
+                    "remaining"
+                  ]
+                },
+                {
+                  "required": [
+                    "remainingPercent"
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "resetGrant": {
+      "type": "object",
+      "properties": {
+        "grantId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "scope": {
+          "$ref": "#/$defs/scope"
+        },
+        "affectedWindows": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "eligibility": {
+          "enum": [
+            "eligible",
+            "ineligible",
+            "unknown"
+          ]
+        },
+        "count": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "expiresAt": {
+          "$ref": "urn:uuid:f646f495-f214-5389-8f70-75f3114ee703#/$defs/timestamp"
+        },
+        "charge": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/money"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        },
+        "evidence": {
+          "$ref": "#/$defs/evidence"
+        },
+        "managementUrl": {
+          "type": "string",
+          "format": "uri"
+        }
+      },
+      "required": [
+        "grantId",
+        "scope",
+        "affectedWindows",
+        "eligibility",
+        "charge",
+        "evidence"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "required": [
+              "count"
+            ],
+            "properties": {
+              "count": {
+                "const": 0
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "eligibility": {
+                "enum": [
+                  "ineligible",
+                  "unknown"
+                ]
+              }
+            }
+          }
+        }
+      ]
+    },
+    "price": {
+      "type": "object",
+      "properties": {
+        "planId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "enum": [
+            "published",
+            "account-confirmed",
+            "by-contract",
+            "unknown",
+            "unpublished"
+          ]
+        },
+        "price": {
+          "$ref": "#/$defs/money"
+        },
+        "region": {
+          "type": "string",
+          "minLength": 1
+        },
+        "period": {
+          "type": "string",
+          "minLength": 1
+        },
+        "basis": {
+          "enum": [
+            "account",
+            "seat",
+            "organization",
+            "usage",
+            "action"
+          ]
+        },
+        "tax": {
+          "enum": [
+            "included",
+            "excluded",
+            "unknown"
+          ]
+        },
+        "annualTerms": {
+          "type": "string",
+          "minLength": 1
+        },
+        "evidence": {
+          "$ref": "#/$defs/evidence"
+        },
+        "termsUrl": {
+          "type": "string",
+          "format": "uri"
+        }
+      },
+      "required": [
+        "planId",
+        "status",
+        "region",
+        "basis",
+        "evidence"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "required": [
+              "status"
+            ],
+            "properties": {
+              "status": {
+                "enum": [
+                  "published",
+                  "account-confirmed"
+                ]
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "price",
+              "period"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "enum": [
+                  "unknown",
+                  "unpublished",
+                  "by-contract"
+                ]
+              }
+            }
+          },
+          "then": {
+            "not": {
+              "required": [
+                "price"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "account": {
+      "type": "object",
+      "properties": {
+        "accountId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "provider": {
+          "type": "string",
+          "minLength": 1
+        },
+        "product": {
+          "type": "string",
+          "minLength": 1
+        },
+        "route": {
+          "type": "string",
+          "minLength": 1
+        },
+        "authMethod": {
+          "type": "string",
+          "minLength": 1
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1
+        },
+        "upstreamIdentity": {
+          "type": "string",
+          "minLength": 1
+        },
+        "enabled": {
+          "type": "boolean"
+        },
+        "signedIn": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "planCandidates": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "state": {
+          "enum": [
+            "working",
+            "needs-auth",
+            "denied",
+            "exhausted",
+            "disabled",
+            "unverified",
+            "unavailable",
+            "unknown"
+          ]
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        },
+        "lastReply": {
+          "type": "object",
+          "properties": {
+            "model": {
+              "type": "string",
+              "minLength": 1
+            },
+            "mode": {
+              "type": "string",
+              "minLength": 1
+            },
+            "at": {
+              "$ref": "urn:uuid:f646f495-f214-5389-8f70-75f3114ee703#/$defs/timestamp"
+            }
+          },
+          "required": [
+            "model",
+            "at"
+          ],
+          "additionalProperties": false
+        },
+        "evidence": {
+          "$ref": "#/$defs/evidence"
+        },
+        "managementUrl": {
+          "type": "string",
+          "format": "uri"
+        }
+      },
+      "required": [
+        "accountId",
+        "provider",
+        "product",
+        "route",
+        "authMethod",
+        "label",
+        "enabled",
+        "signedIn",
+        "state",
+        "evidence"
+      ],
+      "additionalProperties": false
+    },
+    "model": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "aliases": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "kind": {
+          "enum": [
+            "chat",
+            "generation",
+            "search",
+            "embedding",
+            "rank",
+            "other"
+          ]
+        },
+        "entitled": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "adapterSupported": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "verifiedAt": {
+          "$ref": "urn:uuid:f646f495-f214-5389-8f70-75f3114ee703#/$defs/timestamp"
+        },
+        "inputModalities": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "outputModalities": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "contextLimit": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "outputLimit": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "reasoning": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "tiers": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "parameters": {
+          "$ref": "urn:uuid:f646f495-f214-5389-8f70-75f3114ee703#/$defs/schema"
+        },
+        "constraints": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "eol": {
+          "type": "object",
+          "properties": {
+            "effectiveAt": {
+              "$ref": "urn:uuid:f646f495-f214-5389-8f70-75f3114ee703#/$defs/timestamp"
+            },
+            "source": {
+              "type": "string",
+              "minLength": 1
+            },
+            "replacement": {
+              "type": "string",
+              "minLength": 1
+            },
+            "noticeId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "announcedAt": {
+              "$ref": "urn:uuid:f646f495-f214-5389-8f70-75f3114ee703#/$defs/timestamp"
+            }
+          },
+          "required": [
+            "effectiveAt",
+            "source",
+            "announcedAt"
+          ],
+          "additionalProperties": false
+        },
+        "toolSupport": {
+          "enum": [
+            "yes",
+            "no",
+            "unknown"
+          ]
+        },
+        "officiallyListed": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "unrecognized": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "verifiedOptions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "parameters": {
+                "type": "object"
+              },
+              "at": {
+                "$ref": "urn:uuid:f646f495-f214-5389-8f70-75f3114ee703#/$defs/timestamp"
+              },
+              "evidence": {
+                "$ref": "#/$defs/evidence"
+              }
+            },
+            "required": [
+              "parameters",
+              "at",
+              "evidence"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "entitled",
+        "adapterSupported"
+      ],
+      "additionalProperties": false
+    },
+    "catalog": {
+      "type": "object",
+      "properties": {
+        "provider": {
+          "type": "string",
+          "minLength": 1
+        },
+        "product": {
+          "type": "string",
+          "minLength": 1
+        },
+        "scope": {
+          "$ref": "#/$defs/scope"
+        },
+        "route": {
+          "type": "string",
+          "minLength": 1
+        },
+        "revision": {
+          "type": "string",
+          "minLength": 1
+        },
+        "complete": {
+          "type": "boolean"
+        },
+        "models": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/model"
+          }
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        },
+        "evidence": {
+          "$ref": "#/$defs/evidence"
+        },
+        "nextPageToken": {
+          "type": "string",
+          "minLength": 1
+        },
+        "authMethod": {
+          "type": "string",
+          "minLength": 1
+        },
+        "planId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "region": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "provider",
+        "product",
+        "scope",
+        "route",
+        "revision",
+        "complete",
+        "models",
+        "evidence"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "required": [
+              "complete"
+            ],
+            "properties": {
+              "complete": {
+                "enum": [
+                  false
+                ]
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "reason"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "complete": {
+                "const": true
+              }
+            }
+          },
+          "then": {
+            "not": {
+              "required": [
+                "nextPageToken"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "part": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "const": "text"
+            },
+            "text": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "type",
+            "text"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "const": "data"
+            },
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "data": {}
+          },
+          "required": [
+            "type",
+            "schema",
+            "data"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "const": "artifact"
+            },
+            "artifact": {
+              "$ref": "#/$defs/artifact"
+            }
+          },
+          "required": [
+            "type",
+            "artifact"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "message": {
+      "type": "object",
+      "properties": {
+        "messageId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "replyTo": {
+          "type": "string",
+          "minLength": 1
+        },
+        "contextId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "taskId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "parts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/part"
+          },
+          "minItems": 1
+        },
+        "senderLabel": {
+          "type": "string",
+          "minLength": 1
+        },
+        "purpose": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "enum": [
+            "request",
+            "answer",
+            "clarification",
+            "partial",
+            "authorization-required"
+          ]
+        },
+        "budget": {
+          "$ref": "#/$defs/budget"
+        },
+        "accept": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "messageId",
+        "parts"
+      ],
+      "additionalProperties": false
+    },
+    "surface": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "urn:uuid:f646f495-f214-5389-8f70-75f3114ee703#/$defs/name"
+        },
+        "slot": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "enum": [
+            "declarative",
+            "web",
+            "native",
+            "terminal",
+            "voice",
+            "device",
+            "link"
+          ]
+        },
+        "operations": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "requiredFeatures": {
+          "type": "array",
+          "items": {
+            "$ref": "urn:uuid:f646f495-f214-5389-8f70-75f3114ee703#/$defs/feature"
+          },
+          "uniqueItems": true
+        },
+        "origin": {
+          "type": "string",
+          "minLength": 1
+        },
+        "integrity": {
+          "$ref": "urn:uuid:f646f495-f214-5389-8f70-75f3114ee703#/$defs/digest"
+        },
+        "entry": {
+          "type": "string",
+          "minLength": 1
+        },
+        "allowedEvents": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "contextFields": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "view": {
+          "$ref": "#/$defs/view"
+        }
+      },
+      "required": [
+        "id",
+        "slot",
+        "kind",
+        "operations"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "required": [
+              "kind"
+            ],
+            "properties": {
+              "kind": {
+                "enum": [
+                  "web"
+                ]
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "origin",
+              "integrity",
+              "allowedEvents"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "declarative"
+              }
+            }
+          },
+          "then": {
+            "anyOf": [
+              {
+                "required": [
+                  "view"
+                ]
+              },
+              {
+                "required": [
+                  "entry"
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "resource": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "owner": {
+          "type": "string",
+          "minLength": 1
+        },
+        "revision": {
+          "type": "string",
+          "minLength": 1
+        },
+        "state": {
+          "enum": [
+            "pending",
+            "ready",
+            "degraded",
+            "blocked",
+            "failed",
+            "deleting",
+            "deleted"
+          ]
+        },
+        "observedAt": {
+          "$ref": "urn:uuid:f646f495-f214-5389-8f70-75f3114ee703#/$defs/timestamp"
+        },
+        "conditions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "minLength": 1
+              },
+              "status": {
+                "enum": [
+                  "true",
+                  "false",
+                  "unknown"
+                ]
+              },
+              "reason": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "type",
+              "status",
+              "reason"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "operationId": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "id",
+        "owner",
+        "revision",
+        "state",
+        "observedAt",
+        "conditions"
+      ],
+      "additionalProperties": false
+    },
+    "usage": {
+      "type": "object",
+      "properties": {
+        "scope": {
+          "$ref": "#/$defs/scope"
+        },
+        "from": {
+          "$ref": "urn:uuid:f646f495-f214-5389-8f70-75f3114ee703#/$defs/timestamp"
+        },
+        "to": {
+          "$ref": "urn:uuid:f646f495-f214-5389-8f70-75f3114ee703#/$defs/timestamp"
+        },
+        "workRequests": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "successful": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "activeDays": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "probeRequests": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "fallbackUses": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "lastUsedAt": {
+          "$ref": "urn:uuid:f646f495-f214-5389-8f70-75f3114ee703#/$defs/timestamp"
+        },
+        "attribution": {
+          "enum": [
+            "account",
+            "unattributed",
+            "partial"
+          ]
+        },
+        "evidence": {
+          "$ref": "#/$defs/evidence"
+        },
+        "spend": {
+          "$ref": "#/$defs/money"
+        },
+        "retainedUntil": {
+          "$ref": "urn:uuid:f646f495-f214-5389-8f70-75f3114ee703#/$defs/timestamp"
+        }
+      },
+      "required": [
+        "scope",
+        "from",
+        "to",
+        "attribution",
+        "evidence"
+      ],
+      "additionalProperties": false
+    },
+    "budget": {
+      "type": "object",
+      "properties": {
+        "remainingTurns": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "maxFanOut": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "maxConcurrency": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "remainingBytes": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "remainingCost": {
+          "$ref": "#/$defs/money"
+        }
+      },
+      "minProperties": 1,
+      "additionalProperties": false
+    },
+    "platform": {
+      "type": "object",
+      "properties": {
+        "target": {
+          "type": "string",
+          "minLength": 1
+        },
+        "interface": {
+          "type": "string",
+          "minLength": 1
+        },
+        "revision": {
+          "type": "string",
+          "minLength": 1
+        },
+        "placement": {
+          "enum": [
+            "in-process",
+            "isolated-process",
+            "device",
+            "kernel",
+            "remote"
+          ]
+        },
+        "authority": {
+          "type": "string",
+          "minLength": 1
+        },
+        "isolation": {
+          "type": "string",
+          "minLength": 1
+        },
+        "handleLifetime": {
+          "type": "string",
+          "minLength": 1
+        },
+        "recovery": {
+          "type": "string",
+          "minLength": 1
+        },
+        "timing": {
+          "enum": [
+            "best-effort",
+            "soft-deadline",
+            "hard-deadline"
+          ]
+        },
+        "worstCaseUs": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "qualification": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "target",
+        "interface",
+        "revision",
+        "placement",
+        "authority",
+        "isolation",
+        "handleLifetime",
+        "recovery",
+        "timing"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "timing": {
+                "const": "hard-deadline"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "worstCaseUs",
+              "qualification"
+            ]
+          }
+        }
+      ]
+    },
+    "view": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "dataSchema": {
+          "$ref": "urn:uuid:f646f495-f214-5389-8f70-75f3114ee703#/$defs/schema"
+        },
+        "values": {
+          "type": "object"
+        },
+        "actions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "operation": {
+                "$ref": "urn:uuid:f646f495-f214-5389-8f70-75f3114ee703#/$defs/name"
+              },
+              "version": {
+                "$ref": "urn:uuid:f646f495-f214-5389-8f70-75f3114ee703#/$defs/version"
+              },
+              "label": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "operation",
+              "version",
+              "label"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "title",
+        "dataSchema",
+        "values",
+        "actions"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

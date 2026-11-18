@@ -1,0 +1,16 @@
+{
+  "format": "ocs.package/0.1",
+  "id": "org.example.status-guide",
+  "version": "0.1.0",
+  "runtime": {
+    "binding": "data",
+    "entry": "workflow.md"
+  },
+  "exports": [],
+  "imports": [
+    {
+      "id": "example.status.read",
+      "version": "1.0.0"
+    }
+  ]
+}

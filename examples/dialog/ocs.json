@@ -1,0 +1,27 @@
+{
+  "format": "ocs.package/0.1",
+  "id": "org.example.fact-agent",
+  "version": "0.1.0",
+  "runtime": {
+    "binding": "stdio",
+    "entry": "executor.py",
+    "engine": "python3"
+  },
+  "exports": [
+    {
+      "id": "agent.exchange",
+      "version": "1.0.0",
+      "effect": "read",
+      "inputSchema": {
+        "$ref": "urn:uuid:381a8b66-f9da-576c-93ec-9b2db63266db#/$defs/message"
+      },
+      "outputSchema": {
+        "$ref": "urn:uuid:0aca3339-e509-59db-84d6-a730ff76b07d#/$defs/agentReply"
+      },
+      "summary": "Exchange a message with the owner of an ephemeral synthetic fact."
+    }
+  ],
+  "features": [
+    "ocs.agents/0.1"
+  ]
+}

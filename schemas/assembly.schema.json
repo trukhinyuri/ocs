@@ -1,0 +1,101 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:uuid:6ff60971-f088-5561-bded-8158b8f35287",
+  "title": "OCS assembly",
+  "type": "object",
+  "properties": {
+    "format": {
+      "const": "ocs.assembly/0.1"
+    },
+    "instances": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "instance": {
+            "type": "string",
+            "minLength": 1
+          },
+          "packageId": {
+            "$ref": "urn:uuid:f646f495-f214-5389-8f70-75f3114ee703#/$defs/name"
+          },
+          "packageVersion": {
+            "$ref": "urn:uuid:f646f495-f214-5389-8f70-75f3114ee703#/$defs/version"
+          },
+          "manifestDigest": {
+            "$ref": "urn:uuid:f646f495-f214-5389-8f70-75f3114ee703#/$defs/digest"
+          },
+          "domain": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "instance",
+          "packageId",
+          "packageVersion",
+          "manifestDigest",
+          "domain"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 1
+    },
+    "edges": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "caller": {
+            "type": "string",
+            "minLength": 1
+          },
+          "receiver": {
+            "type": "string",
+            "minLength": 1
+          },
+          "operation": {
+            "$ref": "urn:uuid:f646f495-f214-5389-8f70-75f3114ee703#/$defs/name"
+          },
+          "version": {
+            "$ref": "urn:uuid:f646f495-f214-5389-8f70-75f3114ee703#/$defs/version"
+          },
+          "scope": {
+            "type": "string",
+            "minLength": 1
+          },
+          "grantedEffects": {
+            "type": "array",
+            "items": {
+              "enum": [
+                "read",
+                "local-write",
+                "external-write"
+              ]
+            },
+            "minItems": 1,
+            "uniqueItems": true
+          },
+          "optional": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "caller",
+          "receiver",
+          "operation",
+          "version",
+          "scope",
+          "grantedEffects"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "format",
+    "instances",
+    "edges"
+  ],
+  "additionalProperties": false
+}

@@ -1,0 +1,54 @@
+{
+  "format": "ocs.package/0.1",
+  "id": "org.example.status",
+  "version": "0.1.0",
+  "runtime": {
+    "binding": "stdio",
+    "entry": "executor.py",
+    "engine": "python3"
+  },
+  "exports": [
+    {
+      "id": "example.status.read",
+      "version": "1.0.0",
+      "effect": "read",
+      "summary": "Read the condition of the demonstration resource.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "resourceId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80
+          }
+        },
+        "required": [
+          "resourceId"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "resourceId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "state": {
+            "enum": [
+              "ready",
+              "degraded"
+            ]
+          }
+        },
+        "required": [
+          "resourceId",
+          "state"
+        ],
+        "additionalProperties": false
+      }
+    }
+  ],
+  "needs": [],
+  "features": []
+}

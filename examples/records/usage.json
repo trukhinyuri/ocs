@@ -1,0 +1,19 @@
+{
+  "scope": {
+    "kind": "account",
+    "id": "fixture-account"
+  },
+  "from": "2030-01-01T00:00:00.000Z",
+  "to": "2030-01-08T00:00:00.000Z",
+  "attribution": "account",
+  "workRequests": 9,
+  "successful": 8,
+  "activeDays": 2,
+  "probeRequests": 3,
+  "fallbackUses": 1,
+  "evidence": {
+    "source": "fixture-ledger",
+    "observedAt": "2030-01-01T00:00:00.000Z",
+    "status": "reported"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "eventId": "evt-2",
+  "source": "fixture",
+  "type": "resource.changed",
+  "scope": {
+    "kind": "account",
+    "id": "fixture-account"
+  },
+  "observedAt": "2030-01-01T00:00:00.000Z",
+  "cursor": "rev-2",
+  "data": {
+    "revision": "2"
+  }
+}

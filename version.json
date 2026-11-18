@@ -1,0 +1,40 @@
+{
+  "name": "Open Composition Standard",
+  "edition": "0.1.0-draft.1",
+  "stage": "working-draft",
+  "wire": "0.1",
+  "license": "Apache-2.0",
+  "normative": [
+    "spec/core.md",
+    "spec/wire.md",
+    "spec/composition.md",
+    "spec/conformance.md",
+    "spec/profiles/README.md",
+    "spec/profiles/agents.md",
+    "spec/profiles/effects-and-jobs.md",
+    "spec/profiles/interaction.md",
+    "spec/profiles/interfaces.md",
+    "spec/profiles/platforms.md",
+    "spec/profiles/presentation.md",
+    "spec/profiles/providers.md",
+    "spec/profiles/index.json",
+    "spec/profiles/operations.json",
+    "schemas/assembly.schema.json",
+    "schemas/common.schema.json",
+    "schemas/manifest.schema.json",
+    "schemas/profile-data.schema.json",
+    "schemas/profile-wire.schema.json",
+    "schemas/report.schema.json",
+    "schemas/wire.schema.json"
+  ],
+  "schemaDialect": "https://json-schema.org/draft/2020-12/schema",
+  "schemaResources": {
+    "schemas/assembly.schema.json": "urn:uuid:6ff60971-f088-5561-bded-8158b8f35287",
+    "schemas/common.schema.json": "urn:uuid:f646f495-f214-5389-8f70-75f3114ee703",
+    "schemas/manifest.schema.json": "urn:uuid:cc97868a-676e-5577-9464-f0a7b051f541",
+    "schemas/profile-data.schema.json": "urn:uuid:381a8b66-f9da-576c-93ec-9b2db63266db",
+    "schemas/profile-wire.schema.json": "urn:uuid:0aca3339-e509-59db-84d6-a730ff76b07d",
+    "schemas/report.schema.json": "urn:uuid:2469d359-fc4d-5d46-a619-371eabb038a3",
+    "schemas/wire.schema.json": "urn:uuid:831ca4af-a462-5244-afc1-718a1d9346c1"
+  }
+}

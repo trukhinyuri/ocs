@@ -1,0 +1,11 @@
+{
+  "target": "example-os/test-cpu",
+  "interface": "sample-ring",
+  "revision": "abi-3",
+  "placement": "device",
+  "authority": "device-owner",
+  "isolation": "bounded simulator memory",
+  "handleLifetime": "one admitted session",
+  "recovery": "drain handles, reload the saved configuration",
+  "timing": "soft-deadline"
+}

@@ -1,0 +1,17 @@
+{
+  "windowId": "model-week",
+  "scope": {
+    "kind": "model",
+    "id": "fixture-fast"
+  },
+  "unit": "requests",
+  "period": "P7D",
+  "total": "100",
+  "remaining": "0",
+  "state": "known",
+  "evidence": {
+    "source": "fixture-ledger",
+    "observedAt": "2030-01-01T00:00:00.000Z",
+    "status": "reported"
+  }
+}

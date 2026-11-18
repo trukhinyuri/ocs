@@ -1,0 +1,266 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:uuid:cc97868a-676e-5577-9464-f0a7b051f541",
+  "title": "OCS manifest",
+  "type": "object",
+  "properties": {
+    "format": {
+      "const": "ocs.package/0.1"
+    },
+    "id": {
+      "$ref": "urn:uuid:f646f495-f214-5389-8f70-75f3114ee703#/$defs/name"
+    },
+    "version": {
+      "$ref": "urn:uuid:f646f495-f214-5389-8f70-75f3114ee703#/$defs/version"
+    },
+    "runtime": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "binding": {
+              "const": "stdio"
+            },
+            "entry": {
+              "$ref": "urn:uuid:f646f495-f214-5389-8f70-75f3114ee703#/$defs/entry"
+            },
+            "engine": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "binding",
+            "entry"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "binding": {
+              "const": "https"
+            }
+          },
+          "required": [
+            "binding"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "binding": {
+              "const": "data"
+            },
+            "entry": {
+              "$ref": "urn:uuid:f646f495-f214-5389-8f70-75f3114ee703#/$defs/entry"
+            }
+          },
+          "required": [
+            "binding",
+            "entry"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "binding": {
+              "const": "platform"
+            },
+            "adapter": {
+              "$ref": "urn:uuid:f646f495-f214-5389-8f70-75f3114ee703#/$defs/name"
+            }
+          },
+          "required": [
+            "binding",
+            "adapter"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "exports": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "urn:uuid:f646f495-f214-5389-8f70-75f3114ee703#/$defs/name"
+          },
+          "version": {
+            "$ref": "urn:uuid:f646f495-f214-5389-8f70-75f3114ee703#/$defs/version"
+          },
+          "effect": {
+            "enum": [
+              "read",
+              "local-write",
+              "external-write"
+            ]
+          },
+          "flags": {
+            "type": "array",
+            "items": {
+              "enum": [
+                "monetary",
+                "irreversible",
+                "destructive"
+              ]
+            },
+            "uniqueItems": true
+          },
+          "inputSchema": {
+            "$ref": "urn:uuid:f646f495-f214-5389-8f70-75f3114ee703#/$defs/schema"
+          },
+          "outputSchema": {
+            "$ref": "urn:uuid:f646f495-f214-5389-8f70-75f3114ee703#/$defs/schema"
+          },
+          "summary": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "id",
+          "version",
+          "effect",
+          "inputSchema",
+          "outputSchema"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "imports": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "urn:uuid:f646f495-f214-5389-8f70-75f3114ee703#/$defs/name"
+          },
+          "version": {
+            "$ref": "urn:uuid:f646f495-f214-5389-8f70-75f3114ee703#/$defs/version"
+          },
+          "optional": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "version"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "features": {
+      "type": "array",
+      "items": {
+        "$ref": "urn:uuid:f646f495-f214-5389-8f70-75f3114ee703#/$defs/feature"
+      },
+      "uniqueItems": true
+    },
+    "requiresFeatures": {
+      "type": "array",
+      "items": {
+        "$ref": "urn:uuid:f646f495-f214-5389-8f70-75f3114ee703#/$defs/feature"
+      },
+      "uniqueItems": true
+    },
+    "needs": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "extensions": {
+      "type": "object",
+      "propertyNames": {
+        "$ref": "urn:uuid:f646f495-f214-5389-8f70-75f3114ee703#/$defs/name"
+      },
+      "properties": {
+        "org.ocs.surfaces": {
+          "type": "array",
+          "items": {
+            "$ref": "urn:uuid:381a8b66-f9da-576c-93ec-9b2db63266db#/$defs/surface"
+          },
+          "uniqueItems": true
+        },
+        "org.ocs.platform": {
+          "$ref": "urn:uuid:381a8b66-f9da-576c-93ec-9b2db63266db#/$defs/platform"
+        },
+        "org.ocs.controls": {
+          "type": "array",
+          "items": {
+            "$ref": "urn:uuid:f646f495-f214-5389-8f70-75f3114ee703#/$defs/name"
+          },
+          "uniqueItems": true
+        }
+      }
+    }
+  },
+  "required": [
+    "format",
+    "id",
+    "version",
+    "runtime",
+    "exports"
+  ],
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "runtime": {
+            "properties": {
+              "binding": {
+                "const": "data"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "exports": {
+            "maxItems": 0
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "exports": {
+            "minItems": 1
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "runtime": {
+            "properties": {
+              "binding": {
+                "const": "platform"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "extensions"
+        ],
+        "properties": {
+          "extensions": {
+            "required": [
+              "org.ocs.platform"
+            ]
+          }
+        }
+      }
+    }
+  ]
+}

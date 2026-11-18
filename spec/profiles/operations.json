@@ -1,0 +1,315 @@
+{
+  "edition": "0.1.0-draft.1",
+  "operations": [
+    {
+      "profile": "ocs.stream/0.1",
+      "method": "stream.open",
+      "channel": "control",
+      "input": "urn:uuid:0aca3339-e509-59db-84d6-a730ff76b07d#/$defs/streamParams",
+      "output": "urn:uuid:831ca4af-a462-5244-afc1-718a1d9346c1#/$defs/callResult",
+      "condition": "baseline",
+      "policy": "underlying export grant"
+    },
+    {
+      "profile": "ocs.stream/0.1",
+      "method": "ocs.chunk",
+      "channel": "notification",
+      "input": "urn:uuid:0aca3339-e509-59db-84d6-a730ff76b07d#/$defs/chunkParams",
+      "output": null,
+      "condition": "baseline",
+      "policy": "active request and remaining credit"
+    },
+    {
+      "profile": "ocs.stream/0.1",
+      "method": "ocs.credit",
+      "channel": "notification",
+      "input": "urn:uuid:0aca3339-e509-59db-84d6-a730ff76b07d#/$defs/creditParams",
+      "output": null,
+      "condition": "baseline",
+      "policy": "same caller and active stream"
+    },
+    {
+      "profile": "ocs.stream/0.1",
+      "method": "ocs.cancel",
+      "channel": "notification",
+      "input": "urn:uuid:0aca3339-e509-59db-84d6-a730ff76b07d#/$defs/cancelParams",
+      "output": null,
+      "condition": "baseline",
+      "policy": "same caller and active stream"
+    },
+    {
+      "profile": "ocs.artifacts/0.1",
+      "method": "artifact.read",
+      "channel": "export",
+      "version": "1.0.0",
+      "input": "urn:uuid:0aca3339-e509-59db-84d6-a730ff76b07d#/$defs/artifactRead",
+      "output": "urn:uuid:0aca3339-e509-59db-84d6-a730ff76b07d#/$defs/artifactPage",
+      "condition": "baseline",
+      "policy": "authenticated recipient, purpose, artifact scope, lifetime and pinned revision"
+    },
+    {
+      "profile": "ocs.effects/0.1",
+      "method": "effect.prepare",
+      "channel": "control",
+      "input": "urn:uuid:0aca3339-e509-59db-84d6-a730ff76b07d#/$defs/prepareParams",
+      "output": "urn:uuid:0aca3339-e509-59db-84d6-a730ff76b07d#/$defs/proposal",
+      "condition": "baseline",
+      "policy": "target grant; no mutation"
+    },
+    {
+      "profile": "ocs.effects/0.1",
+      "method": "effect.commit",
+      "channel": "control",
+      "input": "urn:uuid:0aca3339-e509-59db-84d6-a730ff76b07d#/$defs/commitParams",
+      "output": "urn:uuid:381a8b66-f9da-576c-93ec-9b2db63266db#/$defs/effectReceipt",
+      "condition": "baseline",
+      "policy": "trusted approval and fresh target grant"
+    },
+    {
+      "profile": "ocs.effects/0.1",
+      "method": "effect.readback",
+      "channel": "control",
+      "input": "urn:uuid:0aca3339-e509-59db-84d6-a730ff76b07d#/$defs/opControl",
+      "output": "urn:uuid:381a8b66-f9da-576c-93ec-9b2db63266db#/$defs/effectReceipt",
+      "condition": "baseline",
+      "policy": "owner read grant"
+    },
+    {
+      "profile": "ocs.jobs/0.1",
+      "method": "job.status",
+      "channel": "control",
+      "input": "urn:uuid:0aca3339-e509-59db-84d6-a730ff76b07d#/$defs/jobControl",
+      "output": "urn:uuid:381a8b66-f9da-576c-93ec-9b2db63266db#/$defs/job",
+      "condition": "baseline",
+      "policy": "owner read grant"
+    },
+    {
+      "profile": "ocs.jobs/0.1",
+      "method": "job.cancel",
+      "channel": "control",
+      "input": "urn:uuid:0aca3339-e509-59db-84d6-a730ff76b07d#/$defs/jobControl",
+      "output": "urn:uuid:381a8b66-f9da-576c-93ec-9b2db63266db#/$defs/job",
+      "condition": "when cancellable",
+      "policy": "owner control grant"
+    },
+    {
+      "profile": "ocs.jobs/0.1",
+      "method": "job.continue",
+      "channel": "control",
+      "input": "urn:uuid:0aca3339-e509-59db-84d6-a730ff76b07d#/$defs/continueParams",
+      "output": "urn:uuid:381a8b66-f9da-576c-93ec-9b2db63266db#/$defs/job",
+      "condition": "when resumable",
+      "policy": "owner control grant and expected revision"
+    },
+    {
+      "profile": "ocs.events/0.1",
+      "method": "events.subscribe",
+      "channel": "export",
+      "input": "urn:uuid:0aca3339-e509-59db-84d6-a730ff76b07d#/$defs/eventSubscribe",
+      "output": "urn:uuid:0aca3339-e509-59db-84d6-a730ff76b07d#/$defs/subscription",
+      "condition": "baseline",
+      "policy": "source read and subscriber scope",
+      "version": "1.0.0"
+    },
+    {
+      "profile": "ocs.events/0.1",
+      "method": "events.ack",
+      "channel": "export",
+      "input": "urn:uuid:0aca3339-e509-59db-84d6-a730ff76b07d#/$defs/eventPosition",
+      "output": "urn:uuid:0aca3339-e509-59db-84d6-a730ff76b07d#/$defs/ack",
+      "condition": "when durable",
+      "policy": "subscription owner",
+      "version": "1.0.0"
+    },
+    {
+      "profile": "ocs.events/0.1",
+      "method": "events.resume",
+      "channel": "export",
+      "input": "urn:uuid:0aca3339-e509-59db-84d6-a730ff76b07d#/$defs/eventPosition",
+      "output": "urn:uuid:0aca3339-e509-59db-84d6-a730ff76b07d#/$defs/eventPage",
+      "condition": "when durable",
+      "policy": "subscription owner",
+      "version": "1.0.0"
+    },
+    {
+      "profile": "ocs.providers/0.1",
+      "method": "provider.describe",
+      "channel": "export",
+      "input": "urn:uuid:0aca3339-e509-59db-84d6-a730ff76b07d#/$defs/none",
+      "output": "urn:uuid:0aca3339-e509-59db-84d6-a730ff76b07d#/$defs/providerInfo",
+      "condition": "baseline",
+      "policy": "catalog read",
+      "version": "1.0.0"
+    },
+    {
+      "profile": "ocs.providers/0.1",
+      "method": "account.list",
+      "channel": "export",
+      "input": "urn:uuid:0aca3339-e509-59db-84d6-a730ff76b07d#/$defs/accountListInput",
+      "output": "urn:uuid:0aca3339-e509-59db-84d6-a730ff76b07d#/$defs/accountPage",
+      "condition": "when owning account inventory",
+      "policy": "current subject, provider and product read scope",
+      "version": "1.0.0"
+    },
+    {
+      "profile": "ocs.providers/0.1",
+      "method": "account.connect",
+      "channel": "export",
+      "input": "urn:uuid:0aca3339-e509-59db-84d6-a730ff76b07d#/$defs/connectInput",
+      "output": "urn:uuid:0aca3339-e509-59db-84d6-a730ff76b07d#/$defs/authStep",
+      "condition": "when connectable",
+      "policy": "explicit new-account intent",
+      "version": "1.0.0"
+    },
+    {
+      "profile": "ocs.providers/0.1",
+      "method": "account.reauthenticate",
+      "channel": "export",
+      "input": "urn:uuid:0aca3339-e509-59db-84d6-a730ff76b07d#/$defs/accountKey",
+      "output": "urn:uuid:0aca3339-e509-59db-84d6-a730ff76b07d#/$defs/authStep",
+      "condition": "when supported",
+      "policy": "exact account owner",
+      "version": "1.0.0"
+    },
+    {
+      "profile": "ocs.providers/0.1",
+      "method": "account.continue",
+      "channel": "export",
+      "input": "urn:uuid:0aca3339-e509-59db-84d6-a730ff76b07d#/$defs/authContinue",
+      "output": "urn:uuid:0aca3339-e509-59db-84d6-a730ff76b07d#/$defs/authStep",
+      "condition": "when sign-in is multi-step",
+      "policy": "bound flow and subject",
+      "version": "1.0.0"
+    },
+    {
+      "profile": "ocs.providers/0.1",
+      "method": "account.enable",
+      "channel": "export",
+      "input": "urn:uuid:0aca3339-e509-59db-84d6-a730ff76b07d#/$defs/enableInput",
+      "output": "urn:uuid:381a8b66-f9da-576c-93ec-9b2db63266db#/$defs/account",
+      "condition": "when supported",
+      "policy": "local routing grant",
+      "version": "1.0.0"
+    },
+    {
+      "profile": "ocs.providers/0.1",
+      "method": "account.signout",
+      "channel": "export",
+      "input": "urn:uuid:0aca3339-e509-59db-84d6-a730ff76b07d#/$defs/accountKey",
+      "output": "urn:uuid:0aca3339-e509-59db-84d6-a730ff76b07d#/$defs/ack",
+      "condition": "when supported",
+      "policy": "exact account owner and confirmation as applicable",
+      "version": "1.0.0"
+    },
+    {
+      "profile": "ocs.providers/0.1",
+      "method": "account.remove",
+      "channel": "export",
+      "input": "urn:uuid:0aca3339-e509-59db-84d6-a730ff76b07d#/$defs/accountKey",
+      "output": "urn:uuid:0aca3339-e509-59db-84d6-a730ff76b07d#/$defs/ack",
+      "condition": "when supported",
+      "policy": "exact account owner and deletion approval",
+      "version": "1.0.0"
+    },
+    {
+      "profile": "ocs.providers/0.1",
+      "method": "limits.read",
+      "channel": "export",
+      "input": "urn:uuid:0aca3339-e509-59db-84d6-a730ff76b07d#/$defs/accountKey",
+      "output": "urn:uuid:0aca3339-e509-59db-84d6-a730ff76b07d#/$defs/limits",
+      "condition": "when measured",
+      "policy": "exact account read",
+      "version": "1.0.0"
+    },
+    {
+      "profile": "ocs.providers/0.1",
+      "method": "quota.reset",
+      "channel": "export",
+      "input": "urn:uuid:0aca3339-e509-59db-84d6-a730ff76b07d#/$defs/effectTarget",
+      "output": "urn:uuid:381a8b66-f9da-576c-93ec-9b2db63266db#/$defs/effectReceipt",
+      "condition": "when consumable grant exists",
+      "policy": "effects profile, exact account and grant",
+      "version": "1.0.0"
+    },
+    {
+      "profile": "ocs.providers/0.1",
+      "method": "plans.price",
+      "channel": "export",
+      "input": "urn:uuid:0aca3339-e509-59db-84d6-a730ff76b07d#/$defs/pricesInput",
+      "output": "urn:uuid:0aca3339-e509-59db-84d6-a730ff76b07d#/$defs/prices",
+      "condition": "when reported",
+      "policy": "terms read",
+      "version": "1.0.0"
+    },
+    {
+      "profile": "ocs.providers/0.1",
+      "method": "model.list",
+      "channel": "export",
+      "input": "urn:uuid:0aca3339-e509-59db-84d6-a730ff76b07d#/$defs/catalogInput",
+      "output": "urn:uuid:381a8b66-f9da-576c-93ec-9b2db63266db#/$defs/catalog",
+      "condition": "when discoverable",
+      "policy": "exact account read",
+      "version": "1.0.0"
+    },
+    {
+      "profile": "ocs.providers/0.1",
+      "method": "model.generate",
+      "channel": "export",
+      "input": "urn:uuid:0aca3339-e509-59db-84d6-a730ff76b07d#/$defs/modelInput",
+      "output": "urn:uuid:0aca3339-e509-59db-84d6-a730ff76b07d#/$defs/modelOutput",
+      "condition": "when generative",
+      "policy": "exact route, account, inference budget",
+      "version": "1.0.0"
+    },
+    {
+      "profile": "ocs.providers/0.1",
+      "method": "usage.read",
+      "channel": "export",
+      "input": "urn:uuid:0aca3339-e509-59db-84d6-a730ff76b07d#/$defs/usageInput",
+      "output": "urn:uuid:381a8b66-f9da-576c-93ec-9b2db63266db#/$defs/usage",
+      "condition": "when attributed",
+      "policy": "scoped usage read",
+      "version": "1.0.0"
+    },
+    {
+      "profile": "ocs.agents/0.1",
+      "method": "agent.exchange",
+      "channel": "export",
+      "input": "urn:uuid:381a8b66-f9da-576c-93ec-9b2db63266db#/$defs/message",
+      "output": "urn:uuid:0aca3339-e509-59db-84d6-a730ff76b07d#/$defs/agentReply",
+      "condition": "baseline",
+      "policy": "selected peer, scoped content and budget",
+      "version": "1.0.0"
+    },
+    {
+      "profile": "ocs.presentation/0.1",
+      "method": "surface.open",
+      "channel": "export",
+      "input": "urn:uuid:0aca3339-e509-59db-84d6-a730ff76b07d#/$defs/surfaceOpen",
+      "output": "urn:uuid:0aca3339-e509-59db-84d6-a730ff76b07d#/$defs/presented",
+      "condition": "baseline",
+      "policy": "admitted surface and context",
+      "version": "1.0.0"
+    },
+    {
+      "profile": "ocs.presentation/0.1",
+      "method": "surface.event",
+      "channel": "export",
+      "input": "urn:uuid:0aca3339-e509-59db-84d6-a730ff76b07d#/$defs/surfaceEvent",
+      "output": "urn:uuid:0aca3339-e509-59db-84d6-a730ff76b07d#/$defs/surfaceResult",
+      "condition": "when interactive",
+      "policy": "current generation plus underlying operation grant",
+      "version": "1.0.0"
+    },
+    {
+      "profile": "ocs.cloud/0.1",
+      "method": "resource.observe",
+      "channel": "export",
+      "input": "urn:uuid:0aca3339-e509-59db-84d6-a730ff76b07d#/$defs/resourceInput",
+      "output": "urn:uuid:381a8b66-f9da-576c-93ec-9b2db63266db#/$defs/resource",
+      "condition": "baseline",
+      "policy": "resource/tenant read",
+      "version": "1.0.0"
+    }
+  ]
+}

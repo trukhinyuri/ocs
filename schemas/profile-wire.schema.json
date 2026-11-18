@@ -1,0 +1,1337 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:uuid:0aca3339-e509-59db-84d6-a730ff76b07d",
+  "title": "OCS optional operation signature definitions",
+  "$defs": {
+    "callMeta": {
+      "type": "object",
+      "properties": {
+        "protocol": {
+          "const": "0.1"
+        },
+        "manifestDigest": {
+          "$ref": "urn:uuid:f646f495-f214-5389-8f70-75f3114ee703#/$defs/digest"
+        },
+        "deadline": {
+          "$ref": "urn:uuid:f646f495-f214-5389-8f70-75f3114ee703#/$defs/timestamp"
+        },
+        "traceId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "parentCallId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "idempotencyKey": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "protocol",
+        "manifestDigest",
+        "deadline"
+      ],
+      "additionalProperties": false
+    },
+    "scoped": {
+      "type": "object",
+      "properties": {
+        "scope": {
+          "$ref": "urn:uuid:381a8b66-f9da-576c-93ec-9b2db63266db#/$defs/scope"
+        }
+      },
+      "required": [
+        "scope"
+      ],
+      "additionalProperties": false
+    },
+    "accountKey": {
+      "type": "object",
+      "properties": {
+        "accountId": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "accountId"
+      ],
+      "additionalProperties": false
+    },
+    "ack": {
+      "type": "object",
+      "properties": {
+        "accepted": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "accepted"
+      ],
+      "additionalProperties": false
+    },
+    "none": {
+      "type": "object",
+      "properties": {},
+      "required": [],
+      "additionalProperties": false
+    },
+    "handle": {
+      "type": "object",
+      "properties": {
+        "handle": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "handle"
+      ],
+      "additionalProperties": false
+    },
+    "effectIntent": {
+      "type": "object",
+      "properties": {
+        "issuer": {
+          "type": "string",
+          "minLength": 1
+        },
+        "packageId": {
+          "$ref": "urn:uuid:f646f495-f214-5389-8f70-75f3114ee703#/$defs/name"
+        },
+        "packageVersion": {
+          "$ref": "urn:uuid:f646f495-f214-5389-8f70-75f3114ee703#/$defs/version"
+        },
+        "manifestDigest": {
+          "$ref": "urn:uuid:f646f495-f214-5389-8f70-75f3114ee703#/$defs/digest"
+        },
+        "subject": {
+          "type": "string",
+          "minLength": 1
+        },
+        "scope": {
+          "$ref": "urn:uuid:381a8b66-f9da-576c-93ec-9b2db63266db#/$defs/scope"
+        },
+        "operation": {
+          "$ref": "urn:uuid:f646f495-f214-5389-8f70-75f3114ee703#/$defs/name"
+        },
+        "version": {
+          "$ref": "urn:uuid:f646f495-f214-5389-8f70-75f3114ee703#/$defs/version"
+        },
+        "target": {
+          "type": "string",
+          "minLength": 1
+        },
+        "input": {},
+        "preconditions": {
+          "type": "object"
+        }
+      },
+      "required": [
+        "issuer",
+        "packageId",
+        "packageVersion",
+        "manifestDigest",
+        "subject",
+        "scope",
+        "operation",
+        "version",
+        "target",
+        "input",
+        "preconditions"
+      ],
+      "additionalProperties": false
+    },
+    "proposal": {
+      "type": "object",
+      "properties": {
+        "operationId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "intent": {
+          "$ref": "#/$defs/effectIntent"
+        },
+        "intentDigest": {
+          "$ref": "urn:uuid:f646f495-f214-5389-8f70-75f3114ee703#/$defs/digest"
+        },
+        "expiresAt": {
+          "$ref": "urn:uuid:f646f495-f214-5389-8f70-75f3114ee703#/$defs/timestamp"
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 1
+        },
+        "consequences": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        },
+        "reversible": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "operationId",
+        "intent",
+        "intentDigest",
+        "expiresAt",
+        "summary",
+        "consequences",
+        "reversible"
+      ],
+      "additionalProperties": false
+    },
+    "opControl": {
+      "type": "object",
+      "properties": {
+        "operationId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "meta": {
+          "$ref": "#/$defs/callMeta"
+        }
+      },
+      "required": [
+        "operationId",
+        "meta"
+      ],
+      "additionalProperties": false
+    },
+    "commitParams": {
+      "type": "object",
+      "properties": {
+        "operationId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "intentDigest": {
+          "$ref": "urn:uuid:f646f495-f214-5389-8f70-75f3114ee703#/$defs/digest"
+        },
+        "meta": {
+          "$ref": "#/$defs/callMeta"
+        }
+      },
+      "required": [
+        "operationId",
+        "intentDigest",
+        "meta"
+      ],
+      "additionalProperties": false
+    },
+    "jobControl": {
+      "type": "object",
+      "properties": {
+        "jobId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "meta": {
+          "$ref": "#/$defs/callMeta"
+        }
+      },
+      "required": [
+        "jobId",
+        "meta"
+      ],
+      "additionalProperties": false
+    },
+    "continueParams": {
+      "type": "object",
+      "properties": {
+        "jobId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "input": {},
+        "meta": {
+          "$ref": "#/$defs/callMeta"
+        }
+      },
+      "required": [
+        "jobId",
+        "revision",
+        "input",
+        "meta"
+      ],
+      "additionalProperties": false
+    },
+    "cancelParams": {
+      "type": "object",
+      "properties": {
+        "requestId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "requestId"
+      ],
+      "additionalProperties": false
+    },
+    "creditParams": {
+      "type": "object",
+      "properties": {
+        "requestId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "add": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 65535
+        }
+      },
+      "required": [
+        "requestId",
+        "add"
+      ],
+      "additionalProperties": false
+    },
+    "chunkParams": {
+      "type": "object",
+      "properties": {
+        "requestId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "seq": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "kind": {
+          "type": "string",
+          "minLength": 1
+        },
+        "data": {}
+      },
+      "required": [
+        "requestId",
+        "seq",
+        "kind",
+        "data"
+      ],
+      "additionalProperties": false
+    },
+    "streamParams": {
+      "type": "object",
+      "properties": {
+        "operation": {
+          "$ref": "urn:uuid:f646f495-f214-5389-8f70-75f3114ee703#/$defs/name"
+        },
+        "version": {
+          "$ref": "urn:uuid:f646f495-f214-5389-8f70-75f3114ee703#/$defs/version"
+        },
+        "input": {},
+        "credit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 65535
+        },
+        "meta": {
+          "$ref": "#/$defs/callMeta"
+        },
+        "operationId": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "operation",
+        "version",
+        "input",
+        "credit",
+        "meta"
+      ],
+      "additionalProperties": false
+    },
+    "authMethod": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "enum": [
+            "api-key",
+            "browser-pkce",
+            "device-code",
+            "service-account",
+            "signed-request",
+            "managed",
+            "local-none",
+            "other"
+          ]
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1
+        },
+        "requirements": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "terms": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "label",
+        "requirements"
+      ],
+      "additionalProperties": false
+    },
+    "providerInfo": {
+      "type": "object",
+      "properties": {
+        "provider": {
+          "type": "string",
+          "minLength": 1
+        },
+        "product": {
+          "type": "string",
+          "minLength": 1
+        },
+        "authMethods": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/authMethod"
+          }
+        },
+        "operations": {
+          "type": "array",
+          "items": {
+            "$ref": "urn:uuid:f646f495-f214-5389-8f70-75f3114ee703#/$defs/name"
+          },
+          "uniqueItems": true
+        },
+        "evidence": {
+          "$ref": "urn:uuid:381a8b66-f9da-576c-93ec-9b2db63266db#/$defs/evidence"
+        },
+        "routes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "provider",
+        "product",
+        "authMethods",
+        "operations",
+        "evidence",
+        "routes"
+      ],
+      "additionalProperties": false
+    },
+    "connectInput": {
+      "type": "object",
+      "properties": {
+        "provider": {
+          "type": "string",
+          "minLength": 1
+        },
+        "product": {
+          "type": "string",
+          "minLength": 1
+        },
+        "authMethod": {
+          "type": "string",
+          "minLength": 1
+        },
+        "connectionHandle": {
+          "type": "string",
+          "minLength": 1
+        },
+        "settings": {
+          "type": "object"
+        }
+      },
+      "required": [
+        "provider",
+        "product",
+        "authMethod"
+      ],
+      "additionalProperties": false
+    },
+    "authStep": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "ready"
+            },
+            "account": {
+              "$ref": "urn:uuid:381a8b66-f9da-576c-93ec-9b2db63266db#/$defs/account"
+            }
+          },
+          "required": [
+            "kind",
+            "account"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "browser"
+            },
+            "flowId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "url": {
+              "type": "string",
+              "format": "uri"
+            },
+            "expiresAt": {
+              "$ref": "urn:uuid:f646f495-f214-5389-8f70-75f3114ee703#/$defs/timestamp"
+            }
+          },
+          "required": [
+            "kind",
+            "flowId",
+            "url",
+            "expiresAt"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "device"
+            },
+            "flowId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "url": {
+              "type": "string",
+              "format": "uri"
+            },
+            "userCode": {
+              "type": "string",
+              "minLength": 1
+            },
+            "expiresAt": {
+              "$ref": "urn:uuid:f646f495-f214-5389-8f70-75f3114ee703#/$defs/timestamp"
+            },
+            "intervalSeconds": {
+              "type": "integer",
+              "minimum": 1
+            }
+          },
+          "required": [
+            "kind",
+            "flowId",
+            "url",
+            "userCode",
+            "expiresAt",
+            "intervalSeconds"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "fields"
+            },
+            "flowId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "fields": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "label": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "secret": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "id",
+                  "label",
+                  "secret"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "expiresAt": {
+              "$ref": "urn:uuid:f646f495-f214-5389-8f70-75f3114ee703#/$defs/timestamp"
+            }
+          },
+          "required": [
+            "kind",
+            "flowId",
+            "fields",
+            "expiresAt"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "waiting"
+            },
+            "flowId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "expiresAt": {
+              "$ref": "urn:uuid:f646f495-f214-5389-8f70-75f3114ee703#/$defs/timestamp"
+            }
+          },
+          "required": [
+            "kind",
+            "flowId",
+            "expiresAt"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "authContinue": {
+      "type": "object",
+      "properties": {
+        "flowId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "connectionHandle": {
+          "type": "string",
+          "minLength": 1
+        },
+        "values": {
+          "type": "object"
+        }
+      },
+      "required": [
+        "flowId"
+      ],
+      "additionalProperties": false
+    },
+    "enableInput": {
+      "type": "object",
+      "properties": {
+        "accountId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "enabled": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "accountId",
+        "enabled"
+      ],
+      "additionalProperties": false
+    },
+    "effectTarget": {
+      "type": "object",
+      "properties": {
+        "accountId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "grantId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "windows": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "accountId",
+        "grantId",
+        "windows"
+      ],
+      "additionalProperties": false
+    },
+    "limits": {
+      "type": "object",
+      "properties": {
+        "accountId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "windows": {
+          "type": "array",
+          "items": {
+            "$ref": "urn:uuid:381a8b66-f9da-576c-93ec-9b2db63266db#/$defs/quotaWindow"
+          }
+        },
+        "resetGrants": {
+          "type": "array",
+          "items": {
+            "$ref": "urn:uuid:381a8b66-f9da-576c-93ec-9b2db63266db#/$defs/resetGrant"
+          }
+        },
+        "evidence": {
+          "$ref": "urn:uuid:381a8b66-f9da-576c-93ec-9b2db63266db#/$defs/evidence"
+        }
+      },
+      "required": [
+        "accountId",
+        "windows",
+        "resetGrants",
+        "evidence"
+      ],
+      "additionalProperties": false
+    },
+    "pricesInput": {
+      "type": "object",
+      "properties": {
+        "provider": {
+          "type": "string",
+          "minLength": 1
+        },
+        "product": {
+          "type": "string",
+          "minLength": 1
+        },
+        "region": {
+          "type": "string",
+          "minLength": 1
+        },
+        "accountId": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "provider",
+        "product",
+        "region"
+      ],
+      "additionalProperties": false
+    },
+    "prices": {
+      "type": "object",
+      "properties": {
+        "plans": {
+          "type": "array",
+          "items": {
+            "$ref": "urn:uuid:381a8b66-f9da-576c-93ec-9b2db63266db#/$defs/price"
+          }
+        }
+      },
+      "required": [
+        "plans"
+      ],
+      "additionalProperties": false
+    },
+    "usageInput": {
+      "type": "object",
+      "properties": {
+        "scope": {
+          "$ref": "urn:uuid:381a8b66-f9da-576c-93ec-9b2db63266db#/$defs/scope"
+        },
+        "from": {
+          "$ref": "urn:uuid:f646f495-f214-5389-8f70-75f3114ee703#/$defs/timestamp"
+        },
+        "to": {
+          "$ref": "urn:uuid:f646f495-f214-5389-8f70-75f3114ee703#/$defs/timestamp"
+        }
+      },
+      "required": [
+        "scope",
+        "from",
+        "to"
+      ],
+      "additionalProperties": false
+    },
+    "catalogInput": {
+      "type": "object",
+      "properties": {
+        "accountId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "route": {
+          "type": "string",
+          "minLength": 1
+        },
+        "pageToken": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "accountId",
+        "route"
+      ],
+      "additionalProperties": false
+    },
+    "modelInput": {
+      "type": "object",
+      "properties": {
+        "accountId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "route": {
+          "type": "string",
+          "minLength": 1
+        },
+        "model": {
+          "type": "string",
+          "minLength": 1
+        },
+        "input": {
+          "type": "array",
+          "items": {
+            "$ref": "urn:uuid:381a8b66-f9da-576c-93ec-9b2db63266db#/$defs/part"
+          },
+          "minItems": 1
+        },
+        "parameters": {
+          "type": "object"
+        },
+        "maxOutputTokens": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "required": [
+        "accountId",
+        "route",
+        "model",
+        "input"
+      ],
+      "additionalProperties": false
+    },
+    "modelOutput": {
+      "type": "object",
+      "properties": {
+        "accountId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "route": {
+          "type": "string",
+          "minLength": 1
+        },
+        "model": {
+          "type": "string",
+          "minLength": 1
+        },
+        "parts": {
+          "type": "array",
+          "items": {
+            "$ref": "urn:uuid:381a8b66-f9da-576c-93ec-9b2db63266db#/$defs/part"
+          }
+        },
+        "sent": {
+          "type": "object"
+        },
+        "confirmed": {
+          "type": [
+            "object",
+            "null"
+          ]
+        },
+        "finish": {
+          "enum": [
+            "end",
+            "length",
+            "tool",
+            "cancelled",
+            "error"
+          ]
+        },
+        "inputTokens": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "outputTokens": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": [
+        "accountId",
+        "route",
+        "model",
+        "parts",
+        "sent",
+        "confirmed",
+        "finish"
+      ],
+      "additionalProperties": false
+    },
+    "agentReply": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "message"
+            },
+            "message": {
+              "$ref": "urn:uuid:381a8b66-f9da-576c-93ec-9b2db63266db#/$defs/message"
+            }
+          },
+          "required": [
+            "kind",
+            "message"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "job"
+            },
+            "job": {
+              "$ref": "urn:uuid:381a8b66-f9da-576c-93ec-9b2db63266db#/$defs/job"
+            }
+          },
+          "required": [
+            "kind",
+            "job"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "eventSubscribe": {
+      "type": "object",
+      "properties": {
+        "source": {
+          "type": "string",
+          "minLength": 1
+        },
+        "type": {
+          "$ref": "urn:uuid:f646f495-f214-5389-8f70-75f3114ee703#/$defs/name"
+        },
+        "scope": {
+          "$ref": "urn:uuid:381a8b66-f9da-576c-93ec-9b2db63266db#/$defs/scope"
+        },
+        "durable": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "source",
+        "type",
+        "scope",
+        "durable"
+      ],
+      "additionalProperties": false
+    },
+    "subscription": {
+      "type": "object",
+      "properties": {
+        "subscriptionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "scope": {
+          "$ref": "urn:uuid:381a8b66-f9da-576c-93ec-9b2db63266db#/$defs/scope"
+        },
+        "retentionSeconds": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "cursor": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "subscriptionId",
+        "scope",
+        "retentionSeconds"
+      ],
+      "additionalProperties": false
+    },
+    "eventPosition": {
+      "type": "object",
+      "properties": {
+        "subscriptionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "cursor": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "subscriptionId",
+        "cursor"
+      ],
+      "additionalProperties": false
+    },
+    "eventPage": {
+      "type": "object",
+      "properties": {
+        "events": {
+          "type": "array",
+          "items": {
+            "$ref": "urn:uuid:381a8b66-f9da-576c-93ec-9b2db63266db#/$defs/event"
+          }
+        },
+        "gap": {
+          "type": "boolean"
+        },
+        "nextCursor": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "events",
+        "gap"
+      ],
+      "additionalProperties": false
+    },
+    "surfaceOpen": {
+      "type": "object",
+      "properties": {
+        "surfaceId": {
+          "$ref": "urn:uuid:f646f495-f214-5389-8f70-75f3114ee703#/$defs/name"
+        },
+        "scope": {
+          "$ref": "urn:uuid:381a8b66-f9da-576c-93ec-9b2db63266db#/$defs/scope"
+        }
+      },
+      "required": [
+        "surfaceId",
+        "scope"
+      ],
+      "additionalProperties": false
+    },
+    "presented": {
+      "type": "object",
+      "properties": {
+        "instanceId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "generation": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "surface": {
+          "$ref": "urn:uuid:381a8b66-f9da-576c-93ec-9b2db63266db#/$defs/surface"
+        }
+      },
+      "required": [
+        "instanceId",
+        "generation",
+        "surface"
+      ],
+      "additionalProperties": false
+    },
+    "surfaceEvent": {
+      "type": "object",
+      "properties": {
+        "instanceId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "generation": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "action": {
+          "$ref": "urn:uuid:f646f495-f214-5389-8f70-75f3114ee703#/$defs/name"
+        },
+        "values": {
+          "type": "object"
+        }
+      },
+      "required": [
+        "instanceId",
+        "generation",
+        "action",
+        "values"
+      ],
+      "additionalProperties": false
+    },
+    "surfaceResult": {
+      "type": "object",
+      "properties": {
+        "state": {
+          "enum": [
+            "updated",
+            "needs-approval",
+            "closed"
+          ]
+        },
+        "view": {
+          "$ref": "urn:uuid:381a8b66-f9da-576c-93ec-9b2db63266db#/$defs/view"
+        },
+        "operationId": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "state"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "state": {
+                "const": "needs-approval"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "operationId"
+            ]
+          }
+        }
+      ]
+    },
+    "resourceInput": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "owner": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "id",
+        "owner"
+      ],
+      "additionalProperties": false
+    },
+    "prepareParams": {
+      "allOf": [
+        {
+          "$ref": "urn:uuid:831ca4af-a462-5244-afc1-718a1d9346c1#/$defs/callParams"
+        },
+        {
+          "properties": {
+            "meta": {
+              "required": [
+                "idempotencyKey"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "accountListInput": {
+      "type": "object",
+      "properties": {
+        "provider": {
+          "type": "string",
+          "minLength": 1
+        },
+        "product": {
+          "type": "string",
+          "minLength": 1
+        },
+        "pageToken": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "provider",
+        "product"
+      ],
+      "additionalProperties": false
+    },
+    "accountPage": {
+      "type": "object",
+      "properties": {
+        "accounts": {
+          "type": "array",
+          "items": {
+            "$ref": "urn:uuid:381a8b66-f9da-576c-93ec-9b2db63266db#/$defs/account"
+          }
+        },
+        "complete": {
+          "type": "boolean"
+        },
+        "revision": {
+          "type": "string",
+          "minLength": 1
+        },
+        "nextPageToken": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        },
+        "evidence": {
+          "$ref": "urn:uuid:381a8b66-f9da-576c-93ec-9b2db63266db#/$defs/evidence"
+        }
+      },
+      "required": [
+        "accounts",
+        "complete",
+        "revision",
+        "evidence"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "complete": {
+                "const": true
+              }
+            }
+          },
+          "then": {
+            "not": {
+              "required": [
+                "nextPageToken"
+              ]
+            }
+          },
+          "else": {
+            "required": [
+              "reason"
+            ]
+          }
+        }
+      ]
+    },
+    "artifactRead": {
+      "type": "object",
+      "properties": {
+        "artifact": {
+          "$ref": "urn:uuid:381a8b66-f9da-576c-93ec-9b2db63266db#/$defs/artifact"
+        },
+        "offset": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "maxBytes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": [
+        "artifact",
+        "offset",
+        "maxBytes"
+      ],
+      "additionalProperties": false
+    },
+    "artifactPage": {
+      "type": "object",
+      "properties": {
+        "artifact": {
+          "$ref": "urn:uuid:381a8b66-f9da-576c-93ec-9b2db63266db#/$defs/artifact"
+        },
+        "offset": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "data": {
+          "type": "string",
+          "contentEncoding": "base64",
+          "pattern": "^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$",
+          "not": {
+            "pattern": "[\\r\\n]"
+          }
+        },
+        "eof": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "artifact",
+        "offset",
+        "data",
+        "eof"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "eof": {
+                "const": false
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "data": {
+                "minLength": 4
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

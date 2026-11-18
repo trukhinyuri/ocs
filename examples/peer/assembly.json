@@ -1,0 +1,31 @@
+{
+  "format": "ocs.assembly/0.1",
+  "instances": [
+    {
+      "instance": "reader",
+      "packageId": "org.example.status-guide",
+      "packageVersion": "0.1.0",
+      "manifestDigest": "a2e5a05d20f663065289a9f9a434209bffb9b79644a0b8b187af05b7e7ab1e66",
+      "domain": "local-workspace"
+    },
+    {
+      "instance": "authority",
+      "packageId": "org.example.status",
+      "packageVersion": "0.1.0",
+      "manifestDigest": "5eba19b3801e90c2d161fdd49c46152a5c8b8aae82c238b8557dbc6948a1e19a",
+      "domain": "example-service"
+    }
+  ],
+  "edges": [
+    {
+      "caller": "reader",
+      "receiver": "authority",
+      "operation": "example.status.read",
+      "version": "1.0.0",
+      "scope": "resource:demo",
+      "grantedEffects": [
+        "read"
+      ]
+    }
+  ]
+}

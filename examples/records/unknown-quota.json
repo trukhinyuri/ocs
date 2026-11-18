@@ -1,0 +1,15 @@
+{
+  "windowId": "upstream",
+  "scope": {
+    "kind": "account",
+    "id": "fixture-account"
+  },
+  "unit": "unspecified",
+  "state": "unknown",
+  "evidence": {
+    "source": "fixture-ledger",
+    "observedAt": "2030-01-01T00:00:00.000Z",
+    "status": "unknown",
+    "reason": "Endpoint did not report a limit."
+  }
+}

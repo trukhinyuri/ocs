@@ -1,0 +1,45 @@
+{
+  "provider": "example.service",
+  "product": "test-plan",
+  "route": "route-1",
+  "scope": {
+    "kind": "account",
+    "id": "fixture-account"
+  },
+  "revision": "r2",
+  "complete": true,
+  "evidence": {
+    "source": "fixture-ledger",
+    "observedAt": "2030-01-01T00:00:00.000Z",
+    "status": "reported"
+  },
+  "models": [
+    {
+      "id": "model-a",
+      "kind": "chat",
+      "entitled": true,
+      "adapterSupported": true,
+      "reasoning": [
+        "low",
+        "high"
+      ],
+      "tiers": [
+        "standard",
+        "fast"
+      ],
+      "eol": {
+        "effectiveAt": "2030-06-01T00:00:00.000Z",
+        "source": "https://example.invalid/notices/1",
+        "replacement": "model-b",
+        "announcedAt": "2030-01-01T00:00:00.000Z",
+        "noticeId": "example.notice-1"
+      }
+    },
+    {
+      "id": "model-b",
+      "kind": "chat",
+      "entitled": null,
+      "adapterSupported": false
+    }
+  ]
+}

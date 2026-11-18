@@ -1,0 +1,14 @@
+{
+  "id": "demo",
+  "owner": "domain-a",
+  "revision": "v1",
+  "state": "ready",
+  "observedAt": "2030-01-01T00:00:00.000Z",
+  "conditions": [
+    {
+      "type": "access",
+      "status": "true",
+      "reason": "Fixture admitted."
+    }
+  ]
+}

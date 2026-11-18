@@ -1,0 +1,22 @@
+{
+  "grantId": "grant-1",
+  "scope": {
+    "kind": "account",
+    "id": "fixture-account"
+  },
+  "affectedWindows": [
+    "model-week"
+  ],
+  "eligibility": "eligible",
+  "count": 1,
+  "charge": {
+    "amount": "0",
+    "currency": "USD"
+  },
+  "expiresAt": "2030-01-31T00:00:00.000Z",
+  "evidence": {
+    "source": "fixture-ledger",
+    "observedAt": "2030-01-01T00:00:00.000Z",
+    "status": "reported"
+  }
+}

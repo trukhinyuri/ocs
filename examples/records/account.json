@@ -1,0 +1,20 @@
+{
+  "accountId": "a1",
+  "provider": "example.service",
+  "product": "test-plan",
+  "route": "route-1",
+  "authMethod": "api-key",
+  "label": "Test account",
+  "enabled": true,
+  "signedIn": true,
+  "planCandidates": [
+    "test-plan"
+  ],
+  "state": "exhausted",
+  "reason": "Selected model window is empty.",
+  "evidence": {
+    "source": "fixture-ledger",
+    "observedAt": "2030-01-01T00:00:00.000Z",
+    "status": "reported"
+  }
+}

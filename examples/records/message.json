@@ -1,0 +1,14 @@
+{
+  "messageId": "m2",
+  "replyTo": "m1",
+  "contextId": "c1",
+  "parts": [
+    {
+      "type": "data",
+      "schema": "example.result/1",
+      "data": {
+        "state": "ready"
+      }
+    }
+  ]
+}
