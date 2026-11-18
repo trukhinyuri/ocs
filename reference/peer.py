@@ -8,10 +8,11 @@ import hmac
 import json
 import os
 import time
-from http.server import BaseHTTPRequestHandler, HTTPServer
+from http.server import BaseHTTPRequestHandler
 from pathlib import Path
 
 from admission import check_manifest
+from bounded_http import BoundedServer
 from contracts import LIMIT, ROOT, read_json, validate, validate_with
 from host import Failure, status
 from jsonschema import ValidationError
@@ -126,7 +127,7 @@ class Handler(BaseHTTPRequestHandler):
 
 
 def start(manifest, token):
-    server = HTTPServer(("127.0.0.1", 0), Handler)
+    server = BoundedServer(("127.0.0.1", 0), Handler)
     server.credential = ("Bearer " + token).encode()
     server.manifest_path = Path(manifest)
     raw = server.manifest_path.read_bytes()

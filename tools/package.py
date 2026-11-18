@@ -3,6 +3,8 @@
 
 import argparse
 import hashlib
+import hmac
+import io
 import json
 import os
 import stat
@@ -17,6 +19,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "reference"))
 from admission import check_manifest, check_names
 from contracts import read_json
+from resolution import compiled_schema
 
 MAX_FILES = 1024
 MAX_FILE = 8 * 1024 * 1024
@@ -32,7 +35,11 @@ def digest(data):
 def checked_contents(files):
     if "ocs.json" not in files:
         raise ValueError("missing root manifest")
-    check_manifest(read_json(files["ocs.json"]), files)
+    manifest = read_json(files["ocs.json"])
+    check_manifest(manifest, files)
+    for op in manifest["exports"]:
+        for field in ("inputSchema", "outputSchema"):
+            compiled_schema(op[field], files)
     return {name: digest(files[name]) for name in sorted(files)}
 
 
@@ -94,7 +101,12 @@ def verify(path):
     path = Path(path)
     if not path.is_file() or path.stat().st_size > MAX_ARCHIVE:
         raise ValueError("archive size or type outside the supported limits")
-    with ZipFile(path) as archive:
+    with path.open("rb") as stream:
+        return read_json(inspect_archive(stream)["ocs.json"])
+
+
+def inspect_archive(stream):
+    with ZipFile(stream) as archive:
         entries = archive.infolist()
         if len(entries) > MAX_FILES:
             raise ValueError("too many package entries")
@@ -124,19 +136,59 @@ def verify(path):
         index = read_json(files.pop(INDEX))
         if index != checked_contents(files):
             raise ValueError("package membership or checksum mismatch")
-        return read_json(files["ocs.json"])
+        return files
+
+
+def install(archive, directory, expected_digest):
+    """Atomically activate a verified archive in an owner-private package store."""
+    archive, directory = Path(archive), Path(directory)
+    with archive.open("rb") as stream:
+        raw = stream.read(MAX_ARCHIVE + 1)
+    if len(raw) > MAX_ARCHIVE or not hmac.compare_digest(digest(raw), expected_digest):
+        raise ValueError("whole-package pin mismatch")
+    files = inspect_archive(io.BytesIO(raw))
+    directory.mkdir(mode=0o700, parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory(dir=directory) as tmp:
+        staged = Path(tmp) / "release"
+        staged.mkdir(mode=0o700)
+        for name, data in files.items():
+            target = staged / name
+            target.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
+            target.write_bytes(data)
+        published = directory / expected_digest
+        try:
+            staged.rename(published)
+        except OSError:
+            if published.is_symlink() or not published.is_dir():
+                raise
+            members = source_files(published)
+            members.pop(INDEX)
+            if members != files:
+                raise ValueError("immutable installed revision differs")
+        pointer = Path(tmp) / "pointer"
+        pointer.symlink_to(expected_digest)
+        os.replace(pointer, directory / "current")
+    return read_json(files["ocs.json"])
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--install",
+        metavar="WHOLE_PACKAGE_SHA256",
+        help="install into private OUTPUT under the selected pin",
+    )
     parser.add_argument("--verify", action="store_true", help="inspect an existing package")
     parser.add_argument("path", type=Path)
     parser.add_argument("output", type=Path, nargs="?")
     args = parser.parse_args()
-    if args.verify == (args.output is not None):
+    if (args.verify and args.install) or args.verify == (args.output is not None):
         parser.error("use SOURCE OUTPUT to build, or --verify ARCHIVE to inspect")
     try:
-        if args.verify:
+        if args.install:
+            manifest = install(args.path, args.output, args.install)
+            print(f"{manifest['id']}@{manifest['version']} installed")
+        elif args.verify:
             manifest = verify(args.path)
             print(f"{manifest['id']}@{manifest['version']} verified")
         else:

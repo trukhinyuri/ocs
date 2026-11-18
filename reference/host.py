@@ -102,7 +102,12 @@ class Channel:
             raise Failure(-33005, "deadline", "Reply arrived after deadline.")
         if "error" in reply:
             err = reply["error"]
-            raise Failure(err["code"], err["data"]["kind"], err["message"], err["data"].get("path"))
+            path = err["data"].get("path")
+            if path not in ("/resourceId", "/state", "/meta/deadline", "/meta/manifestDigest"):
+                path = None
+            raise Failure(
+                err["code"], err["data"]["kind"], "Executor refused the scoped call.", path
+            )
         return reply["result"]
 
 
@@ -187,19 +192,68 @@ def status(manifest_path, resource, deadline=None, expected_pin=None):
         channel.close()
 
 
+def observed_status(manifest, resource, receipt):
+    """Attribute the completed public call to the descriptor pinned at admission."""
+    from secrets import token_hex
+
+    started = time.monotonic_ns()
+    record = {
+        "requestId": token_hex(12),
+        "operation": "example.status.read",
+        "version": "1.0.0",
+        "scope": "demo" if resource == "demo" else "outside-grant",
+        "observedAt": utc_at(time.time()),
+        "actualTarget": None,
+        "policy": "sealed-local-read",
+    }
+    try:
+        raw = Path(manifest).read_bytes()
+        pin = hashlib.sha256(raw).hexdigest()
+        record["attemptedDigest"] = pin
+        result = status(manifest, resource, expected_pin=pin)
+        record.update(
+            actualTarget={"packageId": "org.example.status", "manifestDigest": pin},
+            outcome="allowed",
+        )
+        return result
+    except Failure as exc:
+        record["outcome"] = exc.error["data"]["kind"]
+        raise
+    except (ValueError, OSError, ValidationError):
+        record["outcome"] = "invalid-package"
+        raise
+    finally:
+        record["elapsedNs"] = time.monotonic_ns() - started
+        from tempfile import NamedTemporaryFile
+
+        path = Path(receipt)
+        with NamedTemporaryFile(dir=path.parent, mode="w", delete=False) as handle:
+            json.dump(record, handle)
+            staged = Path(handle.name)
+        staged.replace(path)
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--manifest", type=Path, default=ROOT / "examples/status/ocs.json")
     parser.add_argument("--resource", default="demo")
+    parser.add_argument(
+        "--receipt", type=Path, help="atomically record a bounded public call receipt"
+    )
     args = parser.parse_args()
     try:
-        print(json.dumps(status(args.manifest, args.resource)))
+        result = (
+            observed_status(args.manifest, args.resource, args.receipt)
+            if args.receipt
+            else status(args.manifest, args.resource)
+        )
+        print(json.dumps(result))
     except Failure as exc:
         print(json.dumps(exc.error), file=sys.stderr)
         raise SystemExit(1)
     except (OSError, ValueError, ValidationError) as exc:
         print(
-            json.dumps({"error": "invalid development package", "detail": str(exc)[:150]}),
+            json.dumps({"error": "invalid development package", "class": type(exc).__name__}),
             file=sys.stderr,
         )
         raise SystemExit(2)
