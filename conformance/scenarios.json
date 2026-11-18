@@ -299,7 +299,8 @@
         "conformance/test_contracts.py#test_edition_contains_every_normative_file",
         "conformance/test_contracts.py#test_document_links_and_requirement_ids",
         "conformance/test_compatibility.py#test_preserve_inputs_expectations_and_followup",
-        "conformance/test_compatibility.py#test_trace_requires_evidence_or_explicit_qualification"
+        "conformance/test_compatibility.py#test_trace_requires_evidence_or_explicit_qualification",
+        "conformance/test_assurance_gate.py#test_every_required_witness_must_pass_for_its_cell"
       ],
       "qualification": "Edition replay covers the declared reference fixtures. Additional deployments and profiles need their own evidence."
     },
@@ -313,7 +314,11 @@
       "scope": "Operator interpreting health, conformance or usage",
       "expect": "Attribute observations to the actual target, scope, revision and time, distinguish probes from work and preserve evidence gaps.",
       "checks": [
-        "conformance/test_contracts.py#test_record_corpus"
+        "conformance/test_contracts.py#test_record_corpus",
+        "conformance/test_signed_evidence.py#test_valid_receipt_is_offline_and_edition_pinned",
+        "conformance/test_signed_evidence.py#test_independently_resigned_target_subject_checker_and_key_are_rejected",
+        "conformance/test_signed_evidence.py#test_signed_stale_missing_substituted_or_unmeasured_rows_fail",
+        "conformance/test_signed_evidence.py#test_detached_report_and_signature_bind_exact_bytes"
       ],
       "qualification": "Verify aggregation, confidentiality, retention and actual support in the reporting deployment."
     },
