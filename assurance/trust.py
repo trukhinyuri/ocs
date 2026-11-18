@@ -175,6 +175,108 @@ def verify_stand(stand, policy, subject, target, now):
     }
     if missing:
         raise ValueError("missing live observations: " + ", ".join(sorted(missing)))
+    for claim, check_id in (
+        ("W-08.tls", "stand.tls"),
+        ("B-07.domain", "stand.load"),
+        ("L-01.policy", "stand.resource"),
+        ("L-04.tail", "stand.load"),
+        ("U-03.accessibility", "stand.accessibility"),
+        ("L-06.recovery", "L-06.recovery"),
+    ):
+        row = byid.get(check_id, {})
+        if row.get("level") != "deployment" or claim not in row.get(
+            "claims", row.get("obligations", [])
+        ):
+            raise ValueError("wrong deployment check or level: " + claim)
+    for field in (
+        "standCaSha256",
+        "serverCertificateSha256",
+        "relayCertificateSha256",
+        "goExecutableSha256",
+    ):
+        if (
+            not isinstance(target.get(field), str)
+            or len(target[field]) != 64
+            or any(ch not in "0123456789abcdef" for ch in target[field])
+        ):
+            raise ValueError("missing or invalid target artifact: " + field)
+    limits = policy["workload"]
+    quality = byid["G-04.comparison"]["observed"]
+    routes = quality["results"]
+    if set(routes) != {"direct", "full-admissible-history", "minimum-facts"}:
+        raise ValueError("missing comparative inference route")
+    if (
+        quality["route"] != limits["route"]
+        or quality["model"] != limits["model"]
+        or quality["relay"]["podUID"] != target["relayPodUID"]
+    ):
+        raise ValueError("comparison used an unbound model or relay")
+    for name, route in routes.items():
+        if (
+            route["tasks"] != limits["qualitySamples"]
+            or not limits["minimumCorrect"] <= route["correct"] <= route["tasks"]
+            or route["endToEndMs"]["p95"] > limits["p95LimitMs"]
+        ):
+            raise ValueError("failed live model quality or time bound: " + name)
+        if any(
+            type(route[k]) is not int or route[k] < 0
+            for k in (
+                "requestJsonBytes",
+                "responseJsonBytes",
+                "upstreamRequestJsonBytes",
+                "upstreamResponseJsonBytes",
+                "inputTokens",
+                "outputTokens",
+            )
+        ):
+            raise ValueError("unsupported or negative traffic accounting")
+        if route["allHopJsonBytes"] != sum(
+            route[k]
+            for k in (
+                "requestJsonBytes",
+                "responseJsonBytes",
+                "upstreamRequestJsonBytes",
+                "upstreamResponseJsonBytes",
+            )
+        ):
+            raise ValueError("hop traffic does not reconcile")
+        if name == "direct":
+            if route["relayPodUID"] is not None or route["upstreamRequestJsonBytes"] != 0:
+                raise ValueError("unexpected direct inference hop")
+        elif (
+            route["relayPodUID"] != target["relayPodUID"]
+            or not min(route["upstreamRequestJsonBytes"], route["upstreamResponseJsonBytes"]) > 0
+        ):
+            raise ValueError("unobserved relay inference")
+    prices = byid["P-03.basis"]["observed"]
+    for key, amount in (
+        ("published", limits["publishedListPrice"]),
+        ("observedAccountPrice", limits["accountPrice"]),
+    ):
+        plan = prices[key]
+        if (
+            plan["price"] != {"amount": amount, "currency": limits["currency"]}
+            or plan["basis"] != "organization"
+            or plan["period"] != "P30D"
+        ):
+            raise ValueError("wrong live price or accounting basis: " + key)
+    reset = byid["Q-02.read-only"]["observed"]
+    if reset["beforeCount"] != reset["afterCount"] or reset["beforeCount"] <= 0:
+        raise ValueError("discovery consumed or failed to witness a reset grant")
+    ui = byid["stand.accessibility"]["observed"]
+    if (
+        not {v["requestedCssWidth"] for v in ui["views"]} >= {320, 960}
+        or any(
+            v["scrollWidth"] > v["observedCssWidth"]
+            or not v["focusVisibleAfterClose"]
+            or v["accountRowsChecked"] < 1
+            for v in ui["views"]
+        )
+        or ui["scriptCanReadCredential"]
+        or ui["namespace"] != target["namespace"]
+        or ui["sourceRevision"] != target["sourceRevision"]
+    ):
+        raise ValueError("browser observation failed the qualified task")
     data = byid["stand.load"]["observed"]
     samples = data["samplesMs"]
     limits = policy["workload"]

@@ -369,8 +369,18 @@ def install(cluster, image, revision, storage):
         or actual["status"].get("availableReplicas") != 1
     ):
         raise RuntimeError("deployment readback differs from the requested target")
+    public_identity = cluster.get("secret", "ocs-service-identity")["data"]
     return {
         "context": cluster.context,
+        "standCaSha256": hashlib.sha256(
+            base64.b64decode(public_identity["ca.crt"], validate=True)
+        ).hexdigest(),
+        "serverCertificateSha256": hashlib.sha256(
+            base64.b64decode(public_identity["tls.crt"], validate=True)
+        ).hexdigest(),
+        "relayCertificateSha256": hashlib.sha256(
+            base64.b64decode(public_identity["relay.crt"], validate=True)
+        ).hexdigest(),
         "namespace": cluster.namespace,
         "image": image,
         "sourceRevision": revision,
@@ -409,6 +419,7 @@ if __name__ == "__main__":
         evidence = install(c, ref, revision, opts.storage_class)
         if opts.oci_proof:
             blobs = json.loads(opts.oci_proof.read_text())
+
             def fetch(repo, d):
                 return base64.b64decode(blobs[d], validate=True)
         elif opts.local:

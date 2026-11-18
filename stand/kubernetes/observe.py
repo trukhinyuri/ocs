@@ -360,6 +360,15 @@ def qualify(cluster, deploy, output, browser=True):
             "relayServiceUID": deploy["relayServiceUID"],
         }
         keys = cluster.owned("secret", "ocs-service-identity")["data"]
+        for field, filename in (
+            ("standCaSha256", "ca.crt"),
+            ("serverCertificateSha256", "tls.crt"),
+            ("relayCertificateSha256", "relay.crt"),
+        ):
+            actual = hashlib.sha256(base64.b64decode(keys[filename], validate=True)).hexdigest()
+            require(actual == deploy[field], "TLS origin changed since deployment: " + field)
+            report["target"][field] = actual
+
         with tempfile.TemporaryDirectory() as tmp:
             files = Path(tmp)
             for name in ("probe", "other", "relay-client", "relay-upstream", "ca.crt", "tls.crt"):

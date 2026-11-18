@@ -144,6 +144,22 @@ class ChunkReceiver:
         self.request, self.generation = request, generation
         self.received = []
 
+    def read_chunk(self, stream, generation):
+        from client import Caller
+
+        event = Caller.sse(stream)
+        if not event or event[0] != "chunk":
+            raise Refusal("output", "Expected one chunk frame.")
+        envelope = event[1]
+        try:
+            validate("wire", envelope, "notification")
+            if envelope["method"] != "ocs.chunk":
+                raise Refusal("output", "Unexpected stream method.")
+            validate("profile-wire", envelope["params"], "chunkParams")
+        except ValidationError as e:
+            raise Refusal("output", "Malformed chunk notification.") from e
+        return self.ingest(generation, envelope["params"])
+
     def ingest(self, generation, params):
         if not kernel.admit(
             True, True, True, True, params["requestId"] == self.request, self.generation, generation

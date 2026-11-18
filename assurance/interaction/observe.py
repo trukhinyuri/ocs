@@ -392,7 +392,9 @@ def streams(d):
     )
     # Independently import the candidate's consumer, retaining the frozen public wire expectations.
     import importlib.util
+    import socket
 
+    previous_path = list(sys.path)
     sys.path.insert(0, str(SUBJECT / "reference/interaction"))
     try:
         spec = importlib.util.spec_from_file_location(
@@ -402,24 +404,49 @@ def streams(d):
         sys.modules[spec.name] = consumer
         spec.loader.exec_module(consumer)
         receiver = consumer.ChunkReceiver(rid, 1)
-        insist(
-            receiver.ingest(1, first) and not receiver.ingest(1, first),
-            "wrong duplicate acceptance",
-        )
+
+        def feed(g, p):
+            # Put one real SSE notification through a local fault-injection socket.
+            envelope = {"jsonrpc": "2.0", "method": "ocs.chunk", "params": p}
+            wire = (
+                b"event: chunk\ndata: "
+                + json.dumps(envelope, ensure_ascii=False, separators=(",", ":")).encode()
+                + b"\n\n"
+            )
+            sender, reader = socket.socketpair()
+            try:
+                sender.sendall(wire)
+                sender.shutdown(socket.SHUT_WR)
+                with reader.makefile("rb") as stream:
+                    try:
+                        accepted = receiver.read_chunk(stream, g)
+                    except consumer.Refusal as err:
+                        a.journal.note(
+                            "ocs.chunk", p, a.pin, "receiver-refusal", code=err.kind, rid=rid
+                        )
+                        raise
+                if not accepted:
+                    a.journal.note("ocs.chunk", p, a.pin, "duplicate-suppressed", rid=rid)
+                return accepted
+            finally:
+                sender.close()
+                reader.close()
+
+        insist(feed(1, first) and not feed(1, first), "wrong duplicate acceptance")
         for p, g, wanted in [
             (dict(first, data="different"), 1, "conflict"),
             (last, 1, "conflict"),
             (second, 0, "denied"),
         ]:
             try:
-                receiver.ingest(g, p)
+                feed(g, p)
             except consumer.Refusal as err:
                 insist(err.kind == wanted, "wrong receiver error")
             else:
                 raise AssertionError("accepted stale, conflicting or missing chunk")
-        insist(receiver.ingest(1, second) and receiver.ingest(1, last), "lost contiguous output")
+        insist(feed(1, second) and feed(1, last), "lost contiguous output")
     finally:
-        sys.path.pop(0)
+        sys.path[:] = previous_path
     return {
         "ordinals": [first["seq"], second["seq"], last["seq"]],
         "creditPause": snap,
@@ -435,6 +462,7 @@ def events(d):
     scope = {"kind": "tenant", "id": "alice"}
     source = "fixture-" + secrets.token_hex(5)
     request = {"scope": scope, "source": source, "type": "example.status", "durable": True}
+    refused("denied", lambda: b.call("events.subscribe", request))
     sub = a.call("events.subscribe", request)
     sid = sub["subscriptionId"]
     start = sub["cursor"]

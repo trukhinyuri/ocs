@@ -459,7 +459,16 @@ def collect(oracle, subject, kind, accepted, destination, stand):
             data = load(real)
             bound = load(deployment)
             target = data["target"]
-            for field in ("clusterUID", "serviceUID", "namespace", "image", "sourceRevision"):
+            for field in (
+                "clusterUID",
+                "serviceUID",
+                "namespace",
+                "image",
+                "sourceRevision",
+                "standCaSha256",
+                "serverCertificateSha256",
+                "relayCertificateSha256",
+            ):
                 if bound[field] != target[field]:
                     raise ValueError("deployment identity mismatch: " + field)
             live = {
