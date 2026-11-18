@@ -250,8 +250,21 @@ def feature_matrix(registry, reports, root):
     return data, qualified_consumers
 
 
-def collect(oracle, subject, kind, accepted, destination, stand):
+def collect(oracle, subject, kind, accepted, destination, stand, bootstrap=False):
     started = datetime.now(timezone.utc).isoformat()
+    if not (oracle / "assurance/evidence-index.json").is_file() and not bootstrap:
+        raise ValueError(
+            "unsealed evidence roster; only an explicit pre-enrollment run is available"
+        )
+    if (
+        bootstrap
+        and subprocess.check_output(
+            ["git", "-C", str(oracle), "rev-parse", "HEAD"], text=True
+        ).strip()
+        != accepted
+    ):
+        raise ValueError("bootstrap requires the exact committed checker checkout")
+
     previous_catalog = load(oracle / "assurance/obligations.json")
     current_catalog = load(subject / "assurance/obligations.json")
     previous_scope = load(oracle / "assurance/scope.json")
@@ -443,6 +456,8 @@ def collect(oracle, subject, kind, accepted, destination, stand):
                 + (["--local"] if local else ["--image", stand["image"]])
                 + ["--report", str(deployment)]
             )
+            if stand.get("oci_proof"):
+                args += ["--oci-proof", stand["oci_proof"]]
             if stand["storage"]:
                 args += ["--storage-class", stand["storage"]]
             subprocess.run(
@@ -557,6 +572,9 @@ def collect(oracle, subject, kind, accepted, destination, stand):
     result = {
         "format": "ocs.qualification/1",
         "kind": kind,
+        "eligibility": "initial collection for review"
+        if bootstrap
+        else "independent pinned edition replay",
         "acceptedVerifier": accepted,
         "startedAt": started,
         "finishedAt": datetime.now(timezone.utc).isoformat(),
@@ -587,8 +605,13 @@ if __name__ == "__main__":
     p.add_argument("kind", choices=("local", "full"))
     p.add_argument("--subject", type=Path, required=True)
     p.add_argument("--accepted", required=True)
+    p.add_argument(
+        "--bootstrap",
+        action="store_true",
+        help="collect witnesses in the exact checker checkout before independent enrollment",
+    )
     p.add_argument("--output", type=Path, required=True)
-    for name in ("context", "kubeconfig", "image", "namespace", "storage"):
+    for name in ("context", "kubeconfig", "image", "namespace", "storage", "oci_proof"):
         p.add_argument("--" + name)
     o = p.parse_args()
     try:
@@ -601,8 +624,9 @@ if __name__ == "__main__":
                 o.output.resolve(),
                 {
                     n: getattr(o, n)
-                    for n in ("context", "kubeconfig", "image", "namespace", "storage")
+                    for n in ("context", "kubeconfig", "image", "namespace", "storage", "oci_proof")
                 },
+                o.bootstrap,
             )
         )
     except (OSError, ValueError, TypeError, KeyError, subprocess.SubprocessError) as exc:

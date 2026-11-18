@@ -23,6 +23,7 @@ def main():
     p.add_argument("--image")
     p.add_argument("--namespace")
     p.add_argument("--storage")
+    p.add_argument("--oci_proof")
     args = p.parse_args()
     root = args.subject.resolve()
     if not re.fullmatch(r"(?:[0-9a-f]{40}|[0-9a-f]{64})", args.accepted):
@@ -59,8 +60,8 @@ def main():
             "--output",
             str(run_dir),
         ]
-        for name in ("context", "kubeconfig", "image", "namespace", "storage"):
-            value = getattr(args, name)
+        for name in ("context", "kubeconfig", "image", "namespace", "storage", "oci_proof"):
+            value = getattr(args, name) or os.getenv("OCS_" + name.upper())
             if value:
                 cmd.extend(["--" + name, value])
         result = subprocess.run(cmd, cwd=root, env={**os.environ, "OCS_SUBJECT_ROOT": str(root)})
