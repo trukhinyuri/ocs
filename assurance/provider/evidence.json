@@ -1,0 +1,322 @@
+{
+  "PV-01": {
+    "A-01.identity": {
+      "probe": "authority",
+      "model": [
+        "separate_identity"
+      ]
+    },
+    "A-01.auth": {
+      "probe": "authority"
+    },
+    "A-01.custody": {
+      "probe": "authority",
+      "model": [
+        "exact_scope"
+      ],
+      "source": [
+        "handle_matches_source"
+      ]
+    },
+    "A-01.manage": {
+      "probe": "authority"
+    },
+    "A-02.health": {
+      "probe": "authority"
+    },
+    "A-03.counts": {
+      "probe": "authority"
+    },
+    "A-03.routing": {
+      "probe": "authority"
+    },
+    "A-03.surface-parity": {
+      "probe": "authority"
+    },
+    "interface.registry.broker": {
+      "probe": "authority"
+    },
+    "A-03.filters": {
+      "probe": "selected-view"
+    }
+  },
+  "PV-02": {
+    "A-02.inventory": {
+      "probe": "snapshots",
+      "model": [
+        "partial_preserves",
+        "wrong_scope_preserves"
+      ],
+      "source": [
+        "publish_matches_source"
+      ]
+    },
+    "M-01.complete": {
+      "probe": "snapshots",
+      "model": [
+        "partial_preserves",
+        "wrong_scope_preserves"
+      ],
+      "source": [
+        "publish_matches_source"
+      ]
+    },
+    "M-01.axes": {
+      "probe": "inference"
+    },
+    "M-01.eol": {
+      "probe": "snapshots",
+      "model": [
+        "derived_notice_absent",
+        "duplicate_meter_no_add"
+      ]
+    },
+    "interface.pages.pagination": {
+      "probe": "snapshots",
+      "model": [
+        "partial_preserves"
+      ]
+    },
+    "interface.pages.gap": {
+      "probe": "snapshots",
+      "model": [
+        "partial_preserves",
+        "wrong_scope_preserves"
+      ]
+    },
+    "M-01.history-notice": {
+      "probe": "selected-view"
+    }
+  },
+  "PV-03": {
+    "Q-01.unknown": {
+      "probe": "amounts",
+      "model": [
+        "zero_distinct"
+      ]
+    },
+    "Q-01.aggregate": {
+      "probe": "amounts",
+      "model": [
+        "duplicate_pool_no_add",
+        "independent_pools_add"
+      ],
+      "source": [
+        "pool_matches_source"
+      ]
+    },
+    "Q-01.reobserve": {
+      "probe": "amounts"
+    },
+    "P-02.absence": {
+      "probe": "absent-right",
+      "model": [
+        "zero_distinct",
+        "eligible_exact"
+      ]
+    },
+    "Q-01.limiting-view": {
+      "probe": "selected-view"
+    }
+  },
+  "PV-04": {
+    "P-03.meaning": {
+      "probe": "amounts",
+      "model": [
+        "prices_distinct"
+      ]
+    },
+    "P-03.basis": {
+      "probe": "amounts"
+    },
+    "P-03.shared": {
+      "probe": "amounts",
+      "model": [
+        "duplicate_meter_no_add",
+        "independent_pools_add"
+      ]
+    },
+    "P-03.plan-choices": {
+      "probe": "selected-view"
+    }
+  },
+  "PV-05": {
+    "M-02.invocation": {
+      "probe": "inference",
+      "model": [
+        "eligible_exact"
+      ],
+      "source": [
+        "route_matches_source"
+      ]
+    },
+    "M-02.response": {
+      "probe": "inference"
+    },
+    "M-02.specialized": {
+      "probe": "inference"
+    },
+    "A-02.probe": {
+      "probe": "inference",
+      "measurement": true
+    }
+  },
+  "PV-06": {
+    "A-03.usage": {
+      "probe": "business",
+      "model": [
+        "usage_partition"
+      ]
+    },
+    "A-03.retention": {
+      "probe": "selected-view"
+    }
+  },
+  "PV-07": {
+    "E-01.classify": {
+      "probe": "effects",
+      "model": [
+        "direct_consequence_denied"
+      ],
+      "source": [
+        "direct_matches_source"
+      ]
+    },
+    "E-01.direct": {
+      "probe": "effects",
+      "model": [
+        "direct_consequence_denied"
+      ]
+    },
+    "E-02.inert": {
+      "probe": "effects",
+      "model": [
+        "prepare_inert"
+      ],
+      "source": [
+        "prepare_source_inert"
+      ]
+    },
+    "E-02.canonical": {
+      "probe": "effects"
+    },
+    "E-02.key-conflict": {
+      "probe": "effects",
+      "model": [
+        "intent_changes_conflict",
+        "identical_intent_replays"
+      ],
+      "source": [
+        "prepare_matches_source"
+      ]
+    },
+    "interface.intent.scope": {
+      "probe": "effects",
+      "model": [
+        "intent_changes_conflict",
+        "identical_intent_replays",
+        "separate_identity"
+      ]
+    },
+    "interface.intent.canonical": {
+      "probe": "effects"
+    },
+    "interface.registry.write": {
+      "probe": "effects",
+      "model": [
+        "direct_consequence_denied"
+      ]
+    }
+  },
+  "PV-08": {
+    "E-03.approval": {
+      "probe": "effects",
+      "model": [
+        "denial_preserves",
+        "commit_witness",
+        "denial_witness"
+      ],
+      "source": [
+        "commit_matches_source",
+        "commit_source_refines"
+      ]
+    },
+    "E-03.preconditions": {
+      "probe": "effects",
+      "model": [
+        "stale_preserves"
+      ]
+    },
+    "E-03.serialize": {
+      "probe": "effects",
+      "model": [
+        "once_over_trace",
+        "terminal_readback"
+      ],
+      "source": [
+        "commit_source_refines"
+      ]
+    },
+    "E-03.durable": {
+      "probe": "unknown"
+    },
+    "Q-02.eligibility": {
+      "probe": "effects",
+      "model": [
+        "reset_eligible"
+      ]
+    },
+    "Q-02.consequences": {
+      "probe": "effects"
+    },
+    "Q-02.read-only": {
+      "probe": "amounts"
+    },
+    "J-02.restore": {
+      "probe": "effects"
+    }
+  },
+  "PV-09": {
+    "E-04.readback": {
+      "probe": "unknown",
+      "model": [
+        "readback_inert",
+        "unknown_witness"
+      ]
+    },
+    "E-04.unknown": {
+      "probe": "unknown",
+      "model": [
+        "unknown_preserved",
+        "unknown_witness"
+      ],
+      "source": [
+        "commit_source_refines"
+      ]
+    },
+    "E-04.refresh": {
+      "probe": "effects"
+    },
+    "E-04.retention": {
+      "probe": "effects"
+    }
+  },
+  "PV-10": {
+    "L-06.terms": {
+      "probe": "business"
+    },
+    "L-06.meter": {
+      "probe": "business",
+      "model": [
+        "duplicate_meter_no_add",
+        "changed_meter_conflicts"
+      ],
+      "source": [
+        "meter_matches_source"
+      ]
+    },
+    "L-06.recovery": {
+      "probe": "business"
+    }
+  }
+}

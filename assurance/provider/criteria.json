@@ -1,0 +1,55 @@
+{
+  "scope": "Local synthetic product. Named remote deployment evidence is a separate population.",
+  "workload": {
+    "model": "reference-colour",
+    "route": "local-primary",
+    "parameters": {
+      "reasoning": "off",
+      "tier": "standard"
+    },
+    "maxP95Milliseconds": 2000,
+    "minimumCorrect": 7,
+    "questions": [
+      [
+        "Name the shade of a clear sky.",
+        "blue"
+      ],
+      [
+        "Which colour is ocean water?",
+        "blue"
+      ],
+      [
+        "What coloured hue is sapphire?",
+        "blue"
+      ],
+      [
+        "Describe the colour of blueberries.",
+        "blue"
+      ],
+      [
+        "Name the colour of spring grass.",
+        "green"
+      ],
+      [
+        "Which shade is mint?",
+        "green"
+      ],
+      [
+        "What colour is a fern?",
+        "green"
+      ],
+      [
+        "Name the hue of emeralds.",
+        "green"
+      ]
+    ]
+  },
+  "assumptions": [
+    "The fixture host supplies the subject and isolates the trusted administrative surface.",
+    "Local transactions have SQLite BEGIN IMMEDIATE serializable writer exclusion, unique keys, durable commit on a supported local filesystem.",
+    "Canonical intent values in the sealed route use ASCII keys and strings with ordinary JSON arrays and objects.",
+    "An external dispatch cannot be inferred from a timeout. Independent owner evidence is needed for settlement.",
+    "A local text classifier and fixture terms qualify only the named synthetic service.",
+    "The Python fragment translator recognizes total Boolean decision expressions over built-in Boolean values. SQLite, cryptographic primitives, host time, CPython, Lean kernel and hardware are in the trust boundary."
+  ]
+}

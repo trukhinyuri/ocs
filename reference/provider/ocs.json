@@ -1,0 +1,454 @@
+{
+  "format": "ocs.package/0.1",
+  "id": "org.example.reset",
+  "version": "0.1.0",
+  "runtime": {
+    "binding": "stdio",
+    "entry": "executor.py",
+    "engine": "python3"
+  },
+  "exports": [
+    {
+      "id": "provider.describe",
+      "version": "1.0.0",
+      "effect": "read",
+      "inputSchema": {
+        "$ref": "urn:uuid:0aca3339-e509-59db-84d6-a730ff76b07d#/$defs/none"
+      },
+      "outputSchema": {
+        "$ref": "urn:uuid:0aca3339-e509-59db-84d6-a730ff76b07d#/$defs/providerInfo"
+      }
+    },
+    {
+      "id": "account.list",
+      "version": "1.0.0",
+      "effect": "read",
+      "inputSchema": {
+        "$ref": "urn:uuid:0aca3339-e509-59db-84d6-a730ff76b07d#/$defs/accountListInput"
+      },
+      "outputSchema": {
+        "$ref": "urn:uuid:0aca3339-e509-59db-84d6-a730ff76b07d#/$defs/accountPage"
+      }
+    },
+    {
+      "id": "account.connect",
+      "version": "1.0.0",
+      "effect": "local-write",
+      "inputSchema": {
+        "$ref": "urn:uuid:0aca3339-e509-59db-84d6-a730ff76b07d#/$defs/connectInput"
+      },
+      "outputSchema": {
+        "$ref": "urn:uuid:0aca3339-e509-59db-84d6-a730ff76b07d#/$defs/authStep"
+      }
+    },
+    {
+      "id": "account.reauthenticate",
+      "version": "1.0.0",
+      "effect": "local-write",
+      "inputSchema": {
+        "$ref": "urn:uuid:0aca3339-e509-59db-84d6-a730ff76b07d#/$defs/accountKey"
+      },
+      "outputSchema": {
+        "$ref": "urn:uuid:0aca3339-e509-59db-84d6-a730ff76b07d#/$defs/authStep"
+      }
+    },
+    {
+      "id": "account.continue",
+      "version": "1.0.0",
+      "effect": "local-write",
+      "inputSchema": {
+        "$ref": "urn:uuid:0aca3339-e509-59db-84d6-a730ff76b07d#/$defs/authContinue"
+      },
+      "outputSchema": {
+        "$ref": "urn:uuid:0aca3339-e509-59db-84d6-a730ff76b07d#/$defs/authStep"
+      }
+    },
+    {
+      "id": "account.enable",
+      "version": "1.0.0",
+      "effect": "local-write",
+      "inputSchema": {
+        "$ref": "urn:uuid:0aca3339-e509-59db-84d6-a730ff76b07d#/$defs/enableInput"
+      },
+      "outputSchema": {
+        "$ref": "urn:uuid:381a8b66-f9da-576c-93ec-9b2db63266db#/$defs/account"
+      }
+    },
+    {
+      "id": "account.signout",
+      "version": "1.0.0",
+      "effect": "local-write",
+      "inputSchema": {
+        "$ref": "urn:uuid:0aca3339-e509-59db-84d6-a730ff76b07d#/$defs/accountKey"
+      },
+      "outputSchema": {
+        "$ref": "urn:uuid:0aca3339-e509-59db-84d6-a730ff76b07d#/$defs/ack"
+      }
+    },
+    {
+      "id": "account.remove",
+      "version": "1.0.0",
+      "effect": "local-write",
+      "inputSchema": {
+        "$ref": "urn:uuid:0aca3339-e509-59db-84d6-a730ff76b07d#/$defs/accountKey"
+      },
+      "outputSchema": {
+        "$ref": "urn:uuid:0aca3339-e509-59db-84d6-a730ff76b07d#/$defs/ack"
+      }
+    },
+    {
+      "id": "limits.read",
+      "version": "1.0.0",
+      "effect": "read",
+      "inputSchema": {
+        "$ref": "urn:uuid:0aca3339-e509-59db-84d6-a730ff76b07d#/$defs/accountKey"
+      },
+      "outputSchema": {
+        "$ref": "urn:uuid:0aca3339-e509-59db-84d6-a730ff76b07d#/$defs/limits"
+      }
+    },
+    {
+      "id": "quota.reset",
+      "version": "1.0.0",
+      "effect": "external-write",
+      "inputSchema": {
+        "$ref": "urn:uuid:0aca3339-e509-59db-84d6-a730ff76b07d#/$defs/effectTarget"
+      },
+      "outputSchema": {
+        "$ref": "urn:uuid:381a8b66-f9da-576c-93ec-9b2db63266db#/$defs/effectReceipt"
+      },
+      "flags": [
+        "irreversible"
+      ]
+    },
+    {
+      "id": "plans.price",
+      "version": "1.0.0",
+      "effect": "read",
+      "inputSchema": {
+        "$ref": "urn:uuid:0aca3339-e509-59db-84d6-a730ff76b07d#/$defs/pricesInput"
+      },
+      "outputSchema": {
+        "$ref": "urn:uuid:0aca3339-e509-59db-84d6-a730ff76b07d#/$defs/prices"
+      }
+    },
+    {
+      "id": "model.list",
+      "version": "1.0.0",
+      "effect": "read",
+      "inputSchema": {
+        "$ref": "urn:uuid:0aca3339-e509-59db-84d6-a730ff76b07d#/$defs/catalogInput"
+      },
+      "outputSchema": {
+        "$ref": "urn:uuid:381a8b66-f9da-576c-93ec-9b2db63266db#/$defs/catalog"
+      }
+    },
+    {
+      "id": "model.generate",
+      "version": "1.0.0",
+      "effect": "local-write",
+      "inputSchema": {
+        "$ref": "urn:uuid:0aca3339-e509-59db-84d6-a730ff76b07d#/$defs/modelInput"
+      },
+      "outputSchema": {
+        "$ref": "urn:uuid:0aca3339-e509-59db-84d6-a730ff76b07d#/$defs/modelOutput"
+      }
+    },
+    {
+      "id": "usage.read",
+      "version": "1.0.0",
+      "effect": "read",
+      "inputSchema": {
+        "$ref": "urn:uuid:0aca3339-e509-59db-84d6-a730ff76b07d#/$defs/usageInput"
+      },
+      "outputSchema": {
+        "$ref": "urn:uuid:381a8b66-f9da-576c-93ec-9b2db63266db#/$defs/usage"
+      }
+    },
+    {
+      "id": "example.product.terms",
+      "version": "1.0.0",
+      "effect": "read",
+      "inputSchema": {
+        "$ref": "urn:uuid:0aca3339-e509-59db-84d6-a730ff76b07d#/$defs/accountKey"
+      },
+      "outputSchema": {
+        "type": "object",
+        "required": [
+          "scope",
+          "owner",
+          "organization",
+          "plan",
+          "basis",
+          "expiresAt",
+          "source",
+          "observedAt"
+        ]
+      }
+    },
+    {
+      "id": "example.account.overview",
+      "version": "1.0.0",
+      "effect": "read",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "model": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "provider": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "status": {
+            "enum": [
+              "working",
+              "needs-auth",
+              "denied",
+              "exhausted",
+              "disabled",
+              "unverified",
+              "unavailable",
+              "unknown"
+            ]
+          },
+          "timeZone": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "required": [
+          "provider",
+          "accounts",
+          "count",
+          "enabled",
+          "working",
+          "attention",
+          "sharedPools",
+          "sharedPoolRemaining",
+          "observedAt"
+        ]
+      }
+    },
+    {
+      "id": "example.classify",
+      "version": "1.0.0",
+      "effect": "local-write",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "accountId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "route": {
+            "type": "string",
+            "minLength": 1
+          },
+          "text": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "accountId",
+          "route",
+          "text"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "accountId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "route": {
+            "type": "string",
+            "minLength": 1
+          },
+          "model": {
+            "type": "string",
+            "minLength": 1
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "accountId",
+          "route",
+          "model",
+          "label"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "id": "example.model.select",
+      "version": "1.0.0",
+      "effect": "local-write",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "accountId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "route": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "model": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "tier": {
+                "enum": [
+                  "standard",
+                  "fast"
+                ]
+              },
+              "reasoning": {
+                "const": "off"
+              }
+            },
+            "required": [
+              "tier",
+              "reasoning"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "accountId",
+          "route",
+          "model",
+          "parameters"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "required": [
+          "selection",
+          "advertisedNow",
+          "notices"
+        ]
+      }
+    },
+    {
+      "id": "example.model.selection",
+      "version": "1.0.0",
+      "effect": "read",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "accountId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "accountId"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "required": [
+          "selection",
+          "advertisedNow",
+          "notices"
+        ]
+      }
+    },
+    {
+      "id": "example.conversation.exchange",
+      "version": "1.0.0",
+      "effect": "local-write",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "accountId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "contextId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "text": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "accountId",
+          "contextId",
+          "text"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "$ref": "urn:uuid:0aca3339-e509-59db-84d6-a730ff76b07d#/$defs/modelOutput"
+      }
+    },
+    {
+      "id": "example.conversation.read",
+      "version": "1.0.0",
+      "effect": "read",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "accountId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "contextId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "accountId",
+          "contextId"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "required": [
+          "accountId",
+          "contextId",
+          "turns"
+        ]
+      }
+    }
+  ],
+  "features": [
+    "ocs.providers/0.1",
+    "ocs.effects/0.1"
+  ]
+}
