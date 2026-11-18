@@ -1,0 +1,10 @@
+.git
+.venv
+out
+**/__pycache__
+**/*.pyc
+**/*.sqlite*
+**/*.pem
+**/node_modules
+**/*.olean
+**/.lake

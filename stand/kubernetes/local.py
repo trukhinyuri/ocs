@@ -1,22 +1,26 @@
 #!/usr/bin/env python3
 """Start the isolated local Kubernetes node and write a private dedicated kubeconfig."""
+
 import argparse
 import json
 import os
-from pathlib import Path
 import subprocess
-import sys
 import tempfile
 import time
+from pathlib import Path
 from urllib.request import urlopen
 
 POLICY = json.loads(Path(__file__).with_name("policy.json").read_text())["local"]
 LABEL = "org.ocs.qualification.local"
-DEFAULT_CONFIG = Path(os.environ.get("XDG_STATE_HOME", Path.home() / ".local/state")) / "ocs/kubernetes/config"
+DEFAULT_CONFIG = (
+    Path(os.environ.get("XDG_STATE_HOME", Path.home() / ".local/state")) / "ocs/kubernetes/config"
+)
 
 
 def run(*args, check=True, timeout=120):
-    return subprocess.run(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=check, timeout=timeout)
+    return subprocess.run(
+        args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=check, timeout=timeout
+    )
 
 
 def write_config(data, path):
@@ -26,11 +30,17 @@ def write_config(data, path):
         staged = Path(out.name)
         out.write(data)
     try:
-        cfg = json.loads(run("kubectl", "--kubeconfig", str(staged), "config", "view", "--raw", "-o", "json").stdout)
+        cfg = json.loads(
+            run(
+                "kubectl", "--kubeconfig", str(staged), "config", "view", "--raw", "-o", "json"
+            ).stdout
+        )
         cfg["clusters"][0]["name"] = "ocs-local"
         cfg["clusters"][0]["cluster"]["server"] = f"https://127.0.0.1:{POLICY['port']}"
         cfg["users"][0]["name"] = "ocs-local-admin"
-        cfg["contexts"] = [{"name": "ocs-local", "context": {"cluster": "ocs-local", "user": "ocs-local-admin"}}]
+        cfg["contexts"] = [
+            {"name": "ocs-local", "context": {"cluster": "ocs-local", "user": "ocs-local-admin"}}
+        ]
         cfg["current-context"] = "ocs-local"
         staged.write_text(json.dumps(cfg) + "\n")
         staged.replace(path)
@@ -48,14 +58,38 @@ def start(path, latest):
     info = run("docker", "container", "inspect", name, check=False)
     if info.returncode:
         run("docker", "pull", POLICY["image"], timeout=300)
-        run("docker", "run", "-d", "--privileged", "--restart", "always", "--name", name,
-            "--hostname", "ocs-qualification", "--label", LABEL + "=1",
-            "--tmpfs", "/run", "--tmpfs", "/var/run",
-            "--ulimit", "nofile=65535:65535", "--ulimit", "nproc=65535:65535",
-            "--volume", name + "-data:/var/lib/rancher/k3s",
-            "--publish", f"127.0.0.1:{POLICY['port']}:6443/tcp",
-            POLICY["image"], "server", "--disable", "traefik,servicelb,metrics-server",
-            "--tls-san", "127.0.0.1")
+        run(
+            "docker",
+            "run",
+            "-d",
+            "--privileged",
+            "--restart",
+            "always",
+            "--name",
+            name,
+            "--hostname",
+            "ocs-qualification",
+            "--label",
+            LABEL + "=1",
+            "--tmpfs",
+            "/run",
+            "--tmpfs",
+            "/var/run",
+            "--ulimit",
+            "nofile=65535:65535",
+            "--ulimit",
+            "nproc=65535:65535",
+            "--volume",
+            name + "-data:/var/lib/rancher/k3s",
+            "--publish",
+            f"127.0.0.1:{POLICY['port']}:6443/tcp",
+            POLICY["image"],
+            "server",
+            "--disable",
+            "traefik,servicelb,metrics-server",
+            "--tls-san",
+            "127.0.0.1",
+        )
     else:
         obj = json.loads(info.stdout)[0]
         if obj["Config"]["Labels"].get(LABEL) != "1" or obj["Config"]["Image"] != POLICY["image"]:
@@ -65,10 +99,21 @@ def start(path, latest):
             run("docker", "start", name)
     until = time.monotonic() + 180
     while time.monotonic() < until:
-        result = run("docker", "exec", name, "cat", "/etc/rancher/k3s/k3s.yaml", check=False, timeout=10)
+        result = run(
+            "docker", "exec", name, "cat", "/etc/rancher/k3s/k3s.yaml", check=False, timeout=10
+        )
         if result.returncode == 0 and result.stdout:
             write_config(result.stdout, path)
-            ready = run("kubectl", "--kubeconfig", str(path), "--request-timeout=4s", "get", "--raw=/readyz", check=False, timeout=8)
+            ready = run(
+                "kubectl",
+                "--kubeconfig",
+                str(path),
+                "--request-timeout=4s",
+                "get",
+                "--raw=/readyz",
+                check=False,
+                timeout=8,
+            )
             if ready.returncode == 0 and ready.stdout.strip() == b"ok":
                 break
         time.sleep(2)
@@ -90,6 +135,9 @@ if __name__ == "__main__":
     try:
         start(options.kubeconfig, options.verify_latest)
     except subprocess.CalledProcessError as exc:
-        parser.exit(1, f"local bootstrap failed at {exc.cmd[0]} {exc.cmd[1]}: {exc.stderr.decode(errors='replace')[:420]}\n")
+        parser.exit(
+            1,
+            f"local bootstrap failed at {exc.cmd[0]} {exc.cmd[1]}: {exc.stderr.decode(errors='replace')[:420]}\n",
+        )
     except (ValueError, OSError, RuntimeError, subprocess.TimeoutExpired) as exc:
         parser.exit(1, f"local bootstrap failed: {exc}\n")

@@ -1,0 +1,169 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ocs-provider-data
+  labels:
+    app.kubernetes.io/part-of: ocs-qualification
+spec:
+  accessModes: [ReadWriteOnce]
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ocs-provider
+  labels:
+    app.kubernetes.io/part-of: ocs-qualification
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: ocs-provider
+  template:
+    metadata:
+      annotations:
+        org.ocs/certificate-sha256: "OCS_CERTIFICATE_SHA256"
+      labels:
+        app.kubernetes.io/name: ocs-provider
+        app.kubernetes.io/part-of: ocs-qualification
+    spec:
+      automountServiceAccountToken: false
+      terminationGracePeriodSeconds: 10
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65532
+        runAsGroup: 65532
+        fsGroup: 65532
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: provider
+          image: OCS_IMAGE_REF
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: https
+              containerPort: 8443
+          env:
+            - name: POD_UID
+              valueFrom:
+                fieldRef: {fieldPath: metadata.uid}
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef: {fieldPath: metadata.namespace}
+            - name: OCS_REVISION
+              value: "OCS_SOURCE_REVISION"
+          readinessProbe:
+            httpGet: {scheme: HTTPS, path: /health, port: https}
+            periodSeconds: 3
+            timeoutSeconds: 2
+          livenessProbe:
+            httpGet: {scheme: HTTPS, path: /health, port: https}
+            periodSeconds: 15
+            failureThreshold: 4
+          resources:
+            requests: {cpu: 100m, memory: 64Mi}
+            limits: {cpu: "2", memory: 256Mi}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: [ALL]
+          volumeMounts:
+            - {name: state, mountPath: /data}
+            - {name: credentials, mountPath: /var/run/ocs/keys, readOnly: true}
+        - name: interaction
+          image: OCS_IMAGE_REF
+          imagePullPolicy: IfNotPresent
+          command: ["python", "-I", "/app/stand/kubernetes/interaction_service.py"]
+          readinessProbe:
+            exec:
+              command: ["python", "-I", "-c", "import socket; socket.create_connection(('127.0.0.1',17539),1).close()"]
+            periodSeconds: 5
+          resources:
+            requests: {cpu: 50m, memory: 64Mi}
+            limits: {cpu: "1", memory: 192Mi}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: [ALL]
+          volumeMounts:
+            - {name: state, mountPath: /data}
+            - {name: interaction-credentials, mountPath: /var/run/ocs/interaction, readOnly: true}
+      volumes:
+        - name: state
+          persistentVolumeClaim: {claimName: ocs-provider-data}
+        - name: credentials
+          secret:
+            secretName: ocs-service-identity
+            defaultMode: 288
+            items: [{key: tls.crt, path: tls.crt}, {key: tls.key, path: tls.key}, {key: probe, path: probe}, {key: work, path: work}, {key: other, path: other}, {key: relay-upstream, path: relay-upstream}]
+        - name: interaction-credentials
+          secret:
+            secretName: ocs-service-identity
+            defaultMode: 288
+            items: [{key: probe, path: probe}, {key: other, path: other}]
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ocs-provider
+  labels:
+    app.kubernetes.io/part-of: ocs-qualification
+spec:
+  selector:
+    app.kubernetes.io/name: ocs-provider
+  ports:
+    - {name: https, port: 443, targetPort: https}
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ocs-relay
+  labels: {app.kubernetes.io/part-of: ocs-qualification}
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {app.kubernetes.io/name: ocs-relay}
+  template:
+    metadata:
+      labels: {app.kubernetes.io/name: ocs-relay, app.kubernetes.io/part-of: ocs-qualification}
+      annotations: {org.ocs/certificate-sha256: "OCS_CERTIFICATE_SHA256"}
+    spec:
+      automountServiceAccountToken: false
+      securityContext: {runAsNonRoot: true, runAsUser: 65532, runAsGroup: 65532, fsGroup: 65532, seccompProfile: {type: RuntimeDefault}}
+      containers:
+        - name: relay
+          image: OCS_IMAGE_REF
+          imagePullPolicy: IfNotPresent
+          command: ["python","-I","/app/stand/kubernetes/relay.py"]
+          env:
+            - {name: POD_UID, valueFrom: {fieldRef: {fieldPath: metadata.uid}}}
+            - {name: POD_NAMESPACE, valueFrom: {fieldRef: {fieldPath: metadata.namespace}}}
+          ports: [{name: https, containerPort: 8443}]
+          readinessProbe: {httpGet: {scheme: HTTPS, path: /health, port: https}, periodSeconds: 3}
+          livenessProbe: {httpGet: {scheme: HTTPS, path: /health, port: https}, periodSeconds: 15}
+          resources: {requests: {cpu: 50m, memory: 48Mi}, limits: {cpu: "1", memory: 192Mi}}
+          securityContext: {allowPrivilegeEscalation: false, readOnlyRootFilesystem: true, capabilities: {drop: [ALL]}}
+          volumeMounts: [{name: identity, mountPath: /var/run/ocs/relay, readOnly: true}]
+      volumes:
+        - name: identity
+          secret:
+            secretName: ocs-service-identity
+            defaultMode: 288
+            items: [{key: ca.crt, path: ca.crt}, {key: relay.crt, path: relay.crt}, {key: relay.key, path: relay.key}, {key: relay-client, path: relay-client}, {key: relay-upstream, path: relay-upstream}]
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ocs-relay
+  labels: {app.kubernetes.io/part-of: ocs-qualification}
+spec:
+  selector: {app.kubernetes.io/name: ocs-relay}
+  ports: [{name: https, port: 443, targetPort: https}]
+  type: ClusterIP
