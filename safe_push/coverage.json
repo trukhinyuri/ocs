@@ -1,0 +1,502 @@
+{
+  "format": "ocs.safe-push.coverage/1",
+  "limits": {
+    "entries": 65536,
+    "pathBytes": 4096,
+    "objectBytes": 134217728,
+    "totalBytes": 1073741824,
+    "structuredBytes": 16777216
+  },
+  "base": [
+    "qualification.full",
+    "change.purpose",
+    "change.independence"
+  ],
+  "templates": {
+    "qualification.full": {
+      "kind": "qualification",
+      "ownerRole": "verifier",
+      "criterion": "The independently selected full OCS observer accepts this exact candidate, including original requirements, scenarios, controls, source/build evidence, named deployments and all applicable obligations added by the candidate.",
+      "evidence": [
+        "qualified-ocs-receipt",
+        "subject-and-full-tree",
+        "frozen-checker",
+        "complete-claim-levels"
+      ]
+    },
+    "change.purpose": {
+      "kind": "domain-review",
+      "ownerRole": "domain",
+      "criterion": "Review the actual purpose of the change, affected claims, alternatives, complexity, dependencies, contrary evidence and intended use. Identify every scientific, operational, security or safety-critical assertion independently of its file name.",
+      "evidence": [
+        "path-dispositions",
+        "claim-ids",
+        "alternatives",
+        "threats-and-hazards",
+        "scientific-applicability"
+      ]
+    },
+    "change.independence": {
+      "kind": "independent-review",
+      "ownerRole": "independent",
+      "criterion": "Independently reproduce the scope and identify omitted direct or transitive claims, references, jurisdictions, user populations or target platforms. Record unresolved disagreement.",
+      "evidence": [
+        "independent-scope-check",
+        "transitive-dependencies",
+        "contrary-findings",
+        "conflict-disposition"
+      ]
+    },
+    "policy.transition": {
+      "kind": "portable-proof",
+      "ownerRole": "verifier",
+      "criterion": "The previously enrolled verifier accepts a transition proof for the exact changed guardian, oracle or trusted input. Preserve the old meanings, admissible domains, mandatory successes, refusals and evidence levels, including the new guardian's implemented behavior.",
+      "evidence": [
+        "old-guardian",
+        "transition-certificate",
+        "old-and-new-policy",
+        "positive-and-negative-controls"
+      ]
+    },
+    "policy.independent": {
+      "kind": "independent-review",
+      "ownerRole": "independent",
+      "criterion": "Replay historical certificates and controls independently and review revocation, recovery, old/new authority sets and promotion epoch under the established guardian.",
+      "evidence": [
+        "independent-replay",
+        "threshold-authorities",
+        "revocation",
+        "audit-log"
+      ]
+    },
+    "platform.portability": {
+      "kind": "independent-review",
+      "ownerRole": "independent",
+      "criterion": "Identify every affected OS, architecture, ABI and runtime. Review retained witnesses on the enrolled targets and disclose missing or incomparable targets.",
+      "evidence": [
+        "target-matrix",
+        "path-and-mode-semantics",
+        "declared-builds",
+        "unresolved-targets"
+      ]
+    },
+    "governance.meaning": {
+      "kind": "domain-review",
+      "ownerRole": "domain",
+      "criterion": "Maintain licensing, user rights, security/privacy duties, responsibility, access, and governance under the earlier text and applications.",
+      "evidence": [
+        "original-rights",
+        "recipient-impact",
+        "authoritative-mapping"
+      ]
+    },
+    "contract.relation": {
+      "kind": "portable-proof",
+      "ownerRole": "verifier",
+      "criterion": "Recheck a preservation or non-interference relation for the exact semantic delta. Preserve original admissible inputs and conditions, defined effects and common outputs, required progress, failure outcomes, and confidentiality for consumers with optional features disabled.",
+      "evidence": [
+        "old-contract",
+        "new-contract",
+        "domain-inclusion",
+        "observation-projection",
+        "progress-and-noninterference"
+      ]
+    },
+    "contract.domain": {
+      "kind": "domain-review",
+      "ownerRole": "domain",
+      "criterion": "Review changes to version, operation identity, semantic meaning, scope, authority, state, fairness and evolution under the original consumer contracts.",
+      "evidence": [
+        "old-claim-ids",
+        "new-claim-ids",
+        "independent-consumers",
+        "migration-and-contrary-cases"
+      ]
+    },
+    "test.oracle": {
+      "kind": "qualification",
+      "ownerRole": "verifier",
+      "criterion": "Replay the original positive and forbidden behaviors from the enrolled corpus against the actual changed programs. Verify new cases on public entry points and account for every removed or relocated oracle.",
+      "evidence": [
+        "historical-scenario-ids",
+        "independent-corpus",
+        "actual-entry-point-results"
+      ]
+    },
+    "test.independent": {
+      "kind": "independent-review",
+      "ownerRole": "independent",
+      "criterion": "Compare every changed test, input dataset, fixture and expected output with the original obligation and its counterexample. Preserve adverse outcomes and the declared population.",
+      "evidence": [
+        "retained-cases",
+        "falsifier",
+        "removed-data-disposition"
+      ]
+    },
+    "build.closure": {
+      "kind": "portable-proof",
+      "ownerRole": "verifier",
+      "criterion": "Validate artifact construction for the exact input closure including dependencies, generated output, executable modes and selected tool configuration; preserve the receiver and sandbox boundaries.",
+      "evidence": [
+        "locked-inputs",
+        "verified-build-or-translation",
+        "target-artifacts"
+      ]
+    },
+    "proof.replay": {
+      "kind": "qualification",
+      "ownerRole": "verifier",
+      "criterion": "The old kernel checks the original propositions and their previous assumptions against this exact candidate's source, proofs and build identities.",
+      "evidence": [
+        "actual-kernel-replay",
+        "detached-certificates",
+        "source-binding"
+      ]
+    },
+    "proof.review": {
+      "kind": "independent-review",
+      "ownerRole": "independent",
+      "criterion": "Review the statement, domain, assumptions, imports, non-vacuity and retained positive/refusal witnesses. A stronger proof must entail the earlier promised result.",
+      "evidence": [
+        "statement-comparison",
+        "axiom-audit",
+        "reachable-positive-witness"
+      ]
+    },
+    "source.behavior": {
+      "kind": "qualification",
+      "ownerRole": "verifier",
+      "criterion": "Exercise changed source on the supported public entry points with previous and updated consumers, including refusals, concurrency, recovery and maintained state.",
+      "evidence": [
+        "old-program-behavior",
+        "new-program-behavior",
+        "source-and-artifact-ids"
+      ]
+    },
+    "source.refinement": {
+      "kind": "portable-proof",
+      "ownerRole": "verifier",
+      "criterion": "The old guardian independently replays a claim-specific relation for the changed executable semantics and the original interface, or a checked non-interference certificate for a new optional implementation.",
+      "evidence": [
+        "public-semantics",
+        "candidate-source-or-build",
+        "trusted-translation",
+        "failure-and-progress",
+        "noninterference"
+      ]
+    },
+    "artifact.provenance": {
+      "kind": "independent-review",
+      "ownerRole": "independent",
+      "criterion": "Trace every changed artifact or datum to a versioned producer, raw inputs, transformations, target, license, and complete independently reproduced content.",
+      "evidence": [
+        "producer-and-inputs",
+        "reproduction",
+        "content-and-mode-digests"
+      ]
+    },
+    "binary.refinement": {
+      "kind": "portable-proof",
+      "ownerRole": "verifier",
+      "criterion": "Independently check the declared executable bytes against the supported instruction semantics, ABI, initial state and trust boundary of the original contract.",
+      "evidence": [
+        "exact-bytes",
+        "isa-or-bytecode",
+        "checked-translation-or-binary-proof"
+      ]
+    },
+    "docs.meaning": {
+      "kind": "domain-review",
+      "ownerRole": "domain",
+      "criterion": "Check the changed text or example against named sources and actual behavior. Record substantive claims, contrary evidence, runnable examples and the disposition of purely editorial changes.",
+      "evidence": [
+        "claim-register-or-editorial-disposition",
+        "sources",
+        "runnable-example-identities"
+      ]
+    },
+    "science.protocol": {
+      "kind": "domain-review",
+      "ownerRole": "domain",
+      "criterion": "For each empirical or scientific assertion bind the prospectively registered hypothesis, domain, falsifier, instruments, sampling, uncertainty, exclusions, all raw trials and contrary observations.",
+      "evidence": [
+        "pre-result-protocol",
+        "raw-instrument-data",
+        "calibration",
+        "all-trials",
+        "counterevidence",
+        "uncertainty"
+      ]
+    },
+    "science.reproduction": {
+      "kind": "independent-review",
+      "ownerRole": "independent",
+      "criterion": "Independently reproduce scientific conclusions on the same material and replicate on new observations where the registered claim requires it; account for shared dependencies and unresolved dissent.",
+      "evidence": [
+        "independent-reproduction",
+        "replication-or-registered-reason",
+        "shared-assumptions",
+        "disagreement"
+      ]
+    },
+    "safety.hazards": {
+      "kind": "domain-review",
+      "ownerRole": "domain",
+      "criterion": "Trace each intended critical use and credible common-cause fault through controls, human/system integration, degraded behavior, evidence and documented residual risk.",
+      "evidence": [
+        "intended-use",
+        "hazards-and-severity",
+        "control-trace",
+        "residual-risk-owner"
+      ]
+    },
+    "safety.independent": {
+      "kind": "independent-review",
+      "ownerRole": "independent",
+      "criterion": "Independently validate the safety controls on each named platform, including faults, timing, containment, recovery and monitor/withdrawal decisions.",
+      "evidence": [
+        "independent-ivv",
+        "named-platform",
+        "fault-and-timing-evidence",
+        "withdrawal"
+      ]
+    },
+    "tree.object": {
+      "kind": "independent-review",
+      "ownerRole": "independent",
+      "criterion": "Qualify exact path, type, mode, ownership and deterministic interpretation on every applicable target, including directories and links.",
+      "evidence": [
+        "entry-before-and-after",
+        "target-path-and-mode",
+        "resolved-link-closure"
+      ]
+    },
+    "change.retirement": {
+      "kind": "portable-proof",
+      "ownerRole": "verifier",
+      "criterion": "Preserve every supported previously reachable behavior and state behind a retained implementation or checked equivalent mapping after removal or type change.",
+      "evidence": [
+        "original-reachable-uses",
+        "retained-equivalent",
+        "migration",
+        "replay"
+      ]
+    },
+    "science.applicability": {
+      "kind": "domain-review",
+      "ownerRole": "domain",
+      "criterion": "Account for substantive real-world, empirical and safety claims in any changed file. Where applicable, bind hypotheses, hazards, prospective experimental protocol, actual evidence, raw data and owner; otherwise record a specific independent disposition.",
+      "evidence": [
+        "per-path-claims",
+        "registered-scientific-protocol-or-disposition",
+        "hazard-controls-or-disposition",
+        "real-world-premises"
+      ]
+    },
+    "science.independence": {
+      "kind": "independent-review",
+      "ownerRole": "independent",
+      "criterion": "Confirm scientific and critical-use dispositions independently of location or authorship. For applicable claims reproduce the original materials and check independently acquired evidence or explicitly scoped external authority.",
+      "evidence": [
+        "independent-applicability",
+        "reproduction-and-replication-where-applicable",
+        "contrary-data"
+      ]
+    }
+  },
+  "classes": [
+    {
+      "id": "guardian",
+      "pattern": "safe_push/(?:[^/]+/)*(?:[^/]+\\.(?:py|lean|json|toml|ya?ml|sh)|pre-receive|post-receive|reference-transaction|update|safe-push)",
+      "policy": true,
+      "requirements": [
+        "policy.transition",
+        "policy.independent",
+        "platform.portability"
+      ]
+    },
+    {
+      "id": "forge",
+      "pattern": "(?:\\.github/(?:[^/]+/)*(?:[^/]+\\.(?:ya?ml|json|toml|sh)|CODEOWNERS)|CODEOWNERS|\\.gitlab-ci\\.yml|\\.gitattributes|\\.gitmodules)",
+      "policy": true,
+      "requirements": [
+        "policy.transition",
+        "policy.independent",
+        "platform.portability"
+      ]
+    },
+    {
+      "id": "governance",
+      "pattern": "(?:AGENTS\\.md|GOVERNANCE\\.md|CONTRIBUTING\\.md|SECURITY\\.md|assurance/qualification-plan\\.md)",
+      "policy": true,
+      "requirements": [
+        "policy.transition",
+        "policy.independent",
+        "governance.meaning"
+      ]
+    },
+    {
+      "id": "license",
+      "pattern": "(?:[^/]+/)*LICENSE(?:\\.txt)?",
+      "policy": true,
+      "requirements": [
+        "governance.meaning",
+        "policy.transition",
+        "policy.independent"
+      ]
+    },
+    {
+      "id": "delivery",
+      "pattern": "(?:examples/(?:[^/]+/)*ocs\\.json|examples/peer/assembly\\.json|reference/(?:[^/]+/)*ocs\\.json|assurance/external/example/evidence\\.json)",
+      "policy": false,
+      "requirements": [
+        "artifact.provenance",
+        "contract.domain",
+        "platform.portability",
+        "contract.relation"
+      ]
+    },
+    {
+      "id": "policy",
+      "pattern": "(?:assurance/(?:[^/]+/)*[^/]+\\.(?:py|go|json)|conformance/(?:compatibility|fixture_suite|run)\\.py|conformance/scenarios\\.json|stand/kubernetes/(?:observe|workload|browser|deploy|local|requirements|restart_check|incluster|oci)\\.py|stand/kubernetes/policy\\.json)",
+      "policy": true,
+      "requirements": [
+        "policy.transition",
+        "policy.independent",
+        "platform.portability"
+      ]
+    },
+    {
+      "id": "contract",
+      "pattern": "(?:spec/(?:[^/]+/)*[^/]+\\.md|spec/profiles/(?:index|operations)\\.json|schemas/(?:[^/]+/)*[^/]+\\.schema\\.json|version\\.json)",
+      "policy": false,
+      "requirements": [
+        "contract.relation",
+        "contract.domain",
+        "platform.portability"
+      ]
+    },
+    {
+      "id": "corpus",
+      "pattern": "(?:conformance/cases/(?:[^/]+/)*[^/]+\\.json|conformance/test_[^/]+\\.py|reference/(?:[^/]+/)*[^/]+_test\\.go|examples/records/[^/]+\\.json)",
+      "policy": false,
+      "requirements": [
+        "test.oracle",
+        "test.independent"
+      ]
+    },
+    {
+      "id": "build",
+      "pattern": "(?:Makefile|go\\.mod|go\\.sum|uv\\.lock|pyproject\\.toml|\\.dockerignore|\\.gitignore|stand/kubernetes/(?:Dockerfile|[^/]+\\.ya?ml)|tools/(?:[^/]+/)*[^/]+\\.(?:py|sh))",
+      "policy": true,
+      "requirements": [
+        "build.closure",
+        "policy.transition",
+        "policy.independent",
+        "platform.portability"
+      ]
+    },
+    {
+      "id": "proof",
+      "pattern": "assurance/(?:[^/]+/)*[^/]+\\.lean",
+      "policy": false,
+      "requirements": [
+        "proof.replay",
+        "proof.review"
+      ]
+    },
+    {
+      "id": "wasm",
+      "pattern": "assurance/external/example/[^/]+\\.wasm",
+      "policy": false,
+      "requirements": [
+        "binary.refinement",
+        "artifact.provenance",
+        "platform.portability"
+      ]
+    },
+    {
+      "id": "program",
+      "pattern": "(?:reference/(?:[^/]+/)*(?:[^/]+\\.(?:py|go|c|sh)|run)|examples/(?:[^/]+/)*[^/]+\\.(?:py|go|c|sh)|assurance/external/example/[^/]+\\.c|stand/kubernetes/[^/]+\\.py)",
+      "policy": false,
+      "requirements": [
+        "source.behavior",
+        "source.refinement",
+        "platform.portability"
+      ]
+    },
+    {
+      "id": "research",
+      "pattern": "(?:research|studies)/(?:[^/]+/)*[^/]+\\.(?:md|json|csv)",
+      "policy": false,
+      "requirements": [
+        "science.protocol",
+        "science.reproduction",
+        "platform.portability"
+      ]
+    },
+    {
+      "id": "data",
+      "pattern": "(?:data|benchmarks|models)/(?:[^/]+/)*[^/]+\\.(?:csv|json|jsonl)",
+      "policy": false,
+      "requirements": [
+        "science.protocol",
+        "science.reproduction",
+        "artifact.provenance",
+        "platform.portability"
+      ]
+    },
+    {
+      "id": "critical",
+      "pattern": "(?:critical|safety)/(?:[^/]+/)*[^/]+\\.(?:md|json)",
+      "policy": false,
+      "requirements": [
+        "safety.hazards",
+        "safety.independent",
+        "source.refinement",
+        "platform.portability"
+      ]
+    },
+    {
+      "id": "documentation",
+      "pattern": "(?:README\\.md|CHANGELOG\\.md|(?:assurance|conformance|docs|examples|proposals|reference|safe_push|stand|\\.github)/(?:[^/]+/)*[^/]+\\.md)",
+      "policy": false,
+      "requirements": [
+        "docs.meaning"
+      ]
+    }
+  ],
+  "scientificDisposition": [
+    "science.applicability",
+    "science.independence"
+  ],
+  "pureProofSubjects": [
+    "assurance/core/Proofs.lean",
+    "assurance/provider/Provider.lean",
+    "assurance/interaction/Interaction.lean",
+    "assurance/interaction/Source.lean",
+    "assurance/platform/Platform.lean",
+    "assurance/platform/Source.lean"
+  ],
+  "directoryRoots": [
+    ".github",
+    "assurance",
+    "benchmarks",
+    "conformance",
+    "critical",
+    "data",
+    "docs",
+    "examples",
+    "models",
+    "proposals",
+    "reference",
+    "research",
+    "safe_push",
+    "safety",
+    "schemas",
+    "spec",
+    "stand",
+    "studies",
+    "tools"
+  ]
+}
