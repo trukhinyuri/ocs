@@ -1,0 +1,23 @@
+# Local interaction host
+
+The example is a reviewed process serving OCS 0.1 at the numeric loopback endpoint `/ocs`. Supply a private SQLite path, an explicit port or zero, and synthetic credentials through `OCS_FIXTURE_IDENTITIES`. The JSON object maps each disposable bearer value to an `owner` and an optional `admin` Boolean. The local lifecycle and receipt issuer use the administrator for the same owner. Each ordinary reader retains its own scoped authority. See [the executable observations](../../assurance/interaction/observe.py).
+
+A client negotiates with an authenticated `ocs.describe` request and returns the server's `OCS-Session` response header on subsequent calls. The header binds the caller to the current instance epoch. Administrative retirement stops outstanding streams, invalidates the epoch and removes ephemeral resources. The host can reactivate under a fresh epoch. Process restart requires negotiation again. Durable jobs, confirmed receipts and durable subscription ownership remain in the same state database.
+
+The stream binding uses authenticated SSE with a credit window of eight chunks, four concurrent streams, a 16 KiB JSON frame limit and a five-second maximum deadline. Open request identifiers remain reserved for the bounded generation. Controls cannot affect a different owner or a closed stream. The receiver retains its complete demo sequence and distinguishes duplicate content, conflicts and gaps. Durable event records retain scoped identities for sixty seconds. The replay window covers the latest four source ordinals and reports a gap outside the retained range. Jobs use an atomic SQLite transaction and a checked waiting revision. A synthetic administrator seeds test receipts. Reading an applied receipt or cancelling its stream cannot create another receipt.
+
+The terminal renderer obtains authoritative state from the service and dispatches an admitted read, with refresh and close operable from the keyboard. A custom web contribution is checked against the configured origin, integrity and generation before selecting the safe terminal alternative. The deterministic agent supports direct and separately authenticated delegated text exchange. Its comparison records confirmation quality, wire body bytes, first useful result and end-to-end latency. It has no tokenizer and incurs zero billed inference cost.
+
+```sh
+uv run --locked python reference/interaction/server.py --port 17539 --database /path/to/fixture.sqlite
+uv run --locked python reference/interaction/terminal.py --endpoint http://127.0.0.1:17539/ocs --owner alice
+```
+
+The terminal process reads its ordinary synthetic bearer from `OCS_INTERACTION_TOKEN`. A Kubernetes pod may run the same host and access its numeric loopback interface through a colocated client or authorized port-forward. Bind the observed pod, image, configuration and freshness separately in the deployment receipt. The portable manifest's HTTPS binding outside isolated loopback requires deployment-provided authenticated transport.
+
+
+A host-owned grant epoch belongs to the authenticated tenant and the cookie also binds the principal's producer, callback or artifact purpose. Revocation admits zero further requests under the retired authority at this single host. A controlled process restart applies rotated operator credentials and invalidates preceding sessions. The fixture measures the restart and scoped read under a five-second soft budget. The connection slot has a total six-second wall lifetime from accept, including slow headers or body. Nested calls forward the remaining local monotonic budget.
+
+The terminal distinguishes refresh, retry, new work, resume and permission review. To exercise explicit local authorization, provide a named synthetic compensation proposal to `--proposal-id` and give the trusted host client `OCS_INTERACTION_APPROVER` separately. The review shows the recipient, resource, amount/currency, exact operation and intent digest. Only the current owner authority may confirm that displayed digest. An ordinary renderer event cannot approve it.
+
+Short-lived private observation state and its separately redacted diagnostic projection remain in this cell and use an owner-selected 50–5000 ms retention. Withdrawal revokes access immediately, and a bounded periodic sweep erases both copies. Durable jobs, receipt identifiers and subscriptions retain their separate recovery terms. A registered observer runs under its own named read-only binding, finite budget and stoppable instance lifetime. The agent can reserve every resource share before launching a parallel pair of separately authenticated child exchanges.

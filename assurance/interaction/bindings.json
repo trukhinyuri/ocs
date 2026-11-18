@@ -1,0 +1,772 @@
+{
+  "format": "ocs.interaction-bindings/1",
+  "subject": "org.example.interaction@0.1.0, Python reference with authenticated loopback transport",
+  "model": "Interaction.lean",
+  "sourceBridge": "lift.py and Source.lean",
+  "observations": "observe.py",
+  "assumptions": [
+    "Reviewed Python interpreter and standard integer/Boolean semantics on validated natural inputs; actual branch and call-site scope is recorded for each derivation.",
+    "Serialized instance generation and per-stream condition; SQLite committed transactions, owner-local authority and durable storage survive a process stop. Cryptographic digests use the stated hash function.",
+    "Progress has finite selected input, a scheduled available owner and delivered credit before the deadline. The local deterministic agent has no tokenizer or inference charge.",
+    "The private alias replacement, denied charge, browser renderer fallback and soft deadlines are local reference behaviors. Target-specific production claims require separate authenticated observations."
+  ],
+  "checks": {
+    "interaction.dispatchRequirements": {
+      "level": "model",
+      "claims": [
+        "C-08.lifecycle"
+      ],
+      "theorem": "Interaction.dispatchRequirements",
+      "criterion": "Exactly the inspected, admitted, bound, active, scoped current generation can dispatch."
+    },
+    "interaction.revokedNoDispatch": {
+      "level": "model",
+      "claims": [
+        "C-08.disable"
+      ],
+      "theorem": "Interaction.revokedNoDispatch",
+      "criterion": "Disabling an instance prevents fresh dispatch for all owners and epochs."
+    },
+    "interaction.staleNoDispatch": {
+      "level": "model",
+      "claims": [
+        "C-08.generation",
+        "U-03.surface-event"
+      ],
+      "theorem": "Interaction.staleNoDispatch",
+      "criterion": "Any unequal generation disables dispatch."
+    },
+    "interaction.delegationNonAmplifying": {
+      "level": "model",
+      "claims": [
+        "B-03.delegate",
+        "B-04.mutual"
+      ],
+      "theorem": "Interaction.delegationNonAmplifying",
+      "criterion": "A granted arbitrary-length path requires its parent grant and each admitted edge."
+    },
+    "interaction.scopedDispatch": {
+      "level": "model",
+      "claims": [
+        "B-03.scope",
+        "B-04.tenant",
+        "I-03.authority",
+        "composition.outbound.channel"
+      ],
+      "theorem": "Interaction.scopedDispatch",
+      "criterion": "An admitted hop preserves tenant, recipient, resource, policy epoch, freshness and required write grant."
+    },
+    "interaction.partitionDenies": {
+      "level": "model",
+      "claims": [
+        "B-04.partition"
+      ],
+      "theorem": "Interaction.partitionDenies",
+      "criterion": "A hop lacking current authority cannot dispatch."
+    },
+    "interaction.forgedLabelInert": {
+      "level": "model",
+      "claims": [
+        "G-02.trust",
+        "U-03.surface-event",
+        "I-05.observer"
+      ],
+      "theorem": "Interaction.forgedLabelInert",
+      "criterion": "A claimed content label cannot change the outcome of the scoped grant decision."
+    },
+    "interaction.reserveConserved": {
+      "level": "model",
+      "claims": [
+        "B-05.budgets",
+        "G-03.budget"
+      ],
+      "theorem": "Interaction.reserveConserved",
+      "criterion": "An admitted child share plus the remainder equals the parent's budget."
+    },
+    "interaction.cycleFuelTerminates": {
+      "level": "model",
+      "claims": [
+        "G-03.stop",
+        "B-05.budgets"
+      ],
+      "theorem": "Interaction.cycleFuelTerminates",
+      "criterion": "The retained prefix of a finite routed trace is bounded by allocated fuel."
+    },
+    "interaction.graphHopsBound": {
+      "level": "model",
+      "claims": [
+        "G-03.stop",
+        "B-05.budgets"
+      ],
+      "theorem": "Interaction.graphHopsBound",
+      "criterion": "For arbitrary routing graphs including cycles, the causal traversal visits at most its fuel allocation."
+    },
+    "interaction.retryOwnerPreserved": {
+      "level": "model",
+      "claims": [
+        "I-01.retry-owner"
+      ],
+      "theorem": "Interaction.retryOwnerPreserved",
+      "criterion": "A budgeted child preserves the retry owner and cannot increase the remaining budget."
+    },
+    "interaction.replaceDependency": {
+      "level": "model",
+      "claims": [
+        "composition.outbound.private"
+      ],
+      "theorem": "Interaction.replaceDependency",
+      "criterion": "Equivalent admitted private observations produce equal public reads under the same owner/target."
+    },
+    "interaction.openRequiresCredit": {
+      "level": "model",
+      "claims": [
+        "I-02.credit"
+      ],
+      "theorem": "Interaction.openRequiresCredit",
+      "criterion": "Open is admitted only with positive initial credit within the negotiated window."
+    },
+    "interaction.streamConserved": {
+      "level": "model",
+      "claims": [
+        "I-02.credit"
+      ],
+      "theorem": "Interaction.streamConserved",
+      "criterion": "For an arbitrary command trace, outstanding credit plus delivered chunks equals total granted."
+    },
+    "interaction.creditRefusal": {
+      "level": "model",
+      "claims": [
+        "I-02.credit"
+      ],
+      "theorem": "Interaction.creditRefusal",
+      "criterion": "A zero-credit running stream with output ready emits zero chunks."
+    },
+    "interaction.streamWitness": {
+      "level": "model",
+      "claims": [
+        "I-02.progress"
+      ],
+      "theorem": "Interaction.streamWitness",
+      "criterion": "A two-piece request with two grants produces two chunks."
+    },
+    "interaction.terminalAtMostOnce": {
+      "level": "model",
+      "claims": [
+        "I-02.terminal"
+      ],
+      "theorem": "Interaction.terminalAtMostOnce",
+      "criterion": "Reachable traces cannot exceed one terminal outcome."
+    },
+    "interaction.closedIgnoresAll": {
+      "level": "model",
+      "claims": [
+        "I-02.terminal"
+      ],
+      "theorem": "Interaction.closedIgnoresAll",
+      "criterion": "No command to a completed stream changes its state, including new credits or cancels."
+    },
+    "interaction.finishExactlyOne": {
+      "level": "model",
+      "claims": [
+        "I-02.terminal"
+      ],
+      "theorem": "Interaction.finishExactlyOne",
+      "criterion": "Finishing an open stream yields one terminal outcome without another chunk."
+    },
+    "interaction.sendOrdinal": {
+      "level": "model",
+      "claims": [
+        "I-02.number"
+      ],
+      "theorem": "Interaction.sendOrdinal",
+      "criterion": "Each accepted send advances the one-based sequence exactly once."
+    },
+    "interaction.streamProgress": {
+      "level": "model",
+      "claims": [
+        "I-02.progress"
+      ],
+      "theorem": "Interaction.streamProgress",
+      "criterion": "Under enough delivered credit and scheduled transitions, any finite remaining work reaches one terminal success."
+    },
+    "interaction.duplicateSame": {
+      "level": "model",
+      "claims": [
+        "I-02.number",
+        "G-03.dedup"
+      ],
+      "theorem": "Interaction.duplicateSame",
+      "criterion": "An exact duplicate is retained without a new delivery."
+    },
+    "interaction.duplicateConflict": {
+      "level": "model",
+      "claims": [
+        "I-02.number",
+        "G-03.dedup"
+      ],
+      "theorem": "Interaction.duplicateConflict",
+      "criterion": "A duplicate identity with different content is a conflict."
+    },
+    "interaction.ordinalGap": {
+      "level": "model",
+      "claims": [
+        "I-02.number"
+      ],
+      "theorem": "Interaction.ordinalGap",
+      "criterion": "Unknown noncontiguous sequence produces an explicit gap."
+    },
+    "interaction.ackMonotone": {
+      "level": "model",
+      "claims": [
+        "I-03.cursor"
+      ],
+      "theorem": "Interaction.ackMonotone",
+      "criterion": "Acknowledgment preserves or increases the retained cursor."
+    },
+    "interaction.ackWithin": {
+      "level": "model",
+      "claims": [
+        "I-03.cursor"
+      ],
+      "theorem": "Interaction.ackWithin",
+      "criterion": "Acknowledgment never exceeds the source head."
+    },
+    "interaction.historyGap": {
+      "level": "model",
+      "claims": [
+        "I-03.cursor"
+      ],
+      "theorem": "Interaction.historyGap",
+      "criterion": "A cursor preceding retained history is outside the replay window."
+    },
+    "interaction.jobTerminalStable": {
+      "level": "model",
+      "claims": [
+        "J-01.transitions"
+      ],
+      "theorem": "Interaction.jobTerminalStable",
+      "criterion": "An arbitrary sequence of resume/cancel controls preserves every terminal record."
+    },
+    "interaction.jobCasExclusive": {
+      "level": "model",
+      "claims": [
+        "J-01.continue"
+      ],
+      "theorem": "Interaction.jobCasExclusive",
+      "criterion": "After an accepted continuation a duplicate at the same expected revision cannot win."
+    },
+    "interaction.cancellationPreservesEffect": {
+      "level": "model",
+      "claims": [
+        "J-01.cancel"
+      ],
+      "theorem": "Interaction.cancellationPreservesEffect",
+      "criterion": "Job cancellation preserves its separately recorded effect outcome."
+    },
+    "interaction.newCompensation": {
+      "level": "model",
+      "claims": [
+        "J-02.compensate"
+      ],
+      "theorem": "Interaction.newCompensation",
+      "criterion": "A consequential compensation requires owner authority, its own approval and a distinct id."
+    },
+    "interaction.pageProgress": {
+      "level": "model",
+      "claims": [
+        "I-04.range"
+      ],
+      "theorem": "Interaction.pageProgress",
+      "criterion": "A nonempty remaining range with positive page budget makes bounded positive progress."
+    },
+    "interaction.rangeReconstructs": {
+      "level": "model",
+      "claims": [
+        "I-04.integrity"
+      ],
+      "theorem": "Interaction.rangeReconstructs",
+      "criterion": "Ordered prefix, bounded page and remainder reconstruct any original sequence."
+    },
+    "interaction.artifactIntegrity": {
+      "level": "model",
+      "claims": [
+        "I-04.integrity"
+      ],
+      "theorem": "Interaction.artifactIntegrity",
+      "criterion": "Accepting reassembly establishes declared length and agreement with the selected digest function."
+    },
+    "interaction.observationInert": {
+      "level": "model",
+      "claims": [
+        "I-03.authority",
+        "I-05.observer"
+      ],
+      "theorem": "Interaction.observationInert",
+      "criterion": "Observing an event preserves the authoritative state."
+    },
+    "interaction.readEffectsInert": {
+      "level": "model",
+      "claims": [
+        "I-02.effect"
+      ],
+      "theorem": "Interaction.readEffectsInert",
+      "criterion": "Reading a committed output preserves the effect state."
+    },
+    "interaction.unconfirmedNeverReissued": {
+      "level": "model",
+      "claims": [
+        "B-05.retry",
+        "I-02.effect",
+        "G-03.dedup"
+      ],
+      "theorem": "Interaction.unconfirmedNeverReissued",
+      "criterion": "An unconfirmed operation yields no output and remains unconfirmed on scoped readback."
+    },
+    "interaction.messageCorrelation": {
+      "level": "model",
+      "claims": [
+        "G-02.reply"
+      ],
+      "theorem": "Interaction.messageCorrelation",
+      "criterion": "Answers reference their original message, context and task, attribute the authority and preserve part order."
+    },
+    "interaction.dialogWitness": {
+      "level": "model",
+      "claims": [
+        "B-03.delegate"
+      ],
+      "theorem": "Interaction.dialogWitness",
+      "criterion": "An authorized all-grants path succeeds and a read without the parent grant is refused."
+    },
+    "interaction.admitSource": {
+      "level": "source-refinement",
+      "claims": [
+        "C-08.lifecycle",
+        "C-08.disable",
+        "C-08.generation",
+        "U-03.surface-event"
+      ],
+      "theorem": "Interaction.admitSource",
+      "criterion": "The actual Python admission decision computes the formal lifecycle/generation/owner condition for every typed input."
+    },
+    "interaction.grantSource": {
+      "level": "source-refinement",
+      "claims": [
+        "B-03.delegate",
+        "U-03.surface-event"
+      ],
+      "theorem": "Interaction.grantSource",
+      "criterion": "The deployed Python grant intersection computes the independently specified four-way intersection."
+    },
+    "interaction.reserveSource": {
+      "level": "source-refinement",
+      "claims": [
+        "G-03.budget"
+      ],
+      "theorem": "Interaction.reserveSource",
+      "criterion": "The deployed share reservation computes the natural budget remainder on admitted inputs."
+    },
+    "interaction.ackSource": {
+      "level": "source-refinement",
+      "claims": [
+        "I-03.cursor"
+      ],
+      "theorem": "Interaction.ackSource",
+      "criterion": "The deployed acknowledgment function computes the published bounded monotone cursor decision."
+    },
+    "interaction.continueSource": {
+      "level": "source-refinement",
+      "claims": [
+        "J-01.continue"
+      ],
+      "theorem": "Interaction.continueSource",
+      "criterion": "The deployed continuation guard computes owner/waiting/revision equality."
+    },
+    "interaction.pageSource": {
+      "level": "source-refinement",
+      "claims": [
+        "I-04.range"
+      ],
+      "theorem": "Interaction.pageSource",
+      "criterion": "The deployed byte-range helper computes the bounded decoded page size."
+    },
+    "interaction.streamSource": {
+      "level": "source-refinement",
+      "claims": [
+        "I-02.credit"
+      ],
+      "theorem": "Interaction.streamSource",
+      "criterion": "The live Python stream step implements the full normative give/send/finish transition for arbitrary validated naturals and owner flag."
+    },
+    "interaction.lifecycle": {
+      "level": "runtime-observation",
+      "claims": [
+        "C-08.lifecycle",
+        "C-08.disable",
+        "C-08.generation",
+        "C-08.drain",
+        "I-05.background",
+        "U-03.surface-event"
+      ],
+      "probe": "life",
+      "criterion": "Inspect the live instance, retire its stream and surface, reject stale credentials and callbacks, then admit a fresh read."
+    },
+    "interaction.stream": {
+      "level": "runtime-observation",
+      "claims": [
+        "I-02.credit",
+        "I-02.number",
+        "I-02.terminal",
+        "I-02.effect",
+        "I-02.progress",
+        "I-02.delivery",
+        "interface.http-stream.sse",
+        "interface.http-stream.control",
+        "interface.http-stream.disconnect",
+        "B-04.tenant",
+        "B-05.retry"
+      ],
+      "probe": "streams",
+      "criterion": "Check ordered SSE chunks, pause at zero credit, gated grant, foreign and late controls, finality, timeout, disconnect and preserved committed/unknown effects."
+    },
+    "interaction.events": {
+      "level": "runtime-observation",
+      "claims": [
+        "I-03.authority",
+        "I-03.dedup",
+        "I-03.cursor",
+        "I-03.lifetime",
+        "B-04.tenant"
+      ],
+      "probe": "events",
+      "criterion": "Exercise scoped durable/ephemeral subscriptions, deduplication, conflicting payload, restart, cursor gap, ACK monotonicity and release."
+    },
+    "interaction.jobs": {
+      "level": "runtime-observation",
+      "claims": [
+        "J-01.transitions",
+        "J-01.continue",
+        "J-01.cancel",
+        "J-01.ownership",
+        "J-02.restore",
+        "J-02.compensate",
+        "B-05.retry"
+      ],
+      "probe": "jobs",
+      "criterion": "Exercise resume race, cancellation, scope, backup/restore and separate authorized compensating operation on the local durable ledger."
+    },
+    "interaction.artifact": {
+      "level": "runtime-observation",
+      "claims": [
+        "I-04.scope",
+        "I-04.range",
+        "I-04.integrity",
+        "I-04.lifetime",
+        "B-03.scope",
+        "I-04.purpose"
+      ],
+      "probe": "artifact",
+      "criterion": "Read a Unicode artifact over three bounded frames, then test mismatch, expiry, foreign owner, release, exact EOF, hash and length."
+    },
+    "interaction.delegation": {
+      "level": "runtime-observation",
+      "claims": [
+        "B-03.delegate",
+        "B-03.scope",
+        "B-03.no-reroute",
+        "B-04.mutual",
+        "B-04.context",
+        "B-04.partition",
+        "B-05.budgets",
+        "B-05.local",
+        "I-01.one-shot",
+        "I-01.retry-owner",
+        "I-05.observer",
+        "I-05.transform",
+        "I-05.background",
+        "composition.outbound.channel",
+        "composition.outbound.callback",
+        "composition.outbound.private",
+        "B-06.trace"
+      ],
+      "probe": "delegation",
+      "criterion": "Test explicit local bindings, private replacement, parent identity, retry owner, remaining time, cycle, denied effects, outage survival and inert ordered hooks."
+    },
+    "interaction.peerOutage": {
+      "level": "measurement",
+      "claims": [
+        "B-05.local"
+      ],
+      "probe": "delegation",
+      "criterion": "Observe elapsed local read under authoritative loss of the optional peer with a five-second limit."
+    },
+    "interaction.surface": {
+      "level": "runtime-observation",
+      "claims": [
+        "U-01.placement",
+        "U-01.headless",
+        "U-02.declarative",
+        "U-02.web",
+        "U-02.alternative",
+        "U-03.surface-event",
+        "U-03.close",
+        "U-04.negative",
+        "U-02.web-boundary"
+      ],
+      "probe": "ui",
+      "criterion": "Exercise scoped placement, data/action validation, web source/origin/generation admission, explicit fallback and close preserving the durable job."
+    },
+    "interaction.keyboard": {
+      "level": "measurement",
+      "claims": [
+        "U-03.accessibility",
+        "U-03.recovery-actions"
+      ],
+      "probe": "keyboard",
+      "criterion": "Drive refresh and close through a PTY at 28 and 14 effective columns; labels for state, unknown quota, checked time, reset and reconnect remain legible."
+    },
+    "interaction.agent": {
+      "level": "runtime-observation",
+      "claims": [
+        "G-01.native",
+        "G-01.modalities",
+        "G-02.reply",
+        "G-02.outcomes",
+        "G-02.trust",
+        "G-03.budget",
+        "G-03.dedup",
+        "G-03.stop",
+        "G-03.privacy",
+        "G-04.two-way",
+        "G-04.faults",
+        "U-04.discovery",
+        "U-04.negative",
+        "B-03.secret"
+      ],
+      "probe": "agent",
+      "criterion": "Drive two-way native fact exchange, clarification, partial answer, delegated authority refusal, budget stop, duplicate and cancellation."
+    },
+    "interaction.agentComparison": {
+      "level": "measurement",
+      "claims": [
+        "G-04.comparison"
+      ],
+      "probe": "comparison",
+      "criterion": "Compare a direct and two relayed public exchanges to the same deterministic authority, validate every confirmation, measure bytes and elapsed time."
+    },
+    "interaction.viewScope": {
+      "level": "model",
+      "claims": [
+        "U-02.declarative",
+        "U-03.surface-event"
+      ],
+      "theorem": "Interaction.viewScope",
+      "criterion": "A versioned action belongs to the manifest, rendered action list and current grants; current values validate."
+    },
+    "interaction.callbackBoundary": {
+      "level": "model",
+      "claims": [
+        "composition.outbound.callback"
+      ],
+      "theorem": "Interaction.callbackBoundary",
+      "criterion": "A busy serial channel cannot admit its own synchronous callback, while a separately granted channel can."
+    },
+    "interaction.directionSeparatesID": {
+      "level": "model",
+      "claims": [
+        "composition.outbound.callback"
+      ],
+      "theorem": "Interaction.directionSeparatesID",
+      "criterion": "The same opaque request ID on opposite directions identifies distinct outstanding work."
+    },
+    "interaction.keyedDelivery": {
+      "level": "model",
+      "claims": [
+        "I-03.dedup"
+      ],
+      "theorem": "Interaction.keyedDelivery",
+      "criterion": "An existing tenant/source/event ID produces same or conflict according to actual content equality."
+    },
+    "interaction.distinctPublication": {
+      "level": "model",
+      "claims": [
+        "I-03.dedup",
+        "B-04.tenant"
+      ],
+      "theorem": "Interaction.distinctPublication",
+      "criterion": "Updating one event key preserves lookup for every distinct scope/source/ID."
+    },
+    "interaction.unauthorizedFinishInert": {
+      "level": "model",
+      "claims": [
+        "I-02.terminal"
+      ],
+      "theorem": "Interaction.unauthorizedFinishInert",
+      "criterion": "An unowned terminal control cannot change any stream state."
+    },
+    "interaction.rollingCreditProgress": {
+      "level": "model",
+      "claims": [
+        "I-02.progress"
+      ],
+      "theorem": "Interaction.rollingCreditProgress",
+      "criterion": "With a finite available output, delivered credits and scheduled work, a one-credit window suffices for arbitrary finite length."
+    },
+    "interaction.pagesReassemble": {
+      "level": "model",
+      "claims": [
+        "I-04.integrity"
+      ],
+      "theorem": "Interaction.pagesReassemble",
+      "criterion": "Arbitrary finite page requests yield a prefix and suffix that reconstruct the original data."
+    },
+    "interaction.byteRankDrops": {
+      "level": "model",
+      "claims": [
+        "I-04.range"
+      ],
+      "theorem": "Interaction.byteRankDrops",
+      "criterion": "A positive page strictly decreases the remaining byte distance inside the artifact."
+    },
+    "interaction.surfaceSource": {
+      "level": "source-refinement",
+      "claims": [
+        "U-03.surface-event"
+      ],
+      "theorem": "Interaction.surfaceSource",
+      "criterion": "The running Python guard computes the independently specified eligibility predicate for every Boolean combination."
+    },
+    "interaction.callbackSource": {
+      "level": "source-refinement",
+      "claims": [
+        "composition.outbound.callback"
+      ],
+      "theorem": "Interaction.callbackSource",
+      "criterion": "The running Python serial/reverse-channel gate computes the independently specified return-path rule."
+    },
+    "interaction.grantEpoch": {
+      "level": "runtime-observation",
+      "claims": [
+        "B-04.revocation-lag",
+        "B-04.partition",
+        "B-04.tenant",
+        "C-08.generation"
+      ],
+      "probe": "updated_policy",
+      "criterion": "Revoking one tenant stops active work immediately at the host gate, rejects old epochs after reconnect and leaves another owner readable."
+    },
+    "interaction.background": {
+      "level": "runtime-observation",
+      "claims": [
+        "I-05.background",
+        "I-05.background-identity",
+        "C-08.disable"
+      ],
+      "probe": "updated_policy",
+      "criterion": "An actual independently identified read worker advances only in its allocated scope, stops on revocation and exhausts exactly its finite budget."
+    },
+    "interaction.privacy": {
+      "level": "runtime-observation",
+      "claims": [
+        "B-06.data-policy",
+        "B-03.secret"
+      ],
+      "probe": "data_policy",
+      "criterion": "Time-limited user state and separately redacted diagnostics have tenant-local access, bounded erasure and declared residency."
+    },
+    "interaction.callback": {
+      "level": "runtime-observation",
+      "claims": [
+        "composition.outbound.callback",
+        "composition.outbound.channel"
+      ],
+      "probe": "callback",
+      "criterion": "A real authenticated reverse call reuses the original ID only on a separately admitted direction; self-wait and direct forgery are refused."
+    },
+    "interaction.lateOutcome": {
+      "level": "runtime-observation",
+      "claims": [
+        "W-04.write-timeout",
+        "J-01.cancel",
+        "J-01.continue"
+      ],
+      "probe": "late_job",
+      "criterion": "Delay delivery after a real SQLite continuation and cancellation commit; report the durable scoped operation ID and recover both actual terminal states and the existing receipt."
+    },
+    "interaction.trustedReview": {
+      "level": "runtime-observation",
+      "claims": [
+        "U-03.review-intent",
+        "E-03.approval"
+      ],
+      "probe": "review_intent",
+      "criterion": "Rebuild the reviewed digest from the exact tenant, recipient, resource, amount, currency, package and execution intent; only the trusted owner can authorize it."
+    },
+    "interaction.socketAndBudget": {
+      "level": "runtime-observation",
+      "claims": [
+        "W-04.propagate",
+        "B-05.budgets",
+        "W-03.queues",
+        "I-01.retry-owner"
+      ],
+      "probe": "transport_bounds",
+      "criterion": "Bound continuous header/body drips and propagate the locally shorter parent deadline before a real delayed child request."
+    },
+    "interaction.recoveryActions": {
+      "level": "runtime-observation",
+      "claims": [
+        "U-03.recovery-actions",
+        "U-03.review-intent"
+      ],
+      "probe": "keyboard",
+      "criterion": "A keyboard client creates new work, resumes the saved job, retries a read and reviews a separate exact consent at both widths."
+    },
+    "interaction.registry": {
+      "level": "runtime-observation",
+      "claims": [
+        "T-03.feature-matrix",
+        "interface.registry.channels"
+      ],
+      "probe": "agent",
+      "criterion": "Record actual cross-edition frame shapes, outcomes and checked registry operation identity on the executed native agent exchange."
+    },
+    "interaction.tenantNoninterference": {
+      "level": "model",
+      "claims": [
+        "B-04.tenant",
+        "B-03.scope"
+      ],
+      "theorem": "Interaction.tenantNoninterference",
+      "criterion": "Arbitrary updates by a different owner preserve the selected tenant grant, cancellation handle or event record."
+    },
+    "interaction.historicalAgent": {
+      "level": "runtime-observation",
+      "claims": [
+        "T-03.feature-matrix",
+        "T-03.directions",
+        "G-02.reply"
+      ],
+      "probe": "historical_dialog",
+      "criterion": "The actual frozen 6f6e228 host implementation negotiates with the selected working native agent executor, acquires and confirms a scoped private fact and observes denial outside its grant."
+    },
+    "interaction.parallelConservation": {
+      "level": "model",
+      "claims": [
+        "G-03.budget",
+        "B-05.budgets"
+      ],
+      "theorem": "Interaction.parallelConservation",
+      "criterion": "For every finite list of accepted reservations, the parent equals the sum of allocated shares and the remaining amount in each checked dimension."
+    },
+    "interaction.oversizedShareRefused": {
+      "level": "model",
+      "claims": [
+        "G-03.budget",
+        "B-05.budgets"
+      ],
+      "theorem": "Interaction.oversizedShareRefused",
+      "criterion": "A share exceeding the remaining resource dimension prevents accepting the allocation."
+    }
+  }
+}

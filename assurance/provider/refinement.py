@@ -4,6 +4,7 @@ import ast
 import hashlib
 import json
 import os
+import platform
 import re
 import subprocess
 import tempfile
@@ -15,7 +16,55 @@ APPROVED_AXIOMS = {"propext", "Quot.sound", "Classical.choice"}
 
 
 def sha(path):
-    return hashlib.sha256(path.read_bytes()).hexdigest()
+    with path.open("rb") as stream:
+        return hashlib.file_digest(stream, "sha256").hexdigest()
+
+
+def semantic_declarations(text):
+    # The frozen model uses a restricted declaration grammar. Preserve string
+    # tokens verbatim while allowing ordinary comments/whitespace and new definitions.
+    commands = list(
+        re.finditer(
+            r"(?m)^(?:private )?(def|abbrev|structure|inductive|theorem|namespace|end|import)\b(?:\s+(\w+))?",
+            text,
+        )
+    )
+    found = {}
+    for i, cmd in enumerate(commands):
+        if cmd[1] not in {"def", "abbrev", "structure", "inductive"}:
+            continue
+        contents = text[
+            cmd.start() : commands[i + 1].start() if i + 1 < len(commands) else len(text)
+        ]
+        tokens = re.findall(
+            r'"(?:\\.|[^"\\])*"|--[^\n]*|/\-.*?\-/|[\w\']+|[^\s]', contents, re.DOTALL
+        )
+        if cmd[2] in found:
+            raise ValueError("ambiguous formal definition: " + cmd[2])
+        found[cmd[2]] = [t for t in tokens if not t.startswith(("--", "/-"))]
+    return found
+
+
+def accepted_tools():
+    config = json.loads((ORACLE.parent / "wire/toolchain.json").read_text())
+    target = platform.system() + "/" + platform.machine()
+    build = config["builds"].get(target)
+    if config["release"] != TOOLCHAIN or not build:
+        raise ValueError("no independently selected provider kernel on this release/platform")
+    env = {
+        k: v
+        for k, v in os.environ.items()
+        if k not in ("LD_PRELOAD", "LD_LIBRARY_PATH", "LEAN_PATH", "LEAN_SRC_PATH", "LEAN_SYSROOT")
+    }
+    env["ELAN_TOOLCHAIN"] = TOOLCHAIN
+    lean = Path(
+        subprocess.check_output(["elan", "which", "lean"], env=env, text=True).strip()
+    ).resolve()
+    prefix = lean.parent.parent
+    for name, identity in build["files"].items():
+        if sha(prefix / name) != identity:
+            raise ValueError("changed accepted verifier binary or library: " + name)
+    return prefix, config, env
 
 
 def boolean_ir(node, args):
@@ -590,13 +639,24 @@ SOURCE_TYPES = {
 
 def verify(subject, certificate_path=None):
     model = subject / "assurance/provider/Provider.lean"
+    candidate_contract = subject / "assurance/provider/Contract.lean"
+    for source in (candidate_contract, model):
+        expected = semantic_declarations((ORACLE / source.name).read_text())
+        observed = semantic_declarations(source.read_text())
+        for name, terms in expected.items():
+            if observed.get(name) != terms:
+                raise ValueError("changed accepted formal declaration: " + name)
+    text = candidate_contract.read_text() + "\n" + model.read_text()
     if re.search(
         r"(?m)^\s*(?:axiom|unsafe|elab|macro|syntax|initialize|#eval|run_cmd)\b|\bsorry\b|\bnative_decide\b|skipKernelTC|trustCompiler",
-        model.read_text(),
+        text,
     ):
         raise ValueError("unexpected trusted or unfinished declaration in candidate provider proof")
     if re.findall(r"(?m)^import (\S+)\s*$", model.read_text()) != ["Contract"]:
         raise ValueError("provider proof imports outside approved contract")
+    if re.findall(r"(?m)^import (\S+)\s*$", candidate_contract.read_text()) != ["Std"]:
+        raise ValueError("provider contract imports outside approved basis")
+    toolprefix, approval, environment = accepted_tools()
     srcfiles = [subject / "reference/provider/policy.py", subject / "examples/reset/decision.py"]
     translated = translate(
         srcfiles[0],
@@ -648,7 +708,7 @@ theorem commit_source_refines (s : Effect) (digest grant approved expiry pin pre
     derived = ["prepare_source_inert", "commit_source_refines"]
     with tempfile.TemporaryDirectory(prefix="ocs-provider-proof-") as directory:
         out = Path(directory)
-        (out / "Contract.lean").write_bytes((ORACLE / "Contract.lean").read_bytes())
+        (out / "Contract.lean").write_bytes(candidate_contract.read_bytes())
         (out / "Provider.lean").write_bytes(model.read_bytes())
         (out / "Check.lean").write_text(
             "import Provider\nnamespace OCS.Provider\n"
@@ -657,15 +717,12 @@ theorem commit_source_refines (s : Effect) (digest grant approved expiry pin pre
             + check
             + "\nend OCS.Provider\n"
         )
-        env = {**os.environ, "LEAN_PATH": directory}
+        env = {**environment, "LEAN_PATH": directory}
         outputs = []
         for n in ("Contract", "Provider", "Check"):
             run = subprocess.run(
                 [
-                    "elan",
-                    "run",
-                    TOOLCHAIN,
-                    "lean",
+                    str(toolprefix / "bin/lean"),
                     "-DwarningAsError=true",
                     "-o",
                     n + ".olean",
@@ -703,14 +760,11 @@ theorem commit_source_refines (s : Effect) (digest grant approved expiry pin pre
                 copy.write(derived_file.read_bytes())
                 staged = Path(copy.name)
             os.replace(staged, certificate_path)
-        toolprefix = subprocess.check_output(
-            ["elan", "run", TOOLCHAIN, "lean", "--print-prefix"], text=True
-        ).strip()
-        kernel = Path(toolprefix) / "bin/leanchecker"
+        kernel = toolprefix / "bin/leanchecker"
         version = subprocess.check_output(
-            ["elan", "run", TOOLCHAIN, "lean", "--githash"], text=True
+            [str(toolprefix / "bin/lean"), "--githash"], env=env, text=True
         ).strip()
-        if version != "b35cb10cf2ced51a2fd1880cfdbf75c71ab7a35a":
+        if version != approval["commit"]:
             raise ValueError("unexpected Lean toolchain commit")
         replay = subprocess.run(
             [str(kernel), "--silent", "Contract", "Provider", "Check"],
@@ -730,6 +784,7 @@ theorem commit_source_refines (s : Effect) (digest grant approved expiry pin pre
             "certificateCheckerSha256": sha(kernel),
             "toolchainCommit": version,
             "contractSha256": sha(ORACLE / "Contract.lean"),
+            "candidateContractSha256": sha(candidate_contract),
             "proofSha256": sha(model),
             "generatedCertificateSha256": sha(derived_file),
             "generatedCertificate": certificate_path.name if certificate_path else None,

@@ -1,0 +1,228 @@
+{
+  "format": "ocs.platform-bindings/1",
+  "subject": "org.example.cell@0.1.0, independent local POSIX resource cells",
+  "scope": "Two separate processes and storage roots, authenticated numeric loopback endpoints, soft-deadline POSIX descriptor and filesystem reference.",
+  "criteria": {
+    "samples": 32,
+    "concurrency": 4,
+    "tenantSlots": 2,
+    "cellSlots": 4,
+    "perCallMs": 5000,
+    "cancellationMs": 5000,
+    "restartAndReadMs": 5000,
+    "desiredBytes": 64,
+    "tenantStoreBytes": 32768
+  },
+  "assumptions": [
+    "The trusted operator configures transport principals, cells, read export/import grants, snapshot trust key and writable per-tenant POSIX storage.",
+    "SQLite committed transactions and the single live writer epoch hold while the state directory is available. A restart is verified on the same storage; total simultaneous media loss is a separate external deployment claim.",
+    "Native handles are owned file descriptors in reviewed processes on this ABI. The named adapter supports soft timing and refuses hard deadlines and unnamed containment.",
+    "The sampled workload is an isolated two-cell deployment. Native and bound measurements share data and the same freshness comparison. Production capacity requires target-bound observations."
+  ],
+  "checks": {
+    "platform.readyMeansObserved": {
+      "level": "model",
+      "theorem": "Platform.readyMeansObserved",
+      "criterion": "Readiness requires the authenticated owner, active revision and observation of exactly the desired physical contents.",
+      "claims": [
+        "L-01.resource"
+      ]
+    },
+    "platform.acceptanceIsPending": {
+      "level": "model",
+      "theorem": "Platform.acceptanceIsPending",
+      "criterion": "An accepted new desired revision starts pending.",
+      "claims": [
+        "L-01.resource"
+      ]
+    },
+    "platform.reconciledRequestIsReady": {
+      "level": "model",
+      "theorem": "Platform.reconciledRequestIsReady",
+      "criterion": "Materializing the accepted request provides a reachable ready result.",
+      "claims": [
+        "L-01.resource"
+      ]
+    },
+    "platform.wrongTenant": {
+      "level": "model",
+      "theorem": "Platform.wrongTenant",
+      "criterion": "A different authenticated tenant cannot see the resource state.",
+      "claims": [
+        "L-01.resource",
+        "L-02.autonomy"
+      ]
+    },
+    "platform.peerRequiresBoth": {
+      "level": "model",
+      "theorem": "Platform.peerRequiresBoth",
+      "criterion": "An available cross-domain observed result has an import, export, online peer and matching scope.",
+      "claims": [
+        "L-02.autonomy"
+      ]
+    },
+    "platform.revokedPreservesLocal": {
+      "level": "model",
+      "theorem": "Platform.revokedPreservesLocal",
+      "criterion": "Revoking the export blocks the external observation without changing the state owner's local observation.",
+      "claims": [
+        "L-02.autonomy",
+        "L-02.partition"
+      ]
+    },
+    "platform.interruptedOutcome": {
+      "level": "model",
+      "theorem": "Platform.interruptedOutcome",
+      "criterion": "Loss of new evidence preserves the unknown remote operation and its identifier.",
+      "claims": [
+        "L-02.partition"
+      ]
+    },
+    "platform.soleWriter": {
+      "level": "model",
+      "theorem": "Platform.soleWriter",
+      "criterion": "In one fence state at a given epoch, two admitted writers have the same identity.",
+      "claims": [
+        "L-05.cutover"
+      ]
+    },
+    "platform.retiredEpochCannotWrite": {
+      "level": "model",
+      "theorem": "Platform.retiredEpochCannotWrite",
+      "criterion": "After cutover the retired epoch cannot authorize a write.",
+      "claims": [
+        "L-05.cutover"
+      ]
+    },
+    "platform.migrationPreserves": {
+      "level": "model",
+      "theorem": "Platform.migrationPreserves",
+      "criterion": "Cutover preserves resource identity, state owner, pending state and previously owned data.",
+      "claims": [
+        "L-05.cutover"
+      ]
+    },
+    "platform.nativeRequiresBoundary": {
+      "level": "model",
+      "theorem": "Platform.nativeRequiresBoundary",
+      "criterion": "Successful native admission implies compatible target, ABI, authority and supported confinement.",
+      "claims": [
+        "L-03.confinement"
+      ]
+    },
+    "platform.hardTimingRefused": {
+      "level": "model",
+      "theorem": "Platform.hardTimingRefused",
+      "criterion": "This soft-time native deployment rejects every proposed hard deadline.",
+      "claims": [
+        "L-03.timing"
+      ]
+    },
+    "platform.retiredHandleRefused": {
+      "level": "model",
+      "theorem": "Platform.retiredHandleRefused",
+      "criterion": "A changed owner epoch invalidates the native handle.",
+      "claims": [
+        "L-03.confinement"
+      ]
+    },
+    "platform.finiteCell": {
+      "level": "model",
+      "theorem": "Platform.finiteCell",
+      "criterion": "For any finite trace of admissions and releases, per-tenant and total occupancy remain within configured bounds.",
+      "claims": [
+        "B-07.limits"
+      ]
+    },
+    "platform.witness": {
+      "level": "model",
+      "theorem": "Platform.witness",
+      "criterion": "An admissible soft native path succeeds, an incompatible ABI fails and an at-capacity cell cannot grow its occupancy.",
+      "claims": [
+        "L-03.confinement",
+        "B-07.limits"
+      ]
+    },
+    "platform.resource": {
+      "level": "runtime-observation",
+      "probe": "lifecycle",
+      "criterion": "Observe pending before materialization, actual damage as degraded, authorized replay and scoped export/restore with disclosed required capacity.",
+      "claims": [
+        "L-01.resource",
+        "L-01.lifecycle",
+        "L-01.policy",
+        "L-06.terms",
+        "L-06.recovery",
+        "T-03.feature-matrix"
+      ]
+    },
+    "platform.descriptor": {
+      "level": "runtime-observation",
+      "probe": "native",
+      "criterion": "Open/read/release a real POSIX descriptor, reject altered target, ABI, authority, isolation or hard deadlines, then perform fenced writer cutover and reconcile pending work after restart.",
+      "claims": [
+        "L-03.descriptors",
+        "L-03.confinement",
+        "L-03.timing",
+        "L-05.mapping",
+        "L-05.cutover"
+      ]
+    },
+    "platform.federation": {
+      "level": "runtime-observation",
+      "probe": "federation",
+      "criterion": "Both independent cells must approve a read. Revocation preserves local ownership and a real stopped peer leaves an identical unknown operation on repeated readback.",
+      "claims": [
+        "L-02.autonomy",
+        "T-03.feature-matrix"
+      ]
+    },
+    "platform.partition": {
+      "level": "measurement",
+      "probe": "federation",
+      "criterion": "Measure local observation through peer loss and time from restarting the same persistent cell to successful scoped remote read.",
+      "claims": [
+        "L-02.partition",
+        "L-04.recovery",
+        "B-07.limits"
+      ]
+    },
+    "platform.capacity": {
+      "level": "measurement",
+      "probe": "capacity",
+      "criterion": "Measure 32 bound reads at concurrency four against the same native file bytes. Retain raw latencies, available dedicated control capacity, first result, p95/p99 and actual cancellation latency.",
+      "claims": [
+        "L-04.workload",
+        "L-04.tail",
+        "L-04.recovery",
+        "B-07.limits",
+        "B-07.workload"
+      ]
+    },
+    "platform.nativeSource": {
+      "level": "source-refinement",
+      "theorem": "Platform.nativeSource",
+      "criterion": "The running Python admission decision implements all four checks and rejects every hard-timing request.",
+      "claims": [
+        "L-03.confinement",
+        "L-03.timing"
+      ]
+    },
+    "platform.writerSource": {
+      "level": "source-refinement",
+      "theorem": "Platform.writerSource",
+      "criterion": "The SQLite mutation first checks the source-derived tenant, writer identity and observed epoch decision.",
+      "claims": [
+        "L-05.cutover"
+      ]
+    },
+    "platform.cellSource": {
+      "level": "source-refinement",
+      "theorem": "Platform.cellSource",
+      "criterion": "The Python admission decision implements the proved global and tenant occupancy predicate.",
+      "claims": [
+        "B-07.limits"
+      ]
+    }
+  }
+}

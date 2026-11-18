@@ -1,4 +1,5 @@
 {
+  "assurance": {"catalog": "assurance/obligations.json", "scope": "assurance/scope.json", "entry": "make qualify", "dossier": "out/qualification/full/latest/report.json"},
   "requirements": {
     "spec/core.md": {
       "C-01": ["package-inspection"],
@@ -271,7 +272,7 @@
     "model-invocation": {
       "scope": "Adapter serving an explicitly selected account, route, model and mode",
       "expect": "Attribute the actual reply and reject silent substitution.",
-      "checks": [],
+      "checks": ["conformance/test_provider_reference.py#test_requested_model_and_mode"],
       "qualification": "Qualify each supported mode and parameter combination against its real endpoint."
     },
     "surface-actions": {
@@ -305,7 +306,7 @@
     "instance-lifecycle": {
       "scope": "Host draining an instance, hook or surface",
       "expect": "Revocation prevents new dispatch. Retired generations release resources and cannot act on current state.",
-      "checks": [],
+      "checks": ["conformance/test_interaction_reference.py#test_retired_instance"],
       "qualification": "Exercise disablement, crash, hook reentry and replacement on a lifecycle implementation."
     },
     "operational-evidence": {
@@ -319,7 +320,7 @@
     "stream-delivery": {
       "scope": "Producer and slow consumer on a negotiated stream",
       "expect": "Enforce credit, ordered progress, cancellation and one terminal outcome.",
-      "checks": [],
+      "checks": ["conformance/test_interaction_reference.py#test_credit_and_terminal_outcome"],
       "qualification": "Exercise a real stream binding across slow consumers, reconnects and sequence gaps."
     },
     "event-delivery": {
@@ -357,13 +358,13 @@
     "capacity-and-recovery": {
       "scope": "Independent cells, tenants and a constrained native path",
       "expect": "Bound resource use and demonstrate recovery and timing for a named workload and failure domain.",
-      "checks": [],
+      "checks": ["conformance/test_platform_reference.py#test_cell_capacity_and_recovery"],
       "qualification": "Measure throughput, queue growth, latency and recovery under the declared load and loss of a cell."
     },
     "service-obligations": {
       "scope": "Operator of a metered or commercial service",
       "expect": "Maintain accountable terms, ownership, retention and idempotent meter attribution across upgrades and recovery.",
-      "checks": [],
+      "checks": ["conformance/test_provider_reference.py#test_meter_terms_and_recovery"],
       "qualification": "Verify metering, billing, support and continuity against the actual offering."
     }
   }

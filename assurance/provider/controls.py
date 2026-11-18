@@ -16,6 +16,7 @@ SUBJECTS = (
     "reference/provider/policy.py",
     "reference/provider/service.py",
     "assurance/provider/Provider.lean",
+    "assurance/provider/Contract.lean",
 )
 
 
@@ -40,6 +41,14 @@ def main():
     p.add_argument("--report", required=True, type=Path)
     args = p.parse_args()
     controls = [
+        (
+            "E-03.serialize",
+            "weaken-public-contract-definition",
+            "assurance/provider/Contract.lean",
+            "def Once := ∀ events : List Event, (trace fresh events).dispatches ≤ 1",
+            "def Once := ∀ events : List Event, (trace fresh events).dispatches ≤ 2",
+            False,
+        ),
         (
             "M-02.invocation",
             "drop-subject-authorization",
