@@ -2,6 +2,7 @@
 
 import hashlib
 import json
+import math
 import os
 import subprocess
 import tempfile
@@ -224,6 +225,17 @@ def verify_stand(stand, policy, subject, target, now):
     ):
         raise ValueError("comparison used an unbound model or relay")
     for name, route in routes.items():
+        for metric in ("synchronousFirstUsefulMs", "endToEndMs"):
+            summary = route[metric]
+            quantiles = [summary[q] for q in ("p50", "p95", "p99", "max")]
+            if (
+                summary["n"] != limits["qualitySamples"]
+                or quantiles != sorted(quantiles)
+                or any(
+                    type(n) not in (int, float) or not math.isfinite(n) or n < 0 for n in quantiles
+                )
+            ):
+                raise ValueError("invalid time distribution: " + name)
         if (
             route["tasks"] != limits["qualitySamples"]
             or not limits["minimumCorrect"] <= route["correct"] <= route["tasks"]
@@ -300,8 +312,6 @@ def verify_stand(stand, policy, subject, target, now):
         )
     ):
         raise ValueError("changed workload size, domain or individual latency threshold")
-    import math
-
     p95 = sorted(samples)[math.ceil(0.95 * len(samples)) - 1]
     if p95 != data["p95Ms"] or p95 > limits["p95LimitMs"]:
         raise ValueError("invalid latency percentile")

@@ -10,3 +10,6 @@ The complete run can be split with `--mode formal` or `--mode runtime`. Individu
 
 
 The formal report includes the detached NDJSON certificate name and digest, the accepted declaration and the independent checker hash. All compiler/checker binaries and shared libraries must match the [approved toolchain distribution](../wire/toolchain.json). The raw proof term bundle is emitted beside the JSON report. Each `--mode formal` replay regenerates and independently verifies the bundle for the selected subject.
+
+
+To verify detached submitted artifacts, run `uv run --locked python assurance/interaction/verify_artifacts.py --interaction-report out/interaction.json --platform-report out/platform.json --report out/profile-artifacts.json` from the reviewed verifier checkout, selecting the candidate with `OCS_SUBJECT_ROOT` or `--subject-root`. The verifier regenerates both accepted declaration sets and their independently checked term bundles from the selected source, checks the supplied report's scope, assumptions and exact target hashes, verifies the submitted immutable copy with nanoda, and rejects an authentic certificate from the other domain even when all reported certificate hashes are rewritten to match it.

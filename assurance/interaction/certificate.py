@@ -39,21 +39,7 @@ def pinned_kernels(oracle, directory, release, commit):
     return prefix / "bin", env, policy["builds"][system]["files"]
 
 
-def external_certificate(binaries, env, directory, names, output):
-    cert = directory / "cert.ndjson"
-    with cert.open("wb") as stream:
-        result = subprocess.run(
-            [str(binaries / "leanexport"), "Challenge", "--", *names],
-            cwd=directory,
-            env=env,
-            stdout=stream,
-            stderr=subprocess.PIPE,
-            timeout=100,
-        )
-        if result.returncode:
-            raise ValueError(
-                "certificate export failed: " + result.stderr.decode(errors="replace")[:500]
-            )
+def verify_export(binaries, env, directory, names, cert):
     config = {
         "export_file_path": str(cert),
         "pp_to_stdout": True,
@@ -74,6 +60,25 @@ def external_certificate(binaries, env, directory, names, output):
         re.search(r"(?m)^theorem " + re.escape(name) + r"\b", diagnostics) for name in names
     ):
         raise ValueError("independent checker did not confirm every accepted statement")
+    return int(confirmation[1])
+
+
+def external_certificate(binaries, env, directory, names, output):
+    cert = directory / "cert.ndjson"
+    with cert.open("wb") as stream:
+        result = subprocess.run(
+            [str(binaries / "leanexport"), "Challenge", "--", *names],
+            cwd=directory,
+            env=env,
+            stdout=stream,
+            stderr=subprocess.PIPE,
+            timeout=100,
+        )
+        if result.returncode:
+            raise ValueError(
+                "certificate export failed: " + result.stderr.decode(errors="replace")[:500]
+            )
+    count = verify_export(binaries, env, directory, names, cert)
     with cert.open("rb") as stream:
         digest = hashlib.file_digest(stream, "sha256").hexdigest()
     output.parent.mkdir(parents=True, exist_ok=True)
@@ -87,6 +92,6 @@ def external_certificate(binaries, env, directory, names, output):
     return {
         "file": output.name,
         "sha256": digest,
-        "declarations": int(confirmation[1]),
+        "declarations": count,
         "checker": "nanoda_bin",
     }
