@@ -41,6 +41,7 @@ def controls(report):
             "i-runtime": candidate / "reference/interaction/service.py",
             "i-outcome": candidate / "reference/interaction/state.py",
             "i-model": candidate / "assurance/interaction/Interaction.lean",
+            "i-bridge": candidate / "assurance/interaction/Source.lean",
             "p-kernel": candidate / "reference/platform/native_decisions.py",
             "p-cell": candidate / "reference/platform/cell.py",
         }
@@ -169,6 +170,37 @@ def controls(report):
                     "        if require and actor.writer == 'replacement':\n            return row\n        if not row or (",
                     False,
                     "changed decision consumption",
+                ),
+            ]
+        )
+        changes.extend(
+            [
+                (
+                    "changed-refinement-projection",
+                    "interaction",
+                    "i-bridge",
+                    "def packed (s : Stream) := (s.credit, s.sent, s.granted, s.remaining, s.finals)",
+                    "def packed (s : Stream) := (s.credit, s.sent, s.granted, s.remaining, 0)",
+                    False,
+                    "changed frozen semantics: packed",
+                ),
+                (
+                    "added-elaboration-notation",
+                    "interaction",
+                    "i-model",
+                    "namespace Interaction",
+                    'namespace Interaction\nlocal notation "hiddenPredicate" => True',
+                    False,
+                    "unreviewed string or syntax quotation",
+                ),
+                (
+                    "shadowed-semantic-domain",
+                    "interaction",
+                    "i-model",
+                    "namespace Interaction",
+                    "namespace Interaction\nabbrev AdditionalDomain := Unit",
+                    False,
+                    "changed frozen semantics: AdditionalDomain",
                 ),
             ]
         )

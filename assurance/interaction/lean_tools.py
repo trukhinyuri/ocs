@@ -148,3 +148,95 @@ def verify_consumption(published, subject, methods, module):
             raise ValueError(
                 f"changed decision consumption or complete wrapper control flow in {subject.name}#{func}"
             )
+
+
+def protected_lean_unit(published, candidate, unit):
+    """Only theorem declarations/proof bodies can extend this sealed model language."""
+
+    def plain(source):
+        result = []
+        level = 0
+        index = 0
+        while index < len(source):
+            ch = source[index]
+            pair = source[index : index + 2]
+            if pair == "/-":
+                level += 1
+                result.append(" ")
+                index += 2
+                continue
+            if level:
+                if pair == "-/":
+                    level -= 1
+                    index += 2
+                    continue
+                if ch == "\n":
+                    result.append("\n")
+                index += 1
+                continue
+            if pair == "--":
+                end = source.find("\n", index)
+                index = len(source) if end < 0 else end
+                continue
+            if ch in ('"', chr(96)):
+                raise ValueError(unit + ": unreviewed string or syntax quotation")
+            result.append(ch)
+            index += 1
+        if level:
+            raise ValueError(unit + ": unterminated source comment")
+        return "".join(result)
+
+    def skeleton(source):
+        code = plain(source)
+        forbidden = r"(?<!\.)\b(axiom|axioms|unsafe|partial|noncomputable|native_decide|sorry|sorryAx|run_cmd|run_tac|elab|elab_rules|macro|macro_rules|syntax|syntax_cat|declare_syntax_cat|notation|infix|infixl|infixr|postfix|prefix|attribute|instance|initialize|builtin_initialize|class|opaque|local|section|universe|variable|export|open|include|omit|extern|implemented_by|trustCompiler|skipKernelTC)\b|@\s*\[|#\s*\w+"
+        if m := re.search(forbidden, code):
+            raise ValueError(unit + ": unapproved Lean syntax or trust operation " + m.group(0))
+        declarations = []
+        current = None
+        leaders = {
+            "def",
+            "abbrev",
+            "structure",
+            "inductive",
+            "import",
+            "set_option",
+            "namespace",
+            "end",
+            "theorem",
+            "private",
+        }
+        for line in code.splitlines():
+            if not line.strip():
+                continue
+            words = line.strip().split()
+            leader = words[0]
+            if line[0].isspace():
+                if leader in leaders:
+                    raise ValueError(
+                        unit + ": nested declaration outside the approved semantic context"
+                    )
+                if current is None:
+                    raise ValueError(unit + ": unexpected prelude")
+                current[1].extend(words)
+                continue
+            if leader == "deriving":
+                if current is None or current[0] not in ("structure", "inductive"):
+                    raise ValueError(unit + ": misplaced derivation")
+                current[1].extend(words)
+                continue
+            if leader not in leaders or (leader == "private" and words[1:2] != ["theorem"]):
+                raise ValueError(unit + ": unreviewed Lean command " + leader)
+            if leader == "set_option" and words != ["set_option", "autoImplicit", "false"]:
+                raise ValueError(unit + ": changed kernel or elaboration option")
+            current = [leader, list(words)]
+            declarations.append(current)
+        return [(kind, body) for kind, body in declarations if kind not in ("theorem", "private")]
+
+    if skeleton(published) != skeleton(candidate):
+        originals = definitions(published)
+        proposed = definitions(candidate)
+        changed = sorted(
+            n for n in originals.keys() | proposed.keys() if originals.get(n) != proposed.get(n)
+        )
+        key = ", ".join(changed) or "imports, namespace or semantic declaration ordering"
+        raise ValueError(unit + ": changed frozen semantics: " + key)

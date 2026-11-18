@@ -20,7 +20,13 @@ import observe
 
 sys.path.insert(0, str(ORACLE / "assurance/interaction"))
 from certificate import external_certificate, pinned_kernels
-from lean_tools import checked_run, declarations, definitions, verify_consumption
+from lean_tools import (
+    checked_run,
+    declarations,
+    definitions,
+    protected_lean_unit,
+    verify_consumption,
+)
 from lift import translate
 
 CONFIG = json.loads((HERE / "bindings.json").read_bytes())
@@ -70,6 +76,8 @@ def formal(targets, certificate_path):
                 if new.get(name) != value:
                     raise ValueError("changed frozen semantics: " + name)
             bridge = (SUBJECT / "assurance/platform/Source.lean").read_text()
+            protected_lean_unit(original, live, "Platform")
+            protected_lean_unit((HERE / "Source.lean").read_text(), bridge, "Source")
             if re.search(
                 r"(?m)^\s*(axiom|unsafe|#eval|run_cmd)\b|\bsorry\b|\bnative_decide\b|skipKernelTC|trustCompiler",
                 live + bridge,

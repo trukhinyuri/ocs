@@ -19,7 +19,13 @@ ORACLE = HERE.parents[1]
 SUBJECT = Path(os.environ.get("OCS_SUBJECT_ROOT", ORACLE)).resolve()
 import observe
 from certificate import external_certificate, pinned_kernels
-from lean_tools import checked_run, declarations, definitions, verify_consumption
+from lean_tools import (
+    checked_run,
+    declarations,
+    definitions,
+    protected_lean_unit,
+    verify_consumption,
+)
 from lift import translate
 
 TOOLCHAIN = "leanprover/lean4:v4.36.0-rc2"
@@ -112,6 +118,7 @@ def formal(mode, targets, certificate_path):
                 ("Interaction", actual),
                 ("Source", (SUBJECT / "assurance/interaction/Source.lean").read_text()),
             ):
+                protected_lean_unit((HERE / (key + ".lean")).read_text(), text, key)
                 if re.search(
                     r"(?m)^\s*(axiom|unsafe|#eval|run_cmd)\b|\bsorry\b|\bnative_decide\b|skipKernelTC|trustCompiler",
                     text,
