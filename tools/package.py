@@ -19,7 +19,6 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "reference"))
 from admission import check_manifest, check_names
 from contracts import read_json
-from resolution import compiled_schema
 
 MAX_FILES = 1024
 MAX_FILE = 8 * 1024 * 1024
@@ -37,9 +36,6 @@ def checked_contents(files):
         raise ValueError("missing root manifest")
     manifest = read_json(files["ocs.json"])
     check_manifest(manifest, files)
-    for op in manifest["exports"]:
-        for field in ("inputSchema", "outputSchema"):
-            compiled_schema(op[field], files)
     return {name: digest(files[name]) for name in sorted(files)}
 
 

@@ -7,6 +7,7 @@ import json
 import os
 import secrets
 import shutil
+import subprocess
 import sys
 import tempfile
 import threading
@@ -96,10 +97,39 @@ def probes(tmp):
         compiled_schema(
             {"type": "string", "$vocabulary": {"urn:example:optional": False}}, {}
         ).validate("ok")
+        base = tmp / "public-vocabulary"
+        shutil.copytree(ROOT / "examples/status", base)
+        descriptor = read_json((base / "ocs.json").read_bytes())
+        schema = descriptor["exports"][0]["outputSchema"]
+        schema["$vocabulary"] = {"urn:example:optional": False}
+        manifest = base / "ocs.json"
+        manifest.write_text(json.dumps(descriptor))
+        cmd = [sys.executable, str(ROOT / "reference/host.py"), "--manifest", str(manifest)]
+        allowed = subprocess.run(cmd, capture_output=True, check=True, timeout=8)
+        ensure(
+            read_json(allowed.stdout) == {"resourceId": "demo", "state": "ready"},
+            "optional vocabulary narrowed support",
+        )
+        marker = tmp / "forbidden-activation"
+        entry = base / "executor.py"
+        entry.write_text(
+            f"from pathlib import Path\nPath({str(marker)!r}).touch()\n" + entry.read_text()
+        )
+        schema["$vocabulary"] = {"urn:example:mandatory": True}
+        manifest.write_text(json.dumps(descriptor))
+        denied = subprocess.run(cmd, capture_output=True, timeout=8)
+        ensure(
+            denied.returncode and not marker.exists(),
+            "public host activated a package with an unsupported mandatory vocabulary",
+        )
+        refuse(lambda: start(manifest, "denied-development-binding"), "mandatory")
         return {
             "unsupportedDialect": "refused",
             "mandatoryVocabulary": "refused",
             "optionalVocabulary": "accepted",
+            "hostExecutedOptionalPackage": True,
+            "mandatoryPackageExecuted": marker.exists(),
+            "peerAdmission": "refused before listening",
         }
 
     def immutable():

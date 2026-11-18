@@ -147,13 +147,17 @@ def deploy_reference_targets(edition):
         "reference/host.py",
         "reference/peer.py",
         "reference/admission.py",
+        "reference/schema_resources.py",
+        "reference/package_paths.py",
+        "reference/resolution.py",
+        "reference/bounded_http.py",
         "tools/package.py",
         "go.mod",
     ):
         path = edition / relative
         if not (ROOT / relative).is_file():
             raise ValueError(f"missing candidate implementation: {relative}")
-        path.unlink()
+        path.unlink(missing_ok=True)
         path.symlink_to(ROOT / relative)
     (edition / "go.sum").unlink(missing_ok=True)
     if (ROOT / "go.sum").is_file():

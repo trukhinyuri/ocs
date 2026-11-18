@@ -1,59 +1,37 @@
-"""Offline checks shared by the development host and the package reader."""
+"""Shared offline package and binding admission."""
 
-import re
-import unicodedata
+from collections.abc import Mapping
 
 from contracts import validate
-from jsonschema import Draft202012Validator
+from jsonschema.exceptions import SchemaError
+from package_paths import check_names as check_names
+from package_paths import relative_name
+from referencing.exceptions import Unresolvable
+from schema_resources import compiled_schema
 
 
-def relative_name(name):
-    parts = name.split("/")
-    if (
-        not name
-        or "\\" in name
-        or "\x00" in name
-        or any(part in ("", ".", "..") or part.endswith((" ", ".")) for part in parts)
-        or any(ord(ch) < 32 or ch in ':<>|"?*' for ch in name)
-        or any(
-            re.fullmatch(r"(?:con|prn|aux|nul|com[1-9]|lpt[1-9])", part.split(".")[0], re.I)
-            for part in parts
-        )
-    ):
-        raise ValueError("invalid package-relative name")
-    return parts
-
-
-def check_names(names):
-    spellings = {}
-    paths = set()
-    directories = set()
-    for name in names:
-        parts = relative_name(name)
-        for length in range(1, len(parts) + 1):
-            prefix = "/".join(parts[:length])
-            key = unicodedata.normalize("NFC", prefix).casefold()
-            if spellings.setdefault(key, prefix) != prefix:
-                raise ValueError("case-colliding package paths")
-            if length < len(parts):
-                directories.add(prefix)
-        if name in paths:
-            raise ValueError("duplicate package entry")
-        paths.add(name)
-    if paths & directories:
-        raise ValueError("regular file used as a package directory")
-
-
-def check_manifest(descriptor, files=None):
+def check_manifest(descriptor, files=None, *, schema_resources=None):
     validate("manifest", descriptor)
     for field in ("exports", "imports"):
         declared = descriptor.get(field, [])
         keys = {(item["id"], item["version"]) for item in declared}
         if len(keys) != len(declared):
             raise ValueError("duplicate contract in " + field)
+    resources = (
+        schema_resources
+        if schema_resources is not None
+        else files
+        if isinstance(files, Mapping)
+        else {}
+    )
     for operation in descriptor["exports"]:
+        if operation["id"] == "quota.reset" and operation["effect"] != "external-write":
+            raise ValueError("declared reset effect contradicts the public contract")
         for field in ("inputSchema", "outputSchema"):
-            Draft202012Validator.check_schema(operation[field])
+            try:
+                compiled_schema(operation[field], resources)
+            except (Unresolvable, SchemaError) as exc:
+                raise ValueError("invalid or unresolved public schema") from exc
     entry = descriptor["runtime"].get("entry")
     if entry is not None:
         relative_name(entry)

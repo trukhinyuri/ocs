@@ -127,23 +127,24 @@ class Handler(BaseHTTPRequestHandler):
 
 
 def start(manifest, token):
-    server = BoundedServer(("127.0.0.1", 0), Handler)
-    server.credential = ("Bearer " + token).encode()
-    server.manifest_path = Path(manifest)
-    raw = server.manifest_path.read_bytes()
-    server.manifest = read_json(raw)
-    check_manifest(server.manifest)
+    manifest_path = Path(manifest)
+    raw = manifest_path.read_bytes()
+    descriptor = read_json(raw)
+    check_manifest(descriptor)
     service = next(
         (
             op
-            for op in server.manifest["exports"]
+            for op in descriptor["exports"]
             if op["id"] == "example.status.read" and op["version"] == "1.0.0"
         ),
         None,
     )
     if service is None or service["effect"] != "read" or service.get("flags"):
-        server.server_close()
         raise ValueError("expected an admitted status read")
+    server = BoundedServer(("127.0.0.1", 0), Handler)
+    server.credential = ("Bearer " + token).encode()
+    server.manifest_path = manifest_path
+    server.manifest = descriptor
     server.operation = service
     server.descriptor_pin = hashlib.sha256(raw).hexdigest()
     return server
