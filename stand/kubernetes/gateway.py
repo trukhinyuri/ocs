@@ -242,7 +242,7 @@ def main():
     tls = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
     tls.minimum_version = ssl.TLSVersion.TLSv1_2
     tls.load_cert_chain(args.keys / "tls.crt", args.keys / "tls.key")
-    with BoundedServer(("0.0.0.0", args.port), Gateway, tls=tls) as server:
+    with BoundedServer(("0.0.0.0", args.port), Gateway, tls=tls, wait_for_slot=True) as server:
         server.identities = []
         for filename, owner, purpose in (
             ("probe", "qualification-account", "probe"),

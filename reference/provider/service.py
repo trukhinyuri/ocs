@@ -460,7 +460,10 @@ class Provider(Ledger):
     def page(self, db, owner, context, revision, rows, token, now):
         offset = 0
         context = canonical(context)
-        if token is not None:
+        if token is None:
+            # A fresh inventory is a maintenance point for this owner's temporary pages.
+            db.execute("DELETE FROM cursors WHERE owner=? AND expires<=?", (owner, now))
+        else:
             t = db.execute("SELECT * FROM cursors WHERE id=?", (token,)).fetchone()
             if (
                 t is None

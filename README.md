@@ -12,6 +12,7 @@
 | Maintain provider integrations | [Provider adapter guide](docs/provider-adapter.md) | Map a connection, quota, model and tested capability to one account. |
 | Build a specialized integration | [Profiles](spec/profiles/README.md) | Select the guarantees your service actually needs. |
 | Qualify a release | [Assurance contract](assurance/README.md) and [Kubernetes stand](stand/kubernetes/README.md) | Replay protected theorems, exercise language implementations and verify actual deployment observations. |
+| Admit a canonical commit | [Safe Push](safe_push/README.md) | Verify inherited requirements, implementation evidence, measurements and authority at the receiving Git ref. |
 | Change the standard | [Requirement and scenario index](conformance/scenarios.json), [contribution guide](CONTRIBUTING.md) | Find the existing promises and exercise the accepted edition against a change. |
 
 The [edition manifest](version.json) indexes every normative document and schema. The [implementer guide](docs/implementer-guide.md) explains the host, package and test interfaces. The [compatibility guide](docs/compatibility.md) covers adoption and existing protocols. All specification text, schemas, examples, tests and reference code in this repository are licensed under Apache-2.0.

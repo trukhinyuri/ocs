@@ -68,6 +68,7 @@ class Cell:
         self.root.mkdir(parents=True, exist_ok=True)
         self.key = key
         self.peers = Path(peers)
+        self.peer_credentials = None
         self.lock = threading.RLock()
         self.handles = {}
         self.holds = {}
@@ -463,10 +464,46 @@ class Cell:
                 "digest": digest(data),
             }
 
+    def provision_peers(self, credentials):
+        """Bind each private startup credential to a single peer, tenant and loopback endpoint."""
+        if self.peer_credentials is not None or not isinstance(credentials, dict):
+            raise ValueError("Invalid peer credential inventory.")
+        for name, binding in credentials.items():
+            if (
+                not isinstance(name, str)
+                or not name
+                or not isinstance(binding, dict)
+                or set(binding) != {"tenant", "endpoint", "token"}
+                or not all(isinstance(v, str) and v for v in binding.values())
+                or not binding["token"].isascii()
+                or not binding["token"].isprintable()
+                or " " in binding["token"]
+            ):
+                raise ValueError("Invalid outbound peer credential.")
+            Caller(
+                binding["endpoint"], binding["token"]
+            )  # Validate the transport without sending a request.
+        self.peer_credentials = credentials
+
     def peer(self, actor, op, inp, deadline):
         peer = inp["peer"]
-        if peer not in json.loads(self.peers.read_bytes()):
+        dest = json.loads(self.peers.read_bytes()).get(peer)
+        if not isinstance(dest, dict):
             raise Refusal("denied", "Unknown peer binding in the operator configuration.")
+        if self.peer_credentials is not None:
+            credential = self.peer_credentials.get(peer)
+            if (
+                credential is None
+                or set(dest) != {"endpoint", "tenant"}
+                or credential["tenant"] != dest.get("tenant")
+                or credential["endpoint"] != dest.get("endpoint")
+            ):
+                raise Refusal(
+                    "denied", "Peer route does not match the independently provisioned credential."
+                )
+            token = credential["token"]
+        else:
+            token = dest.get("token")
         if op == "example.peer.grant":
             with self.tx() as db:
                 self.fence(db, actor, True)
@@ -478,11 +515,9 @@ class Cell:
         with self.tx() as db:
             if not self.edge(db, actor.tenant, peer, "import"):
                 raise Refusal("denied", "Missing local import.")
-        configs = json.loads(self.peers.read_bytes())
-        dest = configs.get(peer)
-        if not dest or dest["tenant"] != actor.tenant:
+        if dest.get("tenant") != actor.tenant or not isinstance(token, str) or not token:
             raise Refusal("denied", "No independently configured destination.")
-        client = Caller(dest["endpoint"], dest["token"])
+        client = Caller(dest["endpoint"], token)
         try:
             desc = client.request(
                 "ocs.describe",
@@ -508,7 +543,7 @@ class Cell:
                 exc.kind if exc.kind in Refusal.CODES else "unavailable", "Selected peer refused."
             ) from exc
         except (ConnectionError, OSError):
-            raise Refusal("unavailable", "Selected peer unavailable.")
+            raise Refusal("unavailable", "Selected peer unavailable.") from None
         return result["data"]
 
     def dispatch(self, actor, op, inp, deadline, expires):

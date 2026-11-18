@@ -1,17 +1,58 @@
 """Public entry-point regressions for provider routing and durable metering."""
 
+import sqlite3
 import sys
 import tempfile
 import unittest
+from contextlib import closing
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "assurance/provider"))
-from check import BASE, MODEL, ROUTE, Client, local_admin
+from check import BASE, MODEL, PRODUCT_ARGS, ROUTE, Client, local_admin
 from contracts import utc_at
 
 
 class ProviderReferenceTests(unittest.TestCase):
+    def test_expired_pages_release_storage_and_live_pages_survive_restore(self):
+        with tempfile.TemporaryDirectory() as directory:
+            store = Path(directory) / "provider.sqlite"
+            restored = Path(directory) / "restored.sqlite"
+            first_tokens = {}
+            for owner in ("alpha", "beta"):
+                with Client(store, principal=owner, clock=BASE) as client:
+                    for number in range(3):
+                        client.connect(f"Account {number}")
+                    first_page = client.call("account.list", PRODUCT_ARGS)
+                    first_tokens[owner] = first_page["nextPageToken"]
+            with Client(store, clock=BASE + 89) as client:
+                live_token = client.call("account.list", PRODUCT_ARGS)["nextPageToken"]
+                last_page = client.call(
+                    "account.list", {**PRODUCT_ARGS, "pageToken": first_tokens["alpha"]}
+                )
+                self.assertTrue(last_page["complete"])
+            with Client(store, clock=BASE + 90) as client:
+                client.call("account.list", PRODUCT_ARGS)
+                client.call(
+                    "account.list", {**PRODUCT_ARGS, "pageToken": first_tokens["alpha"]}, "conflict"
+                )
+                live_page = {**PRODUCT_ARGS, "pageToken": live_token}
+                still_live = client.call("account.list", live_page)
+            with closing(sqlite3.connect(store)) as db:
+                remaining = {row[0] for row in db.execute("SELECT id FROM cursors")}
+            self.assertNotIn(first_tokens["alpha"], remaining)
+            self.assertIn(first_tokens["beta"], remaining)
+            self.assertIn(live_token, remaining)
+            local_admin(store, "alpha", "backup", restored, clock=BASE + 90)
+            with Client(restored, clock=BASE + 90) as client:
+                recovered = client.call("account.list", live_page)
+                self.assertEqual(recovered, still_live)
+            with Client(restored, principal="beta", clock=BASE + 89) as client:
+                other_page = client.call(
+                    "account.list", {**PRODUCT_ARGS, "pageToken": first_tokens["beta"]}
+                )
+                self.assertTrue(other_page["complete"])
+
     def test_requested_model_and_mode(self):
         with tempfile.TemporaryDirectory() as folder, Client(Path(folder) / "db") as client:
             account = client.connect()["account"]["accountId"]

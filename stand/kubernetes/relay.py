@@ -92,7 +92,7 @@ def main():
     tls = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
     tls.minimum_version = ssl.TLSVersion.TLSv1_2
     tls.load_cert_chain(keys / "relay.crt", keys / "relay.key")
-    with BoundedServer(("0.0.0.0", 8443), Relay, tls=tls) as server:
+    with BoundedServer(("0.0.0.0", 8443), Relay, tls=tls, wait_for_slot=True) as server:
         server.inbound = b"Bearer " + (keys / "relay-client").read_bytes().strip()
         server.downstream = "Bearer " + (keys / "relay-upstream").read_text().strip()
         server.endpoint = "https://ocs-provider." + os.environ["POD_NAMESPACE"] + ".svc/ocs"

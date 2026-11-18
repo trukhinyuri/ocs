@@ -40,6 +40,8 @@ The deployer needs permission to manage the named Services, Deployments, Job, PV
 
 The workload runs as an unprivileged account, with bounded resources, a read-only root filesystem and no mounted Kubernetes service account token. Server, relay and client credential projections are separate. On renewal, the deployer preserves scoped bearer identities and restarts the owned endpoints on the new certificate pin. Kubeconfigs, CA private keys, bearer tokens and observer signing keys stay outside Git and public evidence.
 
+The provider and relay each serve at most four concurrent HTTPS requests. When a health check or new request reaches a busy listener, the listener waits for a worker within the original connection deadline. The handshake and response share the time left in that budget.
+
 For an isolated transport diagnosis run `stand/kubernetes/observe.py --help`. The complete acceptance uses the frozen observer and verifies each required observation. The diagnostic option that omits the browser leaves its obligation open.
 
 A registry-isolated operator can supply a trusted bundle of raw OCI manifest bytes with `--oci-proof FILE` during deployment or `OCS_OCI_PROOF=FILE` for full qualification. Each base64-encoded blob is keyed by its SHA-256; the verifier resolves child manifests from the separately selected root digest. Without a bundle the deployer reads the pinned registry digest using the build client.

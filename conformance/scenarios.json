@@ -248,7 +248,8 @@
       "expect": "Keep complete and partial inventories distinct and preserve the origin of each account observation.",
       "checks": [
         "conformance/test_profiles.py#test_account_inventory_and_reset_eligibility",
-        "conformance/test_contracts.py#test_record_corpus"
+        "conformance/test_contracts.py#test_record_corpus",
+        "conformance/test_provider_reference.py#test_expired_pages_release_storage_and_live_pages_survive_restore"
       ],
       "qualification": "Verify sign-in, renewal, effective route and attribution with the selected provider."
     },
@@ -364,7 +365,12 @@
     "capacity-and-recovery": {
       "scope": "Independent cells, tenants and a constrained native path",
       "expect": "Bound resource use and demonstrate recovery and timing for a named workload and failure domain.",
-      "checks": ["conformance/test_platform_reference.py#test_cell_capacity_and_recovery"],
+      "checks": [
+        "conformance/test_platform_reference.py#test_cell_capacity_and_recovery",
+        "conformance/test_tls_admission.py#test_health_and_four_reads_share_bounded_tls_workers",
+        "conformance/test_tls_admission.py#test_waiting_preserves_the_original_connection_budget",
+        "conformance/test_tls_admission.py#test_worker_setup_failure_returns_its_slot"
+      ],
       "qualification": "Measure throughput, queue growth, latency and recovery under the declared load and loss of a cell."
     },
     "service-obligations": {
