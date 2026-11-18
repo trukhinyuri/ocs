@@ -1,6 +1,7 @@
 """Check the scenario index and replay the accepted Git edition against this checkout."""
 
 import argparse
+import os
 import re
 import shutil
 import subprocess
@@ -9,8 +10,9 @@ import tempfile
 from pathlib import Path
 from zipfile import ZipFile
 
-ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT / "reference"))
+ORACLE = Path(__file__).resolve().parents[1]
+ROOT = Path(os.environ.get("OCS_SUBJECT_ROOT", ORACLE)).resolve()
+sys.path.insert(0, str(ORACLE / "reference"))
 from contracts import read_json
 from run import matches
 
@@ -187,14 +189,22 @@ def run_report(edition, path, *args):
             f"published runner produced no report ({path.name}, exit {run.returncode})"
         )
     report = read_json(generated.read_bytes())
-    generated.replace(path)
+    with tempfile.NamedTemporaryFile(dir=path.parent, delete=False) as f:
+        f.write(generated.read_bytes())
+        staged = Path(f.name)
+    try:
+        staged.replace(path)
+    finally:
+        staged.unlink(missing_ok=True)
     passed = sum(row["status"] == "pass" for row in report["checks"])
     print(f"{passed}/{len(report['checks'])} passed ({path.relative_to(ROOT)})", flush=True)
     return report, run.returncode
 
 
 def check(revision):
-    current_report = load(ROOT, "out/conformance.json")
+    current_report = read_json(
+        Path(os.environ.get("OCS_REFERENCE_REPORT", ROOT / "out/conformance.json")).read_bytes()
+    )
     current_cases = {case["id"]: case for case in load(ROOT, CORPUS)}
     current_index = load(ROOT, INDEX)
     current_rules = rule_index(ROOT)
@@ -203,7 +213,7 @@ def check(revision):
         current_index, current_report, current_cases, current_rules, current_tests
     )
 
-    reports = ROOT / "out/baseline" / revision
+    reports = Path(os.environ.get("OCS_LEGACY_REPORTS", ROOT / "out/baseline")) / revision
     with tempfile.TemporaryDirectory(prefix=".ocs-compat-", dir=ROOT / "out") as temp:
         edition = Path(temp) / "edition"
         unpack_edition(revision, edition)

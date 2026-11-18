@@ -415,6 +415,20 @@ def observer_keys(directory):
 def admit_reports(catalog, reports, subject, require_stand, required_checks=None):
     """Close each scoped cell only with evidence from a freshly executed approved suite."""
     cells = defaultdict(list)
+    failed_cells = defaultdict(set)
+    required_cells = defaultdict(set)
+
+    def covered_levels(level):
+        if level == "artifact-observation":
+            return ["artifact-observation", "reference"]
+        return ["reference" if level == "runtime-observation" else level]
+
+    for key, claims in (required_checks or {}).items():
+        if key.startswith("stand/") and not require_stand:
+            continue
+        for atom in claims:
+            for level in covered_levels(key.rsplit("@", 1)[1]):
+                required_cells[(atom, level)].add(key)
     unexpected = []
     keys = set()
     rows = []
@@ -436,8 +450,15 @@ def admit_reports(catalog, reports, subject, require_stand, required_checks=None
                 key not in required_checks or set(required_checks[key]) != set(claims)
             ):
                 unexpected.append("changed or unapproved evidence binding: " + key)
+                for atom in required_checks.get(key, ()):
+                    for level in covered_levels(row["level"]):
+                        failed_cells[(atom, level)].add(key)
+                continue
             if row.get("status") != "pass" or row.get("observed") is None:
                 unexpected.append("failed or missing result: " + key)
+                for atom in claims:
+                    for level in covered_levels(row["level"]):
+                        failed_cells[(atom, level)].add(key)
                 continue
             # Signed deployment results originate only from the stand verifier.
             if row["level"] == "deployment" and family != "stand":
@@ -480,8 +501,14 @@ def admit_reports(catalog, reports, subject, require_stand, required_checks=None
         levels = {}
         for level in c["levels"]:
             ids = cells.get((key, level), [])
-            status = "accepted" if ids else "open"
+            absent = sorted(required_cells[(key, level)] - set(ids))
+            failed = sorted(failed_cells[(key, level)])
+            status = "failed" if failed else "accepted" if ids and not absent else "open"
             levels[level] = {"status": status, "evidence": ids}
+            if absent:
+                levels[level]["missingEvidence"] = absent
+            if failed:
+                levels[level]["failedEvidence"] = failed
             totals[level][status] += 1
             profile[c["profile"]][status] += 1
             for scenario in c["scenarios"]:

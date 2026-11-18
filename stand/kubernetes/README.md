@@ -10,7 +10,7 @@ Use a Linux host with a working container engine, `kubectl`, `openssl` and the r
 
 ```sh
 uv sync --locked
-python3 stand/kubernetes/local.py --verify-latest
+python3 stand/kubernetes/local.py --verify-latest --ensure-boot
 uv run --locked python stand/kubernetes/deploy.py --local
 make qualify
 ```
@@ -36,8 +36,10 @@ make qualify OCS_KUBECONFIG="$OCS_KUBECONFIG" OCS_CONTEXT="$OCS_CONTEXT" \
   OCS_NAMESPACE="$OCS_NAMESPACE" OCS_IMAGE="$OCS_IMAGE"
 ```
 
-The deployer needs permission to manage the named Services, Deployments, Job, PVC and stand-owned Secret. Preprovision the namespace with label `app.kubernetes.io/part-of=ocs-qualification` or allow the deployer to create it. The observer reads the cluster identity, namespace, Services, replica owner chain, pod/image status, storage and the qualification credentials. It requires logs, exec, port-forward and UID-preconditioned deletion of the owned workload pod. It leaves unrelated workloads alone. External clusters keep their existing control-plane supervision.
+The deployer needs permission to manage the named Services, Deployments, Job, PVC and stand-owned Secret. Preprovision the namespace with label `app.kubernetes.io/part-of=ocs-qualification` or allow the deployer to create it. The observer reads the cluster identity, namespace, Services, replica owner chain, pod/image status, storage and the qualification credentials. It reads the scheduled node architecture to validate the immutable OCI index and obtains its child manifest or configuration digest. It requires logs, exec, port-forward and UID-preconditioned deletion of the owned workload pod. It leaves unrelated workloads alone. External clusters keep their existing control-plane supervision.
 
 The workload runs as an unprivileged account, with bounded resources, a read-only root filesystem and no mounted Kubernetes service account token. Server, relay and client credential projections are separate. On renewal, the deployer preserves scoped bearer identities and restarts the owned endpoints on the new certificate pin. Kubeconfigs, CA private keys, bearer tokens and observer signing keys stay outside Git and public evidence.
 
 For an isolated transport diagnosis run `stand/kubernetes/observe.py --help`. The complete acceptance uses the frozen observer and verifies each required observation. The diagnostic option that omits the browser leaves its obligation open.
+
+A registry-isolated operator can supply a trusted bundle of raw OCI manifest bytes with `--oci-proof FILE` during deployment or `OCS_OCI_PROOF=FILE` for full qualification. Each base64-encoded blob is keyed by its SHA-256; the verifier resolves child manifests from the separately selected root digest. Without a bundle the deployer reads the pinned registry digest using the build client.

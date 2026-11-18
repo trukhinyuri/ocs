@@ -1,6 +1,7 @@
 """Run the hermetic fixtures and fail if a declared evidence case was skipped."""
 
 import json
+import os
 import subprocess
 import sys
 import unittest
@@ -8,7 +9,7 @@ from pathlib import Path
 
 
 def main():
-    root = Path(__file__).resolve().parents[1]
+    root = Path(os.environ.get("OCS_SUBJECT_ROOT", Path(__file__).resolve().parents[1])).resolve()
     tests = root / "conformance"
     index = json.loads((tests / "scenarios.json").read_text())
     mandatory = {p for s in index["scenarios"].values() for p in s["checks"] if "#" in p}

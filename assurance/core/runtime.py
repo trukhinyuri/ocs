@@ -886,7 +886,7 @@ def observe(root, oracle, tmp, rows):
                 (oracle / name).read_bytes() == (root / name).read_bytes(),
                 "changed bytes of immutable edition " + name,
             )
-        path = root / "out/conformance.json"
+        path = Path(os.environ.get("OCS_REFERENCE_REPORT", root / "out/conformance.json"))
         report = read_json(path.read_bytes())
         validate("report", report)
         require(
@@ -900,7 +900,10 @@ def observe(root, oracle, tmp, rows):
             all(c["status"] == "pass" for c in report["checks"]),
             "candidate conformance has failed/skipped rows",
         )
-        stable = root / "out/baseline/6f6e22842347806f2963ef1984d9ea592fdddaf0"
+        stable = (
+            Path(os.environ.get("OCS_LEGACY_REPORTS", root / "out/baseline"))
+            / "6f6e22842347806f2963ef1984d9ea592fdddaf0"
+        )
         results = {}
         for name in ("hosts-and-go", "python-executor"):
             old = read_json((stable / (name + ".json")).read_bytes())

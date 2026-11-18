@@ -17,8 +17,9 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from urllib import request
 
-ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT / "reference"))
+ORACLE = Path(__file__).resolve().parents[1]
+ROOT = Path(os.environ.get("OCS_SUBJECT_ROOT", ORACLE)).resolve()
+sys.path.insert(0, str(ORACLE / "reference"))
 from contracts import LIMIT, read_json, validate, validate_with
 
 

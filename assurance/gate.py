@@ -272,6 +272,9 @@ def collect(oracle, subject, kind, accepted, destination, stand, bootstrap=False
     old = obligations(previous_catalog, load(oracle / "conformance/scenarios.json"))
     current = obligations(current_catalog, load(subject / "conformance/scenarios.json"))
     errors = compare_policy(old, current, previous_scope, current_scope)
+    for name, scenario in load(subject / "conformance/scenarios.json")["scenarios"].items():
+        if not scenario["checks"]:
+            errors.append("declared scenario lacks executed public evidence: " + name)
     if load(oracle / "stand/kubernetes/policy.json") != load(
         subject / "stand/kubernetes/policy.json"
     ):
@@ -292,6 +295,22 @@ def collect(oracle, subject, kind, accepted, destination, stand, bootstrap=False
             "source": ident,
         },
     )
+    inputs = destination / "reference"
+    inputs.mkdir(parents=True, exist_ok=True)
+    fresh = inputs / "conformance.json"
+    if fresh.exists():
+        raise ValueError("reference results must be regenerated in a fresh directory")
+    env.update(OCS_REFERENCE_REPORT=str(fresh), OCS_LEGACY_REPORTS=str(inputs / "baseline"))
+    for argv in (
+        [str(oracle / "conformance/fixture_suite.py")],
+        [str(oracle / "conformance/run.py"), "--report", str(fresh)],
+        [str(oracle / "conformance/compatibility.py"), previous_scope["compatibilityRevision"]],
+    ):
+        result = subprocess.run(
+            [sys.executable, "-E", "-s", *argv], cwd=subject, env=env, timeout=390
+        )
+        if result.returncode:
+            errors.append("published reference gate failed: " + Path(argv[0]).name)
     reports = {}
 
     def run(family, script, *args):
@@ -539,9 +558,55 @@ def collect(oracle, subject, kind, accepted, destination, stand, bootstrap=False
                 "claims": row.get("claims", row.get("obligations", [])),
             }
         )
+    if "external" in reports:
+        accepted_external = next(
+            (
+                r
+                for r in reports["external"][0]["checks"]
+                if r["id"] == "external.import" and r["status"] == "pass"
+            ),
+            None,
+        )
+        if accepted_external is not None:
+            imported = accepted_external["observed"]
+            for name, reason in imported["rejected"].items():
+                controls.append(
+                    {
+                        "id": "external/" + name,
+                        "result": "pass" if reason else "fail",
+                        "observed": reason,
+                    }
+                )
+            controls.append(
+                {
+                    "id": "external/separately-enrolled-equivalent",
+                    "result": "pass"
+                    if imported.get("separatelyEnrolledEquivalentArtifact")
+                    else "fail",
+                }
+            )
     save(destination / "controls.json", controls)
     required_file = oracle / "assurance/evidence-index.json"
-    required = load(required_file)["checks"] if required_file.is_file() else None
+    enrollment = load(required_file) if required_file.is_file() else None
+    required = enrollment["checks"] if enrollment else None
+    if enrollment:
+        submitted_path = subject / "assurance/evidence-index.json"
+        if not submitted_path.is_file():
+            errors.append("removed supported evidence enrollment")
+            submitted = {}
+        else:
+            submitted = load(submitted_path).get("checks", {})
+        for witness, claims in required.items():
+            if set(submitted.get(witness, ())) != set(claims):
+                errors.append("edited submitted enrollment for published witness: " + witness)
+        mandatory = set(enrollment["controlIds"]["local"])
+        if kind == "full":
+            mandatory.update(enrollment["controlIds"]["deployment"])
+        observed = {row["id"] for row in controls if row["result"] == "pass"}
+        errors.extend(
+            "missing independent mutation/positive control: " + name
+            for name in sorted(mandatory - observed)
+        )
     admitted = admit_reports(current, reports, ident, kind == "full", required)
     admitted["failures"].extend(errors)
     if errors:
@@ -549,10 +614,8 @@ def collect(oracle, subject, kind, accepted, destination, stand, bootstrap=False
     if subject_identity(subject) != ident:
         admitted["failures"].append("subject changed during qualification")
         admitted["status"] = "fail"
-    required_local = (
-        sum(len(s) for s in (r["levels"] for r in admitted["obligations"]))
-        - admitted["byLevel"].get("deployment", {}).get("accepted", 0)
-        - admitted["byLevel"].get("deployment", {}).get("open", 0)
+    required_local = sum(
+        level != "deployment" for atom in current.values() for level in atom["levels"]
     )
     applicable = sum(len(a["levels"]) for a in current.values())
     satisfied = sum(
@@ -579,11 +642,25 @@ def collect(oracle, subject, kind, accepted, destination, stand, bootstrap=False
         "startedAt": started,
         "finishedAt": datetime.now(timezone.utc).isoformat(),
         "subject": ident,
+        "tools": {
+            "inventory": sha(oracle / "assurance/tooling.json"),
+            "python": sys.version,
+            "executableSha256": sha(Path(sys.executable)),
+            "go": subprocess.check_output(["go", "version"], text=True).strip(),
+            "openssl": subprocess.check_output(["openssl", "version"], text=True).strip(),
+            "sqlite": __import__("sqlite3").sqlite_version,
+            "lean": load(oracle / "assurance/wire/toolchain.json")["commit"],
+        },
         "accounting": accounting,
         "applicableEvidenceSlots": applicable,
         "requiredLocalSlots": required_local,
         "acceptedEvidenceSlots": satisfied,
         "independentControls": controls,
+        "artifactInventory": {
+            str(f.relative_to(destination)): {"sha256": sha(f), "bytes": f.stat().st_size}
+            for f in sorted(report_dir.rglob("*"))
+            if f.is_file()
+        },
         "scope": previous_scope,
         **admitted,
     }
@@ -591,6 +668,9 @@ def collect(oracle, subject, kind, accepted, destination, stand, bootstrap=False
         load(oracle / "assurance/result.schema.json"), format_checker=FormatChecker()
     ).validate(result)
     save(destination / "report.json", result)
+    if kind == "full" and result["status"] == "pass" and not bootstrap:
+        sign(destination / "report.json", private, destination / "report.sig")
+        verify_signature(destination / "report.json", public, destination / "report.sig")
     print(
         f"{kind}: {satisfied}/{applicable} evidence obligations; local denominator {required_local}; {len(working)} normative declaration locations.",
         flush=True,

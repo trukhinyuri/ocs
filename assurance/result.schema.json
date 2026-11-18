@@ -20,7 +20,7 @@
     },
     "acceptedVerifier": {
       "type": "string",
-      "minLength": 1
+      "pattern": "^(?:[0-9a-f]{40}|[0-9a-f]{64})$"
     },
     "startedAt": {
       "type": "string",
@@ -125,7 +125,8 @@
                 "status": {
                   "enum": [
                     "accepted",
-                    "open"
+                    "open",
+                    "failed"
                   ]
                 },
                 "evidence": {
@@ -259,6 +260,12 @@
     },
     "byLevel": {
       "type": "object"
+    },
+    "eligibility": {
+      "enum": [
+        "initial collection for review",
+        "independent pinned edition replay"
+      ]
     }
   },
   "required": [
@@ -279,6 +286,7 @@
     "failures",
     "byScenario",
     "byProfile",
-    "byLevel"
+    "byLevel",
+    "eligibility"
   ]
 }

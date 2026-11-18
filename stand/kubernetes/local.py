@@ -131,8 +131,22 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--kubeconfig", type=Path, default=DEFAULT_CONFIG)
     parser.add_argument("--verify-latest", action="store_true")
+    parser.add_argument(
+        "--ensure-boot",
+        action="store_true",
+        help="enable and start the host's existing system container engine when necessary",
+    )
     options = parser.parse_args()
     try:
+        if options.ensure_boot:
+            enabled = (
+                run("systemctl", "is-enabled", "docker", check=False).stdout.strip() == b"enabled"
+            )
+            active = (
+                run("systemctl", "is-active", "docker", check=False).stdout.strip() == b"active"
+            )
+            if not (active and enabled):
+                run("sudo", "-n", "systemctl", "enable", "--now", "docker", timeout=90)
         start(options.kubeconfig, options.verify_latest)
     except subprocess.CalledProcessError as exc:
         parser.exit(
