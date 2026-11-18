@@ -4,4 +4,6 @@ Read README.md and look up the numbered rule and its scenarios in conformance/sc
 
 Choose one observable behavior. Write or update the black-box case, then change the normative text, schema and reference code as applicable. Run `make check`. A test client may share public schemas but must not import implementation internals to determine the expected outcome. Do not broaden permissions or remove a failing case to make CI pass.
 
+For qualification work read assurance/obligations.json and assurance/scope.json. Record the criterion and evidence level before changing implementation. A repeated failure under the same premises warrants a smaller counterexample or a different discriminating check. Use make qualify for a full release dossier. Review the assurance pin independently of the candidate implementation.
+
 Keep examples independently runnable. Declare the scope of any compatibility claim in the report. Edit optional profiles when the behavior is specific to them. Change core only for common semantics demonstrated by independent consumers or to repair a trust or correctness boundary. Follow GOVERNANCE.md and CONTRIBUTING.md. No publish, external deployment or release is implied by a local change.

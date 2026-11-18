@@ -1,0 +1,76 @@
+{
+  "format": "ocs.qualification-tools/1",
+  "proof": [
+    {
+      "name": "Lean 4, leanchecker and leanexport",
+      "pin": "leanprover/lean4:v4.36.0-rc2",
+      "revision": "b35cb10cf2ced51a2fd1880cfdbf75c71ab7a35a",
+      "license": "Apache-2.0",
+      "source": "https://lean-lang.org/doc/reference/latest/ValidatingProofs/",
+      "digests": "assurance/wire/toolchain.json",
+      "trusted": "Type theory, the pinned kernel/imported logical basis, and checked formal definitions. The distribution itself is not asserted to be a verified machine-code prover."
+    },
+    {
+      "name": "nanoda",
+      "pin": "0.4.17 in the pinned Lean distribution",
+      "license": "Apache-2.0",
+      "source": "https://github.com/ammkrn/nanoda_lib",
+      "trusted": "Independent Rust kernel checks exported declaration terms under the registered axioms. Its runtime and ISA remain in the trusted base."
+    }
+  ],
+  "runtime": [
+    {
+      "name": "CPython",
+      "version": "3.13.15 on the qualified image",
+      "license": "PSF-2.0 and bundled component notices",
+      "source": "https://docs.python.org/3/license.html",
+      "boundary": "Actual interpreter and script identities are measured. Scoped source lifts use explicitly recognized semantics."
+    },
+    {
+      "name": "Go",
+      "version": "1.27.4",
+      "license": "BSD-3-Clause",
+      "source": "https://go.dev/LICENSE",
+      "boundary": "Build options and actual executable digest are observed. General compiler preservation is outside the sealed Go source claims."
+    },
+    {
+      "name": "jsonschema / referencing",
+      "version": "versions and artifact hashes in uv.lock",
+      "license": "MIT",
+      "source": "https://python-jsonschema.readthedocs.io/en/stable/",
+      "boundary": "Offline Draft 2020-12 validation under the explicitly registered dialect, resources and format checkers."
+    },
+    {
+      "name": "SQLite",
+      "version": "runtime version recorded by the actual fixture",
+      "license": "public domain",
+      "source": "https://www.sqlite.org/atomiccommit.html",
+      "boundary": "Durable SQLite transaction semantics, storage honoring synchronous commits and single-writer ownership."
+    },
+    {
+      "name": "OpenSSL",
+      "version": "observer runtime version in each dossier",
+      "license": "Apache-2.0 for 3.x and newer",
+      "source": "https://openssl-library.org/source/license/",
+      "boundary": "Cryptographic signature and TLS implementations under the configured trust anchors."
+    },
+    {
+      "name": "Kubernetes and K3s",
+      "version": "Kubernetes v1.37.2 / local K3s v1.37.2+k3s1",
+      "license": "Apache-2.0 and distribution component notices",
+      "source": "https://kubernetes.io/releases/",
+      "boundary": "Control-plane identity/RBAC, network and volume semantics. Cluster deployment, crash and real observations are checked separately."
+    },
+    {
+      "name": "Chromium and WebDriver",
+      "version": "actual browser and driver in observation",
+      "license": "BSD-style and bundled component notices",
+      "source": "https://chromium.googlesource.com/chromium/src/+/main/LICENSE",
+      "boundary": "Browser semantics and actual user-agent rendering, accessibility tree and keyboard navigation at named sizes."
+    }
+  ],
+  "rebuild": {
+    "environment": "UV_OFFLINE=true and GOPROXY=off after populating pinned packages and images.",
+    "toolchain_details": "Archive and executable/library SHA-256 for admitted verifier distributions are recorded in assurance/wire/toolchain.json; artifacts record the platform actually exercised."
+  }
+}

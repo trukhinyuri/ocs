@@ -24,6 +24,8 @@ The machine report lists accounting and execution separately. Results are groupe
 
 ## Primary sources and toolchain boundary
 
+The [tool inventory](tooling.json) records the selected versions, licenses, primary sources and trusted boundaries. Additional formats, including the [C/Wasm import](external/README.md), use an operator-enrolled checker independent of the candidate.
+
 Lean elaborates proof terms, checks them in its kernel and supports separate kernel rechecking. The trusted logical basis and machine assumptions are documented in the pinned toolchain manifests. Lean 4 is Apache-2.0. [Lean proof validation](https://lean-lang.org/doc/reference/latest/ValidatingProofs/), [Lean axioms](https://lean-lang.org/doc/reference/latest/Axioms/), [toolchain license](https://github.com/leanprover/lean4/blob/b35cb10cf2ced51a2fd1880cfdbf75c71ab7a35a/LICENSE)
 
 The frozen wire and core checker export proof declarations for a second kernel and validate the declared build. The included Python and Go interop fixtures run real processes. SQLite supplies the data-owner transaction boundaries. JSON Schema validates the exact edition vocabulary and is used as a trusted boundary for the stated data scopes. [SQLite atomic commit](https://www.sqlite.org/atomiccommit.html), [JSON Schema 2020-12](https://json-schema.org/draft/2020-12/json-schema-core)

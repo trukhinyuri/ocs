@@ -16,6 +16,10 @@ The working draft defines Core and eleven optional feature identifiers. Each imp
 
 The black-box runner reports its own checks. The unit suite separately exercises schemas, documents, archive behavior, deterministic profile cases and authoritative fixture state. A valid record proves that a value can be represented. A deployment claim also needs observations from the actual target and a measured failure case. The edition has working-draft status.
 
+## Formal and operational qualification
+
+The [qualification guide](../assurance/README.md) links the independent wire, profile, source and build witnesses to the atomic catalogue. The [stand](../stand/kubernetes/README.md) exercises a live Kubernetes service, real relay, synthetic accounts, actual local model and browser, bounded load, cancellation, persistent recovery and site attestation. Its results refer to that particular target and time. The table above describes the original published corpus that remains independently replayable.
+
 ## Find a requirement and its evidence
 
 In the [scenario index](scenarios.json), look up the rule ID under its specification file and follow the listed scenario IDs. Each scenario names its scope, expected behavior and checks. A bare check ID refers to the wire corpus or the integration report. A `path#test_name` points to a fixture assertion. The `qualification` field records outstanding evidence. An empty check list means the behavior is specified and awaits a qualifying implementation.
