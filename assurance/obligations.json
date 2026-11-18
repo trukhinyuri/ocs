@@ -216,7 +216,7 @@
       "role": "caller/executor/peer",
       "profile": "core",
       "claims": [
-        {"id":"stdio","levels":["source-refinement","reference"],"expected":"Use LF, flush frames, reserve stdout for protocol and close on EOF."},
+        {"id":"stdio","levels":["source-refinement","reference","artifact-observation"],"expected":"Use LF, flush frames, reserve stdout for protocol and close on EOF."},
         {"id":"http","levels":["reference"],"expected":"Use authenticated, pinned POST JSON and distinguish transport refusal from a successful operation."},
         {"id":"origin","levels":["reference"],"expected":"Enforce configured destination and redirect policy. Plain HTTP is restricted to the isolated loopback fixture."},
         {"id":"tls","levels":["deployment"],"expected":"Qualify verified peer identity, channel protection and admission on any separately claimed cross-domain network route."},
