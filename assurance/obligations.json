@@ -34,6 +34,14 @@
     "interface.pages": [
       "spec/profiles/interfaces.md",
       "Catalog pages"
+    ],
+    "core.interpretation": [
+      "spec/core.md",
+      "Reading a requirement"
+    ],
+    "composition.deployment": [
+      "spec/composition.md",
+      "Deployment choices"
     ]
   },
   "structuralInventory": {
@@ -67,7 +75,8 @@
       "claims": [
         {"id":"versions","levels":["reference"],"expected":"Parse package and operation SemVer independently and bind an exact revision."},
         {"id":"negotiate","levels":["model","source-refinement","reference"],"expected":"Select a tested wire protocol separately from the contract version."},
-        {"id":"immutable","levels":["reference"],"expected":"A bound manifest revision cannot change bytes within an admitted call."}
+        {"id":"immutable","levels":["reference"],"expected":"A bound manifest revision cannot change bytes within an admitted call."},
+        {"id":"package-revision","levels":["reference"],"expected":"Across installs an identical package identity/version under the same publisher domain retains the same whole-artifact bytes; a changed artifact under that revision cannot become active."}
       ]
     },
     "C-04": {
@@ -87,7 +96,8 @@
         {"id":"resolver","levels":["reference"],"expected":"Resolve only trusted bounded package or edition resources, without arbitrary remote retrieval."},
         {"id":"input","levels":["model","source-refinement","reference"],"expected":"Reject malformed operation input before execution."},
         {"id":"output","levels":["reference"],"expected":"Reject an invalid or mismatched reply at the public boundary."},
-        {"id":"pointer","levels":["reference"],"expected":"Return an input or output JSON Pointer relative to its payload where available."}
+        {"id":"pointer","levels":["reference"],"expected":"Return an input or output JSON Pointer relative to its payload where available."},
+        {"id":"vocabulary","levels":["reference"],"expected":"Refuse an unsupported mandatory schema vocabulary or dialect during admission, before dispatch."}
       ]
     },
     "C-06": {
@@ -209,7 +219,8 @@
         {"id":"stdio","levels":["source-refinement","reference"],"expected":"Use LF, flush frames, reserve stdout for protocol and close on EOF."},
         {"id":"http","levels":["reference"],"expected":"Use authenticated, pinned POST JSON and distinguish transport refusal from a successful operation."},
         {"id":"origin","levels":["reference"],"expected":"Enforce configured destination and redirect policy. Plain HTTP is restricted to the isolated loopback fixture."},
-        {"id":"tls","levels":["deployment"],"expected":"Qualify verified peer identity, channel protection and admission on any separately claimed cross-domain network route."}
+        {"id":"tls","levels":["deployment"],"expected":"Qualify verified peer identity, channel protection and admission on any separately claimed cross-domain network route."},
+        {"id":"cache-scope","levels":["reference"],"expected":"Reuse a bootstrap observation only for its exact endpoint, issuer, descriptor and scope. Stateless independently pinned invocation may avoid caching."}
       ]
     },
     "B-01": {
@@ -246,7 +257,8 @@
         {"id":"mutual","levels":["model","reference"],"expected":"Both independent owners admit the direction and the caller never acquires the transitive target's authority by reachability alone."},
         {"id":"context","levels":["reference"],"expected":"Preserve parent identity, minimum necessary content, grant epoch and permitted residency at each hop."},
         {"id":"partition","levels":["model","reference"],"expected":"Deny sensitive work on partition when current authority cannot be established."},
-        {"id":"tenant","levels":["model","reference"],"expected":"Keep grants, cancellation, events and state isolated by tenant."}
+        {"id":"tenant","levels":["model","reference"],"expected":"Keep grants, cancellation, events and state isolated by tenant."},
+        {"id":"revocation-lag","levels":["reference"],"expected":"State the observation bound and enforce revocation per authenticated principal and epoch, including on partition and reconnect."}
       ]
     },
     "B-05": {
@@ -264,7 +276,8 @@
       "claims": [
         {"id":"trace","levels":["reference"],"expected":"Record parent/child, duration, policy decision and actual revision without exposing private operations."},
         {"id":"freshness","levels":["reference"],"expected":"Distinguish confirmed, inferred, partial and stale observations and apply scoped retention."},
-        {"id":"replacement","levels":["reference"],"expected":"Renegotiate a changed consistency, effect, identity, freshness or timing guarantee."}
+        {"id":"replacement","levels":["reference"],"expected":"Renegotiate a changed consistency, effect, identity, freshness or timing guarantee."},
+        {"id":"data-policy","levels":["reference"],"expected":"Apply retention, erasure, confidentiality and the declared residency policy to both subject state and scoped diagnostics."}
       ]
     },
     "B-07": {
@@ -299,7 +312,8 @@
       "claims": [
         {"id":"directions","levels":["model","reference"],"expected":"Exercise old caller/new target and new caller/old target for the applicable published fixtures."},
         {"id":"drift","levels":["reference"],"expected":"Distinguish compatible additions, required-feature rejection and catalog or authority changes."},
-        {"id":"restore","levels":["reference"],"expected":"Reopen prior persisted state without silently losing an effect, scope or explicit selection."}
+        {"id":"restore","levels":["reference"],"expected":"Reopen prior persisted state without silently losing an effect, scope or explicit selection."},
+        {"id":"feature-matrix","levels":["reference"],"expected":"Exercise older caller contracts and records against each newly advertised reference profile. Distinguish unavailable historical executors from a passing behavioral implementation claim."}
       ]
     },
     "T-04": {
@@ -308,7 +322,8 @@
       "claims": [
         {"id":"edition","levels":["reference"],"expected":"Pin the whole accepted edition and keep its public artifacts immutable."},
         {"id":"proof-baseline","levels":["reference"],"expected":"Replaying fixed criteria detects altered assertions, weaker premises, wrong checker or substituted artifact."},
-        {"id":"release","levels":["reference"],"expected":"A claim of stability requires reviewed negative cases and independent implementations in the named scope."}
+        {"id":"release","levels":["reference"],"expected":"A claim of stability requires reviewed negative cases and independent implementations in the named scope."},
+        {"id":"release-record","levels":["reference"],"expected":"Verify the release version record, immutable normative digests, change notes and an applicable migration path independently of a product release."}
       ]
     },
     "P-01": {
@@ -364,7 +379,8 @@
         {"id":"scope","levels":["reference"],"expected":"Recheck recipient, ownership, revision and expiry on every page."},
         {"id":"range","levels":["model","source-refinement","reference"],"expected":"Return exact decoded offset, bounded positive progress and empty EOF only at the end."},
         {"id":"integrity","levels":["model","reference"],"expected":"Reassemble slices in order and check declared length and digest before using the artifact."},
-        {"id":"lifetime","levels":["reference"],"expected":"Release scoped handles on cancellation and refuse implicit conversion loss or stale delta bases."}
+        {"id":"lifetime","levels":["reference"],"expected":"Release scoped handles on cancellation and refuse implicit conversion loss or stale delta bases."},
+        {"id":"purpose","levels":["reference"],"expected":"Check the purpose in the trusted recipient grant on every range read and refuse an unrelated presentation identity even in the same tenant."}
       ]
     },
     "I-05": {
@@ -373,7 +389,8 @@
       "claims": [
         {"id":"observer","levels":["model","reference"],"expected":"An observer cannot transform an event, elevate authority or start an external effect."},
         {"id":"transform","levels":["reference"],"expected":"Validate ordered opt-in transformation before any effect and bound reentry."},
-        {"id":"background","levels":["reference"],"expected":"Schedules, instructions and hooks run under a scoped identity, resource budget and stoppable lifetime."}
+        {"id":"background","levels":["reference"],"expected":"Schedules, instructions and hooks run under a scoped identity, resource budget and stoppable lifetime."},
+        {"id":"background-identity","levels":["reference"],"expected":"Exercise a separately scoped, budgeted background observer with a real stoppable lifetime; foreground inputs cannot elevate it."}
       ]
     },
     "E-01": {
@@ -456,7 +473,8 @@
       "claims": [
         {"id":"unknown","levels":["model","reference"],"expected":"Numeric zero, unavailable, stale, unlimited and percent-only data remain distinguishable."},
         {"id":"aggregate","levels":["model","source-refinement","reference"],"expected":"Sum only independent compatible units, scope and periods; never count a shared pool twice."},
-        {"id":"reobserve","levels":["reference","deployment"],"expected":"Attribute window/reset observations to their source/time and reobserve expired windows."}
+        {"id":"reobserve","levels":["reference","deployment"],"expected":"Attribute window/reset observations to their source/time and reobserve expired windows."},
+        {"id":"limiting-view","levels":["reference"],"expected":"For the selected model find the limiting applicable window or expose uncertainty; return reset time and countdown for the requested locale and observation time."}
       ]
     },
     "Q-02": {
@@ -474,7 +492,8 @@
       "claims": [
         {"id":"meaning","levels":["model","reference"],"expected":"Distinguish public list, actual, contractual, unpublished and unknown prices without conflating a zero charge."},
         {"id":"basis","levels":["reference","deployment"],"expected":"Record the observed official plan, currency, region, period, seat basis, terms, taxes and source/time when known."},
-        {"id":"shared","levels":["model","reference"],"expected":"Shared organization price is never multiplied by the number of connections."}
+        {"id":"shared","levels":["model","reference"],"expected":"Shared organization price is never multiplied by the number of connections."},
+        {"id":"plan-choices","levels":["reference"],"expected":"An ambiguous account plan returns all known applicable prices, with source, and no falsely confirmed account-specific amount."}
       ]
     },
     "M-01": {
@@ -483,7 +502,8 @@
       "claims": [
         {"id":"complete","levels":["model","source-refinement","reference"],"expected":"Only a comparable complete revision can retire or replace the prior complete catalog."},
         {"id":"axes","levels":["reference","deployment"],"expected":"Track listed, entitled, locally supported and actually verified options separately for the exact route."},
-        {"id":"eol","levels":["model","reference"],"expected":"Missing pages or a disappeared model cannot create an EOL notice; deduplicate official notices and preserve explicit selection."}
+        {"id":"eol","levels":["model","reference"],"expected":"Missing pages or a disappeared model cannot create an EOL notice; deduplicate official notices and preserve explicit selection."},
+        {"id":"history-notice","levels":["reference"],"expected":"Retain prior conversation and explicit target selection across a complete catalog change; associate verified notices with effective date, replacement and affected choices."}
       ]
     },
     "M-02": {
@@ -502,7 +522,9 @@
         {"id":"counts","levels":["reference"],"expected":"Show scoped totals of accounts, enabled, working and attention-needed routes with units."},
         {"id":"routing","levels":["reference"],"expected":"Identify affected models before disabling the last admitted route and retain unaffected choices."},
         {"id":"usage","levels":["model","reference"],"expected":"Separate productive, probe, fallback and unattributed traffic in 7- and 30-day views with scope/freshness."},
-        {"id":"surface-parity","levels":["reference"],"expected":"Give human clients and programmatic consumers the same authoritative account and quota observations."}
+        {"id":"surface-parity","levels":["reference"],"expected":"Give human clients and programmatic consumers the same authoritative account and quota observations."},
+        {"id":"filters","levels":["reference"],"expected":"Group by provider and filter by model/status while preserving scoped account counts and explicit units."},
+        {"id":"retention","levels":["reference"],"expected":"Expose 7- and 30-day attribution, observation/retention window and impact of disabling the last admitted route regardless of the active list filter."}
       ]
     },
     "G-01": {
@@ -555,7 +577,8 @@
       "claims": [
         {"id":"declarative","levels":["model","reference"],"expected":"Validate current values and intersect versioned labelled actions with manifest and actual grants."},
         {"id":"web","levels":["reference"],"expected":"A custom web surface requires source integrity, scoped origin and checked event generation. Never expose privileged objects to the renderer."},
-        {"id":"alternative","levels":["reference"],"expected":"An unavailable mandatory control or safe embedding presents an explicit alternative or refusal."}
+        {"id":"alternative","levels":["reference"],"expected":"An unavailable mandatory control or safe embedding presents an explicit alternative or refusal."},
+        {"id":"web-boundary","levels":["reference"],"expected":"Demonstrate safe rejection/fallback for an embedded representation without source integrity, containment, origin, checked event schema or bounded egress/navigation."}
       ]
     },
     "U-03": {
@@ -564,7 +587,9 @@
       "claims": [
         {"id":"surface-event","levels":["model","source-refinement","reference"],"expected":"A surface request cannot approve a consequential operation or act after its generation retires."},
         {"id":"close","levels":["reference"],"expected":"Closing unsubscribes and restores focus without cancelling an owned durable job."},
-        {"id":"accessibility","levels":["measurement","deployment"],"expected":"On the claimed client, labelled actions, quota freshness, eligibility and recovery are distinguishable textually and operable with keyboard at narrow and enlarged sizes."}
+        {"id":"accessibility","levels":["measurement","deployment"],"expected":"On the claimed client, labelled actions, quota freshness, eligibility and recovery are distinguishable textually and operable with keyboard at narrow and enlarged sizes."},
+        {"id":"review-intent","levels":["reference"],"expected":"A trusted confirmation identifies the intended recipient, resource, exact amount and intent digest; changed intent or an ordinary widget cannot authorize the effect."},
+        {"id":"recovery-actions","levels":["reference"],"expected":"Expose distinguishable retry, resume, new request and permission actions, priced terms and authoritative state in the selected user interface."}
       ]
     },
     "U-04": {
@@ -615,7 +640,8 @@
       "profile": "ocs.platform/0.1",
       "claims": [
         {"id":"mapping","levels":["reference"],"expected":"State protocol, ABI, state and feature mappings with explicit representation loss or refusal."},
-        {"id":"cutover","levels":["model","reference"],"expected":"Preserve IDs, authority and in-flight state with only one active write owner through migration."}
+        {"id":"cutover","levels":["model","reference"],"expected":"Preserve IDs, authority and in-flight state with only one active write owner through migration."},
+        {"id":"profile-consumer","levels":["reference"],"expected":"For each normative profile identify an actual consumer, an observable failure boundary, and applicable conformance data."}
       ]
     },
     "L-06": {
@@ -698,6 +724,20 @@
       "claims": [
         {"id":"pagination","levels":["model","reference"],"expected":"Publish a complete catalog or account inventory only after every comparable revision page arrives with no continuation."},
         {"id":"gap","levels":["model","reference"],"expected":"A repeated token, changed scope or missing page yields a partial diagnostic and preserves the previous complete snapshot."}
+      ]
+    },
+    "core.interpretation": {
+      "role": "host",
+      "profile": "core",
+      "claims": [
+        {"id":"conflict","levels":["reference"],"expected":"Refuse a known conflict between normative effect/admission semantics and a descriptor before its invocation."}
+      ]
+    },
+    "composition.deployment": {
+      "role": "host",
+      "profile": "core",
+      "claims": [
+        {"id":"confinement","levels":["reference"],"expected":"Separate reviewed local policy from untrusted executable admission and refuse required confinement when the selected target cannot provide it."}
       ]
     }
   }
