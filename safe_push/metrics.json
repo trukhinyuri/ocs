@@ -1,0 +1,1051 @@
+{
+  "format": "ocs.safe-push.metric-profile/1",
+  "edition": "OCS 0.1 full observed contour",
+  "extraHostCases": {
+    "python-host-read": "W-06",
+    "python-host-scope": "B-03",
+    "go-host-read": "W-06",
+    "go-host-scope": "B-03",
+    "python-rejects-invalid-output": "C-05",
+    "go-rejects-invalid-output": "C-05",
+    "read-through-independent-peer": "B-04",
+    "peer-credential-denied": "B-03",
+    "peer-denies-write-on-read-grant": "B-03",
+    "local-owner-survives-peer-loss": "B-05",
+    "host-and-peer-fixture-boot": "B-01"
+  },
+  "groups": [
+    {
+      "id": "stand.capacity",
+      "source": "stand/stand.load@deployment",
+      "conditions": [
+        "operation",
+        "concurrency",
+        "comparison.samples",
+        "node",
+        "resourceLimits"
+      ],
+      "fields": [
+        {
+          "unit": "ms",
+          "min": [
+            "p95Ms",
+            "comparison.medianNativeMs",
+            "comparison.medianBoundMs"
+          ]
+        }
+      ],
+      "arrays": [
+        {
+          "field": "samplesMs",
+          "unit": "ms",
+          "size": 32,
+          "order": "rank",
+          "direction": "min"
+        },
+        {
+          "field": "comparison.nativeMs",
+          "unit": "ms",
+          "size": 32,
+          "order": "rank",
+          "direction": "min"
+        },
+        {
+          "field": "comparison.boundMs",
+          "unit": "ms",
+          "size": 32,
+          "order": "rank",
+          "direction": "min"
+        }
+      ]
+    },
+    {
+      "id": "stand.backup",
+      "source": "stand/stand.load@deployment",
+      "conditions": [
+        "comparison.restoredMeterCount",
+        "comparison.balance",
+        "comparison.distinctEffectSpends",
+        "comparison.restoredReceiptState",
+        "node"
+      ],
+      "fields": [
+        {
+          "unit": "bytes",
+          "min": [
+            "comparison.requiredBackupBytes",
+            "comparison.requiredRestoreBytes",
+            "comparison.backupBytes",
+            "comparison.secondBackupBytes"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "stand.cancel",
+      "source": "stand/stand.load@deployment",
+      "conditions": [
+        "cancellation.transport",
+        "cancellation.receivedChunks",
+        "cancellation.accepted",
+        "cancellation.terminalCode"
+      ],
+      "fields": [
+        {
+          "unit": "ms",
+          "min": [
+            "cancellation.elapsedMs"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "stand.recovery",
+      "source": "stand/L-06.recovery@deployment",
+      "conditions": [
+        "usage.scope.kind",
+        "usage.attribution",
+        "usage.workRequests",
+        "usage.probeRequests",
+        "grants",
+        "controller.standRestore.restoredMeterCount",
+        "controller.standRestore.balance"
+      ],
+      "fields": [
+        {
+          "unit": "ms",
+          "min": [
+            "controller.elapsedMs"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "stand.inference",
+      "source": "stand/G-04.comparison@deployment",
+      "conditions": [
+        "benchmark",
+        "mode",
+        "model",
+        "route",
+        "thresholds",
+        "history",
+        "relay.authorization"
+      ],
+      "fields": [
+        {
+          "unit": "correct-tasks",
+          "max": [
+            "correct"
+          ]
+        },
+        {
+          "unit": "json-bytes",
+          "min": [
+            "requestJsonBytes",
+            "responseJsonBytes",
+            "upstreamRequestJsonBytes",
+            "upstreamResponseJsonBytes",
+            "allHopJsonBytes"
+          ]
+        },
+        {
+          "unit": "model-tokens",
+          "min": [
+            "inputTokens",
+            "outputTokens"
+          ]
+        },
+        {
+          "unit": "ms",
+          "min": [
+            "synchronousFirstUsefulMs.p50",
+            "synchronousFirstUsefulMs.p95",
+            "synchronousFirstUsefulMs.p99",
+            "synchronousFirstUsefulMs.max",
+            "endToEndMs.p50",
+            "endToEndMs.p95",
+            "endToEndMs.p99",
+            "endToEndMs.max"
+          ]
+        }
+      ],
+      "members": {
+        "path": "results",
+        "keys": [
+          "direct",
+          "full-admissible-history",
+          "minimum-facts"
+        ],
+        "by": "map"
+      },
+      "memberConditions": [
+        "byteScope",
+        "tasks",
+        "endToEndMs.n",
+        "synchronousFirstUsefulMs.n"
+      ]
+    },
+    {
+      "id": "stand.plan-price",
+      "source": "stand/P-03.basis@deployment",
+      "conditions": [
+        "source",
+        "purpose"
+      ],
+      "fields": [
+        {
+          "unit": "currency-per-term",
+          "min": [
+            "price.amount"
+          ],
+          "max": [],
+          "kind": "decimal-text"
+        }
+      ],
+      "members": {
+        "by": "fields",
+        "keys": [
+          "published",
+          "observedAccountPrice"
+        ]
+      },
+      "memberConditions": [
+        "planId",
+        "price.currency",
+        "region",
+        "period",
+        "basis",
+        "tax",
+        "annualTerms",
+        "status",
+        "evidence.source"
+      ]
+    },
+    {
+      "id": "stand.workload-charge",
+      "source": "stand/A-02.probe@deployment",
+      "conditions": [
+        "usage.attribution",
+        "usage.scope.kind",
+        "route",
+        "mode",
+        "model",
+        "thresholds",
+        "usage.probeRequests",
+        "priorUsage.probeRequests",
+        "usage.spend.currency",
+        "priorUsage.spend.currency"
+      ],
+      "fields": [],
+      "differences": [
+        {
+          "id": "incrementalSpend",
+          "field": "usage.spend.amount",
+          "prior": "priorUsage.spend.amount",
+          "kind": "decimal-text",
+          "unit": "currency",
+          "direction": "min"
+        }
+      ]
+    },
+    {
+      "id": "stand.cluster-job",
+      "source": "stand/stand.tls@deployment",
+      "conditions": [
+        "serviceJob.package",
+        "serviceJob.provider",
+        "serviceJob.routes",
+        "identity.namespace",
+        "identity.role"
+      ],
+      "fields": [
+        {
+          "unit": "ms",
+          "min": [
+            "serviceJob.jsonBytes.firstUsefulMs",
+            "serviceJob.jsonBytes.endToEndMs"
+          ]
+        },
+        {
+          "unit": "json-bytes",
+          "min": [
+            "serviceJob.jsonBytes.jsonRequestBytes",
+            "serviceJob.jsonBytes.jsonResponseBytes",
+            "serviceJob.jsonBytes.forwardedRequestJsonBytes",
+            "serviceJob.jsonBytes.forwardedResponseJsonBytes"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "stand.keyboard",
+      "source": "stand/stand.text-and-keyboard@measurement",
+      "conditions": [
+        "cssWidths",
+        "fontPixels"
+      ],
+      "fields": [
+        {
+          "unit": "verified-actions",
+          "max": [
+            "checkedKeyboardOperations"
+          ]
+        }
+      ],
+      "arrays": [
+        {
+          "field": "horizontalOverflowPixels",
+          "unit": "css-pixels",
+          "size": 2,
+          "order": "ordinal",
+          "direction": "min"
+        }
+      ]
+    },
+    {
+      "id": "stand.browser",
+      "source": "stand/stand.accessibility@deployment",
+      "conditions": [],
+      "fields": [
+        {
+          "unit": "boolean",
+          "min": [],
+          "max": [
+            "focusVisibleAfterClose"
+          ],
+          "kind": "boolean"
+        }
+      ],
+      "members": {
+        "path": "views",
+        "keys": [
+          "960",
+          "320"
+        ],
+        "by": "requestedCssWidth"
+      },
+      "memberConditions": [
+        "requestedCssWidth",
+        "observedCssWidth",
+        "rootFontPx",
+        "controlFontPx",
+        "browserVersion",
+        "accessibleDisclosureRole",
+        "keyboard"
+      ],
+      "differences": [
+        {
+          "id": "documentOverflow",
+          "field": "scrollWidth",
+          "prior": "observedCssWidth",
+          "clampZero": true,
+          "unit": "css-pixels",
+          "direction": "min"
+        }
+      ]
+    },
+    {
+      "id": "platform.load",
+      "source": "platform/platform.capacity@measurement",
+      "conditions": [
+        "samples",
+        "concurrency",
+        "tenantCount",
+        "desiredBytes",
+        "boundMethod",
+        "nativeMethod",
+        "warmCache",
+        "stats.cap",
+        "maximumAllowedNs",
+        "workloadBoundary"
+      ],
+      "fields": [
+        {
+          "unit": "ns",
+          "min": [
+            "coldClientBootstrapNs",
+            "firstUsableReadNs",
+            "boundWindowNs",
+            "nativeWindowNs",
+            "nativeP95Ns",
+            "nativeP99Ns",
+            "p95Ns",
+            "p99Ns",
+            "cancellationNs",
+            "unrelatedTenantNs"
+          ]
+        },
+        {
+          "unit": "reads-per-second",
+          "max": [
+            "boundReadsPerSecond",
+            "nativeReadsPerSecond"
+          ]
+        },
+        {
+          "unit": "bytes",
+          "min": [
+            "boundWireBodyBytes",
+            "nativeBytes"
+          ]
+        },
+        {
+          "unit": "handlers",
+          "min": [
+            "stats.peak"
+          ]
+        },
+        {
+          "unit": "rejected-requests",
+          "min": [
+            "stats.rejected"
+          ]
+        }
+      ],
+      "arrays": [
+        {
+          "field": "boundLatencyNs",
+          "unit": "ns",
+          "size": 32,
+          "order": "rank",
+          "direction": "min"
+        },
+        {
+          "field": "nativeLatencyNs",
+          "unit": "ns",
+          "size": 32,
+          "order": "rank",
+          "direction": "min"
+        }
+      ]
+    },
+    {
+      "id": "platform.recovery",
+      "source": "platform/platform.partition@measurement",
+      "conditions": [
+        "grants",
+        "ownerAfterRevocation",
+        "reconciledOutcome",
+        "sameOperationId"
+      ],
+      "fields": [
+        {
+          "unit": "ns",
+          "min": [
+            "localDuringPartitionNs",
+            "restartToScopedReadNs"
+          ]
+        }
+      ],
+      "aliases": [
+        "platform/platform.federation@runtime-observation"
+      ]
+    },
+    {
+      "id": "platform.restore",
+      "source": "platform/platform.resource@runtime-observation",
+      "conditions": [
+        "terms.capacityBytes",
+        "terms.tenantSlots",
+        "terms.slots",
+        "terms.placement",
+        "terms.residency",
+        "terms.continuity",
+        "terms.cost.currency",
+        "terms.metering",
+        "terms.terms"
+      ],
+      "fields": [
+        {
+          "unit": "bytes",
+          "min": [
+            "requiredBytes"
+          ]
+        },
+        {
+          "unit": "currency",
+          "min": [
+            "terms.cost.amount"
+          ],
+          "max": [],
+          "kind": "decimal-text"
+        }
+      ]
+    },
+    {
+      "id": "core.capacity",
+      "source": "core/core.independent-cell-capacity@measurement",
+      "conditions": [
+        "operation",
+        "scope",
+        "payload",
+        "maximumHandlers",
+        "overload"
+      ],
+      "fields": [
+        {
+          "unit": "ms",
+          "min": [
+            "p95Ms",
+            "slowTenantNeighborMs",
+            "coldPeerMs",
+            "firstReadAfterOverloadMs",
+            "otherCellAfterLossMs"
+          ]
+        },
+        {
+          "unit": "retries",
+          "min": [
+            "busyReadRetries"
+          ]
+        }
+      ],
+      "arrays": [
+        {
+          "field": "samplesMs",
+          "unit": "ms",
+          "size": 32,
+          "order": "rank",
+          "direction": "min"
+        },
+        {
+          "field": "nativeStdioMs",
+          "unit": "ms",
+          "size": 4,
+          "order": "rank",
+          "direction": "min"
+        }
+      ]
+    },
+    {
+      "id": "core.public-receipt",
+      "source": "core/core.public-receipts@reference",
+      "conditions": [],
+      "fields": [
+        {
+          "unit": "ns",
+          "min": [
+            "elapsedNs"
+          ]
+        }
+      ],
+      "members": {
+        "by": "fields",
+        "keys": [
+          "allowed",
+          "denied"
+        ]
+      },
+      "memberConditions": [
+        "operation",
+        "version",
+        "scope",
+        "policy",
+        "outcome"
+      ]
+    },
+    {
+      "id": "core.unknown-ack",
+      "source": "core/core.durable-replayed-effect@reference",
+      "conditions": [
+        "writerRevision"
+      ],
+      "fields": [
+        {
+          "unit": "ns",
+          "min": [
+            "waitNs"
+          ]
+        }
+      ],
+      "members": {
+        "path": "observations",
+        "keys": [
+          "before-commit",
+          "after-commit"
+        ],
+        "by": "map"
+      },
+      "memberConditions": [
+        "clientObservation",
+        "state",
+        "balance"
+      ]
+    },
+    {
+      "id": "interaction.inference",
+      "source": "interaction/interaction.agentComparison@measurement",
+      "conditions": [
+        "workload",
+        "qualityThreshold",
+        "tokenUnit",
+        "costBasis",
+        "measurementPoint",
+        "placement"
+      ],
+      "fields": [
+        {
+          "unit": "ns",
+          "min": [
+            "firstUsefulNs",
+            "endToEndNs"
+          ]
+        },
+        {
+          "unit": "bytes",
+          "min": [
+            "messagePayloadBytes",
+            "wireBodyBytes"
+          ]
+        },
+        {
+          "unit": "currency",
+          "min": [
+            "price.amount"
+          ],
+          "max": [],
+          "kind": "decimal-text"
+        },
+        {
+          "unit": "boolean",
+          "min": [],
+          "max": [
+            "confirmed"
+          ],
+          "kind": "boolean"
+        }
+      ],
+      "members": {
+        "path": "observations",
+        "keys": [
+          "direct",
+          "relay-full",
+          "relay-minimum"
+        ],
+        "by": "mode"
+      },
+      "memberConditions": [
+        "price.currency"
+      ]
+    },
+    {
+      "id": "interaction.partition",
+      "source": "interaction/interaction.peerOutage@measurement",
+      "conditions": [
+        "placement",
+        "depthLeft",
+        "cycle",
+        "outage",
+        "orderedTransforms"
+      ],
+      "fields": [
+        {
+          "unit": "ns",
+          "min": [
+            "localDuringOutageNs"
+          ]
+        }
+      ],
+      "aliases": [
+        "interaction/interaction.delegation@runtime-observation"
+      ]
+    },
+    {
+      "id": "interaction.hop",
+      "source": "interaction/interaction.peerOutage@measurement",
+      "conditions": [
+        "placement",
+        "depthLeft",
+        "cycle",
+        "outage"
+      ],
+      "fields": [
+        {
+          "unit": "ns",
+          "min": [
+            "durationNs"
+          ]
+        },
+        {
+          "unit": "ms-remaining",
+          "max": [
+            "remainingMs"
+          ]
+        }
+      ],
+      "members": {
+        "path": "hops",
+        "keys": [
+          "front",
+          "relay"
+        ],
+        "by": "caller"
+      },
+      "memberConditions": [
+        "receiver",
+        "region",
+        "decision",
+        "actualRevision",
+        "retryOwner"
+      ]
+    },
+    {
+      "id": "interaction.drain",
+      "source": "interaction/interaction.socketAndBudget@runtime-observation",
+      "conditions": [
+        "configuredSocketLifetimeMs",
+        "relayDelayMs",
+        "parentRequestedMs",
+        "shortParentMs",
+        "shortResult",
+        "placement"
+      ],
+      "fields": [
+        {
+          "unit": "ms",
+          "min": [
+            "continuousDripUntilClosedMs.headers",
+            "continuousDripUntilClosedMs.body"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "interaction.revocation",
+      "source": "interaction/interaction.grantEpoch@runtime-observation",
+      "conditions": [
+        "maximumRestartMs",
+        "affectedOwner",
+        "unaffectedOwner",
+        "finiteWorkerSteps",
+        "placement"
+      ],
+      "fields": [
+        {
+          "unit": "ns",
+          "min": [
+            "restartToRotationObservedNs",
+            "observedRejectionNs"
+          ]
+        },
+        {
+          "unit": "admissions",
+          "min": [
+            "maxAdmissionsAfterCommit"
+          ]
+        }
+      ],
+      "aliases": [
+        "interaction/interaction.background@runtime-observation"
+      ]
+    },
+    {
+      "id": "interaction.retention",
+      "source": "interaction/interaction.privacy@runtime-observation",
+      "conditions": [
+        "placement",
+        "retentionMs",
+        "residency",
+        "onWithdraw",
+        "purged.region"
+      ],
+      "fields": [
+        {
+          "unit": "ms",
+          "min": [
+            "purged.sweepMs"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "interaction.terminal",
+      "source": "interaction/interaction.keyboard@measurement",
+      "conditions": [
+        "terminal",
+        "target",
+        "physicalFontScale",
+        "placement",
+        "colorsRequired"
+      ],
+      "fields": [],
+      "members": {
+        "path": "viewport",
+        "keys": [
+          "28",
+          "14"
+        ],
+        "by": "columns"
+      },
+      "memberConditions": [
+        "keys",
+        "readCount",
+        "trustedReview"
+      ],
+      "differences": [
+        {
+          "id": "horizontalOverflow",
+          "field": "maximumColumns",
+          "prior": "columns",
+          "clampZero": true,
+          "unit": "terminal-columns",
+          "direction": "min"
+        }
+      ]
+    },
+    {
+      "id": "provider.quality",
+      "source": "provider/PV-05.A-02.probe@measurement",
+      "conditions": [
+        "samples",
+        "thresholdMs",
+        "route",
+        "model",
+        "options",
+        "quality"
+      ],
+      "fields": [
+        {
+          "unit": "correct-tasks",
+          "max": [
+            "correct"
+          ]
+        },
+        {
+          "unit": "ms",
+          "min": [
+            "p95Ms"
+          ]
+        },
+        {
+          "unit": "bytes",
+          "min": [
+            "inputContentBytes"
+          ]
+        },
+        {
+          "unit": "model-tokens",
+          "min": [
+            "inputTokens",
+            "outputTokens"
+          ]
+        }
+      ],
+      "aliases": [
+        "provider/PV-05.A-02.probe@runtime-observation",
+        "provider/PV-05.M-02.invocation@runtime-observation",
+        "provider/PV-05.M-02.response@runtime-observation",
+        "provider/PV-05.M-02.specialized@runtime-observation",
+        "provider/PV-02.M-01.axes@runtime-observation"
+      ]
+    },
+    {
+      "id": "provider.usage",
+      "source": "provider/PV-10.L-06.recovery@runtime-observation",
+      "conditions": [
+        "scopedWork7",
+        "scopedWork30",
+        "probes",
+        "fallback",
+        "retentionSeconds",
+        "scopedSpend.currency",
+        "tenantSpend.currency"
+      ],
+      "fields": [
+        {
+          "unit": "bytes",
+          "min": [
+            "backupBytes"
+          ]
+        },
+        {
+          "unit": "currency",
+          "min": [
+            "scopedSpend.amount",
+            "tenantSpend.amount"
+          ],
+          "max": [],
+          "kind": "decimal-text"
+        }
+      ],
+      "aliases": [
+        "provider/PV-10.L-06.terms@runtime-observation",
+        "provider/PV-10.L-06.meter@runtime-observation",
+        "provider/PV-06.A-03.usage@runtime-observation"
+      ]
+    },
+    {
+      "id": "provider.shared-price",
+      "source": "provider/PV-04.P-03.basis@runtime-observation",
+      "conditions": [
+        "states",
+        "sharedPools",
+        "sharedAccounts"
+      ],
+      "fields": [
+        {
+          "unit": "synthetic-USD",
+          "min": [
+            "distinctOrganizationPriceTotal"
+          ],
+          "max": [],
+          "kind": "decimal-text"
+        }
+      ],
+      "aliases": [
+        "provider/PV-04.P-03.shared@runtime-observation"
+      ]
+    },
+    {
+      "id": "wire.python-host",
+      "source": "wire/WR-05.python-host@runtime-observation",
+      "conditions": [
+        "failedBeforeCall",
+        "failedAfterCall"
+      ],
+      "fields": [
+        {
+          "unit": "seconds",
+          "min": [
+            "latencySeconds.bounds",
+            "latencySeconds.correlation",
+            "latencySeconds.deadline",
+            "latencySeconds.identity",
+            "latencySeconds.output",
+            "latencySeconds.pin",
+            "latencySeconds.revision"
+          ]
+        }
+      ],
+      "body": "details"
+    },
+    {
+      "id": "wire.go-host",
+      "source": "wire/WR-05.go-host@runtime-observation",
+      "conditions": [
+        "failedBeforeCall",
+        "failedAfterCall"
+      ],
+      "fields": [
+        {
+          "unit": "seconds",
+          "min": [
+            "latencySeconds.bounds",
+            "latencySeconds.correlation",
+            "latencySeconds.deadline",
+            "latencySeconds.identity",
+            "latencySeconds.output",
+            "latencySeconds.pin",
+            "latencySeconds.revision",
+            "latencySeconds.teardown"
+          ]
+        }
+      ],
+      "body": "details"
+    },
+    {
+      "id": "proof-size.interaction",
+      "source": "profile-artifacts/profiles.detached.interaction@artifact-observation",
+      "conditions": [
+        "domain",
+        "acceptedDeclarations",
+        "kernelDeclarations",
+        "checkerSha256"
+      ],
+      "fields": [
+        {
+          "unit": "bytes",
+          "min": [
+            "certificateBytes"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "proof-size.platform",
+      "source": "profile-artifacts/profiles.detached.platform@artifact-observation",
+      "conditions": [
+        "domain",
+        "acceptedDeclarations",
+        "kernelDeclarations",
+        "checkerSha256"
+      ],
+      "fields": [
+        {
+          "unit": "bytes",
+          "min": [
+            "certificateBytes"
+          ]
+        }
+      ]
+    }
+  ],
+  "artifactBytes": [
+    "evidence/core.ndjson",
+    "evidence/interaction.ndjson",
+    "evidence/platform.ndjson",
+    "evidence/wire-evidence/wire.ndjson",
+    "evidence/wire-evidence/status-go",
+    "evidence/provider-source.lean",
+    "evidence/wire-evidence/Extracted.lean"
+  ],
+  "coverageLimits": {
+    "operator.cpu-memory-io-energy": "The receipt records capacity and selected byte counts. It contains no measured operator CPU time, peak RSS, I/O traffic, energy or infrastructure invoice.",
+    "network.ciphertext-framing": "Recorded JSON or application bytes omit the HTTP framing, TCP/IP and TLS ciphertext lengths.",
+    "inference.raw-per-task": "Remote and local classifier summaries omit per-task latency, token, cost and outcome vectors. Retained quantiles and sample totals have their own cells.",
+    "interaction.tokens": "The deterministic local peer has no tokenizer. A null token count carries no numerical comparison.",
+    "inference.generalization": "Eight sealed classification tasks establish observed task quality on the specified model. They provide no population-wide model quality guarantee.",
+    "runtime.repeatability": "The legacy receipt records one identified execution. Hardware occupancy, sampling uncertainty, alternating order and confidence across future runs were not recorded.",
+    "storage.whole-store-population": "Restored scoped meters and account state are available. The stand did not record the full unrelated database population or the free-space trajectory across runs.",
+    "qualification.resource-cost": "The signed aggregate has wall-clock duration and selected artifact sizes. Per-stage CPU, memory, engineering time and resource costs are unmeasured.",
+    "ux.human-effort": "Named keyboard and viewport checks establish observed reachability and overflow. No human study or measured completion time, errors, comprehension or cognitive load appears in this receipt.",
+    "risk.unobserved-domains": "Unexercised workloads, customers, hardware, open-world risks and future deployments need independent evidence and enrollment."
+  },
+  "observableShapes": {
+    "admission": {
+      "locations": 6,
+      "sha256": "fe7b2ba6ddd4d46657878871b131163666a71f9066818cad7fe3921b9e0eb54e"
+    },
+    "core": {
+      "locations": 44,
+      "sha256": "813f7cce964194f142d522c5a5554eb99c9f3c9615047e020143445aae596224"
+    },
+    "external": {
+      "locations": 2,
+      "sha256": "3c680a08120b13856b28a9564ed9f93ac46498c9b75be23a63947401a2d11bdb"
+    },
+    "interaction": {
+      "locations": 141,
+      "sha256": "14420b5b6747412a75f274d7ec77f55d8982329117ad5f6500ac0b32439cb225"
+    },
+    "interfaces": {
+      "locations": 1,
+      "sha256": "a9efad85cf14d8a9d0f1abce29da601ec4d1faffc71188c0ef5da3f4f7478e27"
+    },
+    "platform": {
+      "locations": 39,
+      "sha256": "13032a59a0bfae152e74a64db588743701d3f6e56d4cebc7afe7ff4503e072e0"
+    },
+    "profile-artifacts": {
+      "locations": 4,
+      "sha256": "857ed7dc2ff1537f96c825bb7ff312bbb8bb898287a7dcf16aca1aed21f0827e"
+    },
+    "provider": {
+      "locations": 301,
+      "sha256": "eaac5ed37d7fe962f583a8cd54f6cd3a9f3c16579fbb80c41f6cee97b68dc293"
+    },
+    "stand": {
+      "locations": 170,
+      "sha256": "4fee788e125789bf322b5739f5cc61f09d864c60c717d376fc9f6495e00732f6"
+    },
+    "wire": {
+      "locations": 36,
+      "sha256": "66f733e8d597a98f3411e8f39fb259f298013b62efefab78593c2694f93524b3"
+    },
+    "wire-controls": {
+      "locations": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    }
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "format": "ocs.safe-push.criteria/1",
+  "proposal": "proposals/safe-push.md",
+  "establishedBase": "3facf571910e0799539a77a1a5112e6609a9a5ca",
+  "obligations": {
+    "reference.update": "Only the exact single-parent candidate can become the new canonical tip. Test a valid update, a rejected update, concurrent parents, and restarts by reading the actual ref.",
+    "coverage.tree": "Enumerate all Git objects and modes from the receiving object store. Apply the independently installed classifier to additions, removals, dependencies and policy changes.",
+    "coverage.meaning": "Retain the requirements, original admissible domains, expected positive and refused behavior, progress, recovery and the original levels of proof.",
+    "evidence.qualification": "Re-adjudicate every prescribed target using an outside enrollment, pinned verifier and the exact candidate. Missing or stale required evidence holds the ref.",
+    "performance.monotonic": "Each enrolled comparison cell independently satisfies its original direction and conditions. A valid adverse observation remains in the history even after a favorable repeat or a new commit with identical bytes.",
+    "evidence.science": "Obtain claim-specific, separately signed domain validation and independent review. Retain falsifiers, sources, raw and contrary results, applicable methods and unresolved limitations.",
+    "proof.binary": "Where a property of deployed code is claimed, accept only a separately enrolled replay connecting the actual source or artifact to its stated semantics.",
+    "trust.guardian": "Candidate-controlled protection files cannot define admission. Changes affecting the guardian are decided by the old root. Key rotation requires authenticated old and new custodians.",
+    "trust.revocation": "A confirmed open counterexample blocks the affected scope. A scoped signed remediation requires retained evidence, repair and independent replay.",
+    "audit.durability": "Publish and keep immutable receipts, evaluate expiry at ref preparation, and consult the real ref when recovering from an interrupted or competing update.",
+    "security.isolation": "Execute no candidate code as receiver or under credentials of the verifier or release custodians. Use independently installed code, fixed parsers and bounded inputs.",
+    "portability.target": "Bind each claimed architecture, OS, ABI, instrumentation and workload. An unavailable or incomparable target remains open.",
+    "verification.cost": "Preserve the verification pipeline's required comparisons. Reuse only independently validated evidence within its exact dependency and freshness envelope.",
+    "forge.enforcement": "Require an independently owned success result for the exact published object and actual parent. Read back hosted rules and exercise the real ref. Private hosting or an advisory action alone does not establish enforcement.",
+    "application.safety": "Informational conformance and observations concern the enrolled reference system. Critical-use safety requires independent system-specific hazard analysis, integrated target evidence and the responsible safety authority."
+  },
+  "universalClaims": {
+    "programs": "Universal decision of every nontrivial behavioral property of arbitrary programs is unavailable.",
+    "physicalPerformance": "A finite measurement cannot establish absence of a regression in every possible physical execution.",
+    "trust": "The initial root, custody, hardware, time and atomic filesystem/Git operations have explicit trust assumptions.",
+    "scientificTruth": "Undiscovered requirements or universal empirical truth cannot be certified by a finite corpus."
+  }
+}
