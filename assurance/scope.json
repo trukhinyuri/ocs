@@ -1,0 +1,48 @@
+{
+  "format": "ocs.assurance-scope/1",
+  "edition": "0.1.0-draft.1",
+  "inventoryRevision": "beeac9225d2a1715b6f747a76278fdca6937d9ee",
+  "compatibilityRevision": "6f6e22842347806f2963ef1984d9ea592fdddaf0",
+  "languagePolicy": "Any language may supply equivalent independently replayable evidence. Proof tools are development dependencies.",
+  "populations": {
+    "standard": "Every normative paragraph, numbered rule, operation registry entry and schema assertion in version.json.",
+    "reference": "Local author, kernel, caller, executor, peer, operator and domain adapter. Independent Python/Go reference paths on the POSIX machine, persistent fixture stores, stdio and isolated network transport.",
+    "deployment": "A distinct owner-selected real stand. Obtain its authorized identity, route, workload, failure assumptions, thresholds and expiry before measurement. A synthetic account or loopback receipt cannot satisfy this scope."
+  },
+  "assurance": {
+    "model": "Kernel-checked statement of a selected invariant, realizability, refinement, or conditional progress. Freeze formal type and semantic definitions and audit all transitive axioms.",
+    "source": "Program-specific derivation from actual source, with explicit, checked translator boundary. Runtime probes exercise surrounding code but cannot substitute for a source theorem.",
+    "build": "Identify exact executable or interpreter, source, options, ABI and libraries. An artifact observation establishes the behavior seen on that build. A mathematical binary claim additionally requires a checked compilation, translation witness or machine-code proof.",
+    "measurement": "Identify target, workload, observation clock, conditions, limit and oracle. Check positive and refusal outcomes. Use replayable receipts with trusted provenance, issued time and maximum age.",
+    "external": "Operator-controlled, authenticated stand evidence. Absence of a real target receipt leaves the corresponding capability open."
+  },
+  "acceptance": {
+    "accounting": "Every normative unit and atomic promise has a stable source locator, scoped role and acceptance criterion. Report coverage as a count per source/profile.",
+    "execution": "Every applicable evidence obligation has independently accepted evidence at the preregistered level under the original premises. Report separate numerators and denominators; open, stale, failed, skipped and weaker evidence prevent completion.",
+    "mutation": "Removal, weakening, vacuity, missing refusal, narrower inputs, changed executable, changed premise, borrowed certificate and stale operational record must be identified. A compatible addition, equivalent implementation and stronger proof must pass."
+  },
+  "qualificationTargets": {
+    "localCapacity": {
+      "role": "isolated soft-deadline read service and independent cells",
+      "target": "actual built Go status caller and authenticated Python loopback receiver; separate processes",
+      "samples": 32,
+      "concurrency": 4,
+      "payload": "resource demo; five second per-request budget",
+      "singleDeadlineMs": 5000,
+      "maximumQueued": 4,
+      "recoveryLimitMs": 5000,
+      "price": "no external inference or billing"
+    },
+    "native": {
+      "role": "local reviewed ABI and handle simulator",
+      "target": "running POSIX architecture and sealed soft-deadline status fixture",
+      "hardTiming": "Admission must refuse an unqualified hard-deadline target; a p99 observation is insufficient."
+    },
+    "stand": {
+      "role": "separately authorized real stand",
+      "target": null,
+      "thresholds": null,
+      "initialStatus": "awaiting-owner-target"
+    }
+  }
+}

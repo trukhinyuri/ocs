@@ -1,0 +1,16 @@
+# Qualification boundary for draft 1
+
+The initial policy is bound to the accepted normative sources at `beeac9225d2a1715b6f747a76278fdca6937d9ee`. [Scope](scope.json) names the populations and local operating conditions. [Obligations](obligations.json) fixes individually identified acceptance criteria and minimum evidence levels before implementation. Sources in the scenario index identify each numbered rule and its consumers. Structural checks of the edition are a distinct population from behavioral guarantees.
+
+## Reference witnesses
+
+- WR-01 bootstrap; WR-02 ordered compatible negotiation; WR-03 recovery through arbitrary failed ordinary calls; WR-04 exact pin, operation, version, input and resource grant; WR-05 absolute deadline before dispatch; WR-06 strict raw frames and correlation; WR-07 independent old runner rejects a lost regression case. Check Python and Go through public stdio. The translator is trusted only for its explicitly recognized concrete syntax.
+- Disablement and stale generation rejection, credit conservation and one final response across arbitrary traces, conditional progress under delivery/credit/fuel, monotone ACK and visible gaps, stable terminal jobs and CAS, bounded artifact progress and reassembly, path-wise intersection of authority, decreasing finite delegation budget. Observe real authenticated loopback controls, persistent restart and competing continuations.
+- PV-01 scoped inventory and credential lifecycle; PV-02 complete comparable catalogs and explicit EOL; PV-03 exact independent pool aggregation; PV-04 priced plan basis and observation; PV-05 exact admitted route/model/options; PV-06 attributed usage and replay keys; PV-07 inert stable preparation; PV-08 trusted commit, durable local spend and concurrency; PV-09 unknown outcome retention and separate refresh; PV-10 auditable terms, stable billing, backup and tenant isolation. Separate genuine implementation derivation from SQLite/OS/environment observations.
+- Package and schema admission, peer direction, directed imports, conditional authority, diagnostic attribution, source/manifest identity, cutoff/compatibility, local resource observation, qualified native path and measured soft capacity. Independently validate all five previously empty scenario references; retain explicit real stand obligations.
+
+## Trust and compatibility
+
+Model theorems require typed independent statements, kernel replay, a positive witness, an admitted failure where applicable and an axiom audit. A target-specific source claim requires derivation from the executable implementation including the refusal paths. A runtime observation records concrete bytes, target and method. A theorem about an executable requires a checked refinement chain beyond artifact identification. For Python and Go the local sealed status dispatch is in scope for source refinement and native build observations. Whole interpreter, operating system, general compiler correctness and hardware timing are trust boundaries.
+
+Versioned changes with additional scope have to extend this initial catalogue. The separately selected real stand is an applicable population awaiting owner-specified target and conditions. Completion requires separate counts for coverage and verified outcomes. A checked document or passing simulation cannot substitute for required production observations.

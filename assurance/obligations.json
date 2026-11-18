@@ -1,0 +1,704 @@
+{
+  "format": "ocs.obligations/1",
+  "edition": "0.1.0-draft.1",
+  "inventoryRevision": "beeac9225d2a1715b6f747a76278fdca6937d9ee",
+  "extraLocators": {
+    "core.schema-resources": [
+      "spec/core.md",
+      "Schema resources"
+    ],
+    "core.package-distribution": [
+      "spec/core.md",
+      "Packaging and distribution"
+    ],
+    "composition.outbound": [
+      "spec/composition.md",
+      "Calling an import from inside an extension"
+    ],
+    "wire.error-table": [
+      "spec/wire.md",
+      "W-07 Errors"
+    ],
+    "interface.registry": [
+      "spec/profiles/interfaces.md",
+      "Using the optional operation registry"
+    ],
+    "interface.intent": [
+      "spec/profiles/interfaces.md",
+      "Intent equality"
+    ],
+    "interface.http-stream": [
+      "spec/profiles/interfaces.md",
+      "Network streams"
+    ],
+    "interface.pages": [
+      "spec/profiles/interfaces.md",
+      "Catalog pages"
+    ]
+  },
+  "structuralInventory": {
+    "source": "version.json",
+    "schemas": "Enumerate every assertion keyword and each required member in each schema by stable resource name and JSON Pointer. Check the exact reviewed edition constraint independently of runtime behavior.",
+    "operations": "For every operation preserve its profile, channel, support condition, authority, input, output and version. Validate resolution and positive/negative shape boundaries.",
+    "profiles": "Validate each feature identifier, implementing role, records, exports and controls against its published contract."
+  },
+  "groups": {
+    "C-01": {
+      "role": "author/host",
+      "profile": "core",
+      "claims": [
+        {"id":"inspect","levels":["reference"],"expected":"Read manifest identity, permissions, bindings and exports without executing the package."},
+        {"id":"admit","levels":["model","reference"],"expected":"Activation requires prior admission and enablement."},
+        {"id":"data","levels":["reference"],"expected":"A data-only entry is readable with zero executable exports and starts no process."}
+      ]
+    },
+    "C-02": {
+      "role": "host",
+      "profile": "core",
+      "claims": [
+        {"id":"package-id","levels":["schema","reference"],"expected":"Validate the five required package fields and dotted public identifiers."},
+        {"id":"issuer","levels":["model","reference"],"expected":"Bind the authenticated issuer, domain, ID and exact revision before granting an instance."},
+        {"id":"object-id","levels":["model","reference"],"expected":"Keep account, resource, conversation, operation and display identities distinct."}
+      ]
+    },
+    "C-03": {
+      "role": "host/executor",
+      "profile": "core",
+      "claims": [
+        {"id":"versions","levels":["reference"],"expected":"Parse package and operation SemVer independently and bind an exact revision."},
+        {"id":"negotiate","levels":["model","source-refinement","reference"],"expected":"Select a tested wire protocol separately from the contract version."},
+        {"id":"immutable","levels":["reference"],"expected":"A bound manifest revision cannot change bytes within an admitted call."}
+      ]
+    },
+    "C-04": {
+      "role": "host",
+      "profile": "core",
+      "claims": [
+        {"id":"exports","levels":["reference"],"expected":"Reject duplicate operation/version pairs and load both schemas and effect classification."},
+        {"id":"required","levels":["model","reference"],"expected":"Resolve every required import and feature before activating a dependent function."},
+        {"id":"optional","levels":["model","reference"],"expected":"Missing optional imports affect only dependent functions."},
+        {"id":"cycles","levels":["model","reference"],"expected":"Reject ambiguous or unresolvable required activation cycles with a diagnostic."}
+      ]
+    },
+    "C-05": {
+      "role": "host/executor",
+      "profile": "core",
+      "claims": [
+        {"id":"resolver","levels":["reference"],"expected":"Resolve only trusted bounded package or edition resources, without arbitrary remote retrieval."},
+        {"id":"input","levels":["model","source-refinement","reference"],"expected":"Reject malformed operation input before execution."},
+        {"id":"output","levels":["reference"],"expected":"Reject an invalid or mismatched reply at the public boundary."},
+        {"id":"pointer","levels":["reference"],"expected":"Return an input or output JSON Pointer relative to its payload where available."}
+      ]
+    },
+    "C-06": {
+      "role": "host/intermediary",
+      "profile": "core",
+      "claims": [
+        {"id":"namespace","levels":["schema","reference"],"expected":"Enumerate core fields and isolate namespaced optional extensions."},
+        {"id":"required","levels":["model","source-refinement","reference"],"expected":"An unknown required feature makes negotiation or admission ineligible."},
+        {"id":"opaque","levels":["model","reference"],"expected":"A lossless intermediary preserves unknown optional data and refuses essential semantic loss."}
+      ]
+    },
+    "C-07": {
+      "role": "host/peer",
+      "profile": "core",
+      "claims": [
+        {"id":"request","levels":["model","reference"],"expected":"Installing a manifest or requesting a capability supplies no grant."},
+        {"id":"scope","levels":["model","source-refinement","reference"],"expected":"Dispatch only the authorized principal, operation and target resource."},
+        {"id":"effect","levels":["model","reference"],"expected":"Reject unbound, disallowed and undeclared effects before invocation."}
+      ]
+    },
+    "C-08": {
+      "role": "host",
+      "profile": "core",
+      "claims": [
+        {"id":"lifecycle","levels":["model","source-refinement","reference"],"expected":"Dispatch only after inspected, admitted, bound and enabled activation."},
+        {"id":"disable","levels":["model","source-refinement","reference"],"expected":"A disabled instance admits no new calls."},
+        {"id":"generation","levels":["model","source-refinement","reference"],"expected":"Old generations cannot deliver notifications or affect replacement instances."},
+        {"id":"drain","levels":["reference"],"expected":"Dispose registrations, handles and grants after exit, timeout or crash and surface necessary restart/recovery."}
+      ]
+    },
+    "C-09": {
+      "role": "maintainer/host",
+      "profile": "core",
+      "claims": [
+        {"id":"scope","levels":["reference"],"expected":"Advertise tested features only, by role, transport and revision."},
+        {"id":"refinement","levels":["model","reference"],"expected":"An additive compatible change preserves all previously promised traces and outcomes."},
+        {"id":"migration","levels":["reference"],"expected":"A change of meaning, effect or authority is versioned with migration; executable rollback and persisted state are distinguished."}
+      ]
+    },
+    "C-10": {
+      "role": "operator",
+      "profile": "core",
+      "claims": [
+        {"id":"attribution","levels":["reference"],"expected":"Attribute correlated outcome duration, revision and admission to the invoked target."},
+        {"id":"diagnosis","levels":["reference"],"expected":"Distinguish missing, unsupported, unauthorized, unavailable, malformed and uncertain outcomes."},
+        {"id":"redaction","levels":["reference"],"expected":"Diagnostics exclude credentials and unrelated user content."}
+      ]
+    },
+    "W-01": {
+      "role": "caller/executor",
+      "profile": "core",
+      "claims": [
+        {"id":"encoding","levels":["reference"],"expected":"Refuse non-UTF-8, BOM, duplicate keys, batches, nonfinite numbers and unpaired surrogates."},
+        {"id":"precision","levels":["reference"],"expected":"Reject unsafe JSON integers, including equivalent exponent encodings, while allowing exact strings."},
+        {"id":"request-id","levels":["reference"],"expected":"Treat a request ID as an opaque per-outstanding-call token without authority."}
+      ]
+    },
+    "W-02": {
+      "role": "caller/executor",
+      "profile": "core",
+      "claims": [
+        {"id":"envelope","levels":["reference"],"expected":"Accept the exact request or response envelope with exactly one result or error."},
+        {"id":"correlation","levels":["model","reference"],"expected":"Match replies to their outstanding request independently of arrival order."},
+        {"id":"malformed-id","levels":["reference"],"expected":"Emit null when an error cannot be attributed to a valid request ID."},
+        {"id":"notification","levels":["model","reference"],"expected":"A notification produces no response and only negotiated notifications can affect state."}
+      ]
+    },
+    "W-03": {
+      "role": "caller/executor",
+      "profile": "core",
+      "claims": [
+        {"id":"min-bound","levels":["model","reference"],"expected":"The smaller negotiated/local frame limit applies before reading or writing an unbounded message."},
+        {"id":"framing","levels":["reference"],"expected":"Count UTF-8 bytes excluding LF and reject or close on oversized input/output."},
+        {"id":"queues","levels":["model","measurement"],"expected":"Bound concurrent dispatch, queues and output under a slow receiver; route diagnostics off the protocol channel."}
+      ]
+    },
+    "W-04": {
+      "role": "caller/executor",
+      "profile": "core",
+      "claims": [
+        {"id":"syntax","levels":["source-refinement","reference"],"expected":"Reject malformed and expired UTC millisecond deadlines before successful dispatch."},
+        {"id":"propagate","levels":["model","reference"],"expected":"A child call cannot increase the remaining budget."},
+        {"id":"late-read","levels":["reference"],"expected":"Reject a read that completes after its effective deadline using a monotonic elapsed clock."},
+        {"id":"write-timeout","levels":["model","reference"],"expected":"Timeout preserves the durable operation ID and a known or unknown outcome without inferring rollback."}
+      ]
+    },
+    "W-05": {
+      "role": "caller/executor",
+      "profile": "core",
+      "claims": [
+        {"id":"bootstrap","levels":["model","source-refinement","reference"],"expected":"A compatible bootstrap is required before a successful stdio invocation."},
+        {"id":"selection","levels":["model","source-refinement","reference"],"expected":"Select the first mutually supported wire version and reject unknown required features."},
+        {"id":"pin","levels":["model","source-refinement","reference"],"expected":"Compare actual identity and digest with the admitted revision before invocation."},
+        {"id":"frame-bound","levels":["reference"],"expected":"Use the returned capability set and effective frame bound without silently reinstalling."}
+      ]
+    },
+    "W-06": {
+      "role": "caller/executor",
+      "profile": "core",
+      "claims": [
+        {"id":"public-call","levels":["model","source-refinement","reference"],"expected":"A successful sealed read has matching protocol, grant, version, pin, input and resource."},
+        {"id":"recovery","levels":["model","source-refinement","reference"],"expected":"Ordinary input failures preserve the negotiated state for arbitrarily many calls."},
+        {"id":"output","levels":["reference"],"expected":"Return exactly the declared public result and reject conversion loss on a required representation."},
+        {"id":"metadata","levels":["model","reference"],"expected":"Caller correlation metadata confers neither authority nor target selection."}
+      ]
+    },
+    "W-07": {
+      "role": "caller/executor",
+      "profile": "core",
+      "claims": [
+        {"id":"classification","levels":["reference"],"expected":"Return the published stable integer/code-kind pairing, readable text and correctly scoped optional data."},
+        {"id":"retry","levels":["reference"],"expected":"A correlation or retry hint does not report an unknown effect as applied."}
+      ]
+    },
+    "W-08": {
+      "role": "caller/executor/peer",
+      "profile": "core",
+      "claims": [
+        {"id":"stdio","levels":["source-refinement","reference"],"expected":"Use LF, flush frames, reserve stdout for protocol and close on EOF."},
+        {"id":"http","levels":["reference"],"expected":"Use authenticated, pinned POST JSON and distinguish transport refusal from a successful operation."},
+        {"id":"origin","levels":["reference"],"expected":"Enforce configured destination and redirect policy. Plain HTTP is restricted to the isolated loopback fixture."},
+        {"id":"tls","levels":["deployment"],"expected":"Qualify verified peer identity, channel protection and admission on any separately claimed cross-domain network route."}
+      ]
+    },
+    "B-01": {
+      "role": "assembly owner",
+      "profile": "ocs.peers/0.1",
+      "claims": [
+        {"id":"direction","levels":["model","reference"],"expected":"An import selects one directional recipient, operation, revision and scope."},
+        {"id":"independence","levels":["reference"],"expected":"A local read and an admitted peer read require no public service registry."}
+      ]
+    },
+    "B-02": {
+      "role": "host",
+      "profile": "core",
+      "claims": [
+        {"id":"admission","levels":["reference"],"expected":"Validate packages, required bindings, versions, schemas and effect policy before exposing dependent work."},
+        {"id":"fresh-authority","levels":["model","reference"],"expected":"Reevaluate current authorization and preconditions at effect time."},
+        {"id":"attribution","levels":["reference"],"expected":"A probe records the actual bound target and identifies a fallback separately."}
+      ]
+    },
+    "B-03": {
+      "role": "peer",
+      "profile": "ocs.peers/0.1",
+      "claims": [
+        {"id":"delegate","levels":["model","source-refinement","reference"],"expected":"The rights of a read path are nonamplifying across every admitted hop."},
+        {"id":"scope","levels":["model","reference"],"expected":"Revalidate authenticated recipient, operation, resource and owner on reconnect."},
+        {"id":"no-reroute","levels":["reference"],"expected":"Denial never silently switches to another account or recipient."},
+        {"id":"secret","levels":["reference"],"expected":"Broker handles stay scoped to their issuer and recipient; logs, model inputs and displays exclude secrets."}
+      ]
+    },
+    "B-04": {
+      "role": "peer/tenant",
+      "profile": "ocs.peers/0.1",
+      "claims": [
+        {"id":"mutual","levels":["model","reference"],"expected":"Both independent owners admit the direction and the caller never acquires the transitive target's authority by reachability alone."},
+        {"id":"context","levels":["reference"],"expected":"Preserve parent identity, minimum necessary content, grant epoch and permitted residency at each hop."},
+        {"id":"partition","levels":["model","reference"],"expected":"Deny sensitive work on partition when current authority cannot be established."},
+        {"id":"tenant","levels":["model","reference"],"expected":"Keep grants, cancellation, events and state isolated by tenant."}
+      ]
+    },
+    "B-05": {
+      "role": "host/peer",
+      "profile": "ocs.peers/0.1",
+      "claims": [
+        {"id":"budgets","levels":["model","reference"],"expected":"Bound depth, fan-out, retry ownership, queued work and bytes across the call chain."},
+        {"id":"local","levels":["reference","measurement"],"expected":"Optional peer or renderer loss preserves admitted local functions."},
+        {"id":"retry","levels":["model","reference"],"expected":"Reconnect reconciles existing operations and cannot automatically dispatch an uncertain write as new."}
+      ]
+    },
+    "B-06": {
+      "role": "operator",
+      "profile": "ocs.peers/0.1",
+      "claims": [
+        {"id":"trace","levels":["reference"],"expected":"Record parent/child, duration, policy decision and actual revision without exposing private operations."},
+        {"id":"freshness","levels":["reference"],"expected":"Distinguish confirmed, inferred, partial and stale observations and apply scoped retention."},
+        {"id":"replacement","levels":["reference"],"expected":"Renegotiate a changed consistency, effect, identity, freshness or timing guarantee."}
+      ]
+    },
+    "B-07": {
+      "role": "operator",
+      "profile": "ocs.cloud/0.1",
+      "claims": [
+        {"id":"limits","levels":["model","measurement"],"expected":"Independent cells enforce finite bounds, including on slow tenants and loss of a cell."},
+        {"id":"workload","levels":["measurement"],"expected":"Publish comparable native and bound workload, payload, concurrency, observation window, latency and bottleneck."},
+        {"id":"domain","levels":["deployment"],"expected":"Operational capacity and correlated failure claims refer to the named real target and workload."}
+      ]
+    },
+    "T-01": {
+      "role": "maintainer",
+      "profile": "core",
+      "claims": [
+        {"id":"receipt","levels":["reference"],"expected":"Identify edition, version, role, binding, features, platform, suite revision and time in the receipt."},
+        {"id":"outcome","levels":["reference"],"expected":"Failed, skipped, stale or unknown mandatory results prevent certification."}
+      ]
+    },
+    "T-02": {
+      "role": "independent verifier",
+      "profile": "core",
+      "claims": [
+        {"id":"oracle","levels":["reference"],"expected":"Use independently pinned expected behavior and check positive and forbidden cases through public endpoints."},
+        {"id":"state","levels":["reference"],"expected":"For effects observe count, lost response and restart using the state owner."},
+        {"id":"independence","levels":["reference"],"expected":"Run independent hosts and report the actual scope and limitations."}
+      ]
+    },
+    "T-03": {
+      "role": "caller/executor",
+      "profile": "core",
+      "claims": [
+        {"id":"directions","levels":["model","reference"],"expected":"Exercise old caller/new target and new caller/old target for the applicable published fixtures."},
+        {"id":"drift","levels":["reference"],"expected":"Distinguish compatible additions, required-feature rejection and catalog or authority changes."},
+        {"id":"restore","levels":["reference"],"expected":"Reopen prior persisted state without silently losing an effect, scope or explicit selection."}
+      ]
+    },
+    "T-04": {
+      "role": "maintainer",
+      "profile": "core",
+      "claims": [
+        {"id":"edition","levels":["reference"],"expected":"Pin the whole accepted edition and keep its public artifacts immutable."},
+        {"id":"proof-baseline","levels":["reference"],"expected":"Replaying fixed criteria detects altered assertions, weaker premises, wrong checker or substituted artifact."},
+        {"id":"release","levels":["reference"],"expected":"A claim of stability requires reviewed negative cases and independent implementations in the named scope."}
+      ]
+    },
+    "P-01": {
+      "role": "host/adapter",
+      "profile": "core",
+      "claims": [
+        {"id":"profile","levels":["reference"],"expected":"Select an advertised feature and exact known operation version without automatically granting it."},
+        {"id":"control","levels":["reference"],"expected":"Distinguish exports, controls and notifications and require the corresponding authority."}
+      ]
+    },
+    "P-02": {
+      "role": "host/operator",
+      "profile": "core",
+      "claims": [
+        {"id":"applicability","levels":["reference"],"expected":"Distinguish unsupported, unknown, unverified and objectively inapplicable obligations."},
+        {"id":"absence","levels":["model","reference"],"expected":"Silence about entitlement or quota cannot confer a grant or imply unlimited use."}
+      ]
+    },
+    "I-01": {
+      "role": "caller",
+      "profile": "core",
+      "claims": [
+        {"id":"one-shot","levels":["reference"],"expected":"A one-shot read returns one final observation without requiring a durable job."},
+        {"id":"retry-owner","levels":["model","reference"],"expected":"A chain has one retry owner, sharing the remaining time and resource budget."}
+      ]
+    },
+    "I-02": {
+      "role": "stream owner",
+      "profile": "ocs.stream/0.1",
+      "claims": [
+        {"id":"credit","levels":["model","source-refinement","reference"],"expected":"Positive initial credit is required; accepted chunks never exceed granted credit."},
+        {"id":"number","levels":["model","reference"],"expected":"Start at sequence one, suppress identical duplicates and detect conflicting duplicates or gaps."},
+        {"id":"terminal","levels":["model","reference"],"expected":"Emit exactly one terminal result and no later data; a cancellation is scoped to the active caller."},
+        {"id":"effect","levels":["model","reference"],"expected":"Reading committed output cannot dispatch a second charged generation or write."},
+        {"id":"progress","levels":["model","reference"],"expected":"Finite remaining work with delivered credit and service time progresses to its final response."},
+        {"id":"delivery","levels":["reference"],"expected":"Select a transport capable of required credit, cancel, bounded bytes and independently negotiated replay."}
+      ]
+    },
+    "I-03": {
+      "role": "event owner",
+      "profile": "ocs.events/0.1",
+      "claims": [
+        {"id":"authority","levels":["model","reference"],"expected":"An event and its artifacts require the correct publisher/subscriber scope; observation grants no new effect."},
+        {"id":"dedup","levels":["model","reference"],"expected":"Deduplicate by source, scope and ID only for identical content."},
+        {"id":"cursor","levels":["model","source-refinement","reference"],"expected":"Acknowledgement never moves backwards or past the retained stream, and missing history yields a visible gap."},
+        {"id":"lifetime","levels":["reference"],"expected":"Release ephemeral and durable subscription resources according to their distinct terms."}
+      ]
+    },
+    "I-04": {
+      "role": "artifact owner",
+      "profile": "ocs.artifacts/0.1",
+      "claims": [
+        {"id":"scope","levels":["reference"],"expected":"Recheck recipient, ownership, revision and expiry on every page."},
+        {"id":"range","levels":["model","source-refinement","reference"],"expected":"Return exact decoded offset, bounded positive progress and empty EOF only at the end."},
+        {"id":"integrity","levels":["model","reference"],"expected":"Reassemble slices in order and check declared length and digest before using the artifact."},
+        {"id":"lifetime","levels":["reference"],"expected":"Release scoped handles on cancellation and refuse implicit conversion loss or stale delta bases."}
+      ]
+    },
+    "I-05": {
+      "role": "host",
+      "profile": "core",
+      "claims": [
+        {"id":"observer","levels":["model","reference"],"expected":"An observer cannot transform an event, elevate authority or start an external effect."},
+        {"id":"transform","levels":["reference"],"expected":"Validate ordered opt-in transformation before any effect and bound reentry."},
+        {"id":"background","levels":["reference"],"expected":"Schedules, instructions and hooks run under a scoped identity, resource budget and stoppable lifetime."}
+      ]
+    },
+    "E-01": {
+      "role": "host",
+      "profile": "ocs.effects/0.1",
+      "claims": [
+        {"id":"classify","levels":["model","reference"],"expected":"Reads, reversible local writes and external or flagged writes have distinct admission and effects paths."},
+        {"id":"direct","levels":["model","reference"],"expected":"Direct tool.call cannot apply an external, monetary, irreversible or destructive effect."}
+      ]
+    },
+    "E-02": {
+      "role": "effect owner",
+      "profile": "ocs.effects/0.1",
+      "claims": [
+        {"id":"inert","levels":["model","source-refinement","reference"],"expected":"Preparation records intent and never changes the resource balance."},
+        {"id":"canonical","levels":["reference"],"expected":"Hash the complete validated scoped intent using canonical UTF-8 JSON, excluding non-effect-bearing metadata."},
+        {"id":"key-conflict","levels":["model","reference"],"expected":"Same scoped key and changed intent conflict, identical intent retains the operation ID."}
+      ]
+    },
+    "E-03": {
+      "role": "effect owner",
+      "profile": "ocs.effects/0.1",
+      "claims": [
+        {"id":"approval","levels":["model","source-refinement","reference"],"expected":"Only an authenticated approval for this exact intent authorizes commit."},
+        {"id":"preconditions","levels":["model","reference"],"expected":"Check current owner, expiry, target pin, capability and preconditions immediately before execution."},
+        {"id":"serialize","levels":["model","source-refinement","reference"],"expected":"Concurrent attempts on the same scoped key produce at most one local spend within the replay window."},
+        {"id":"durable","levels":["reference"],"expected":"Persist an intent or reservation before an irreversible dispatch and return prior outcome on replay."}
+      ]
+    },
+    "E-04": {
+      "role": "effect owner",
+      "profile": "ocs.effects/0.1",
+      "claims": [
+        {"id":"readback","levels":["model","reference"],"expected":"Readback rechecks access and distinguishes not-applied, applied and unknown."},
+        {"id":"unknown","levels":["model","source-refinement","reference"],"expected":"A lost downstream acknowledgement cannot automatically repeat uncertain execution."},
+        {"id":"refresh","levels":["reference"],"expected":"Separate applied receipt and later refresh failure and validate any retained result."},
+        {"id":"retention","levels":["reference"],"expected":"Retain the scoped key through its promised replay period and prevent expired records from making replay safe."}
+      ]
+    },
+    "J-01": {
+      "role": "job owner",
+      "profile": "ocs.jobs/0.1",
+      "claims": [
+        {"id":"transitions","levels":["model","reference"],"expected":"Owned durable jobs follow allowed states and cannot reopen a terminal state."},
+        {"id":"continue","levels":["model","source-refinement","reference"],"expected":"Only the expected waiting revision can win concurrent continuation."},
+        {"id":"cancel","levels":["model","reference"],"expected":"Job cancellation cannot clear the separately recorded outcome of an external effect."},
+        {"id":"ownership","levels":["reference"],"expected":"Recover job identity, tenant, account, saved draft and applicable inputs after reconnect."}
+      ]
+    },
+    "J-02": {
+      "role": "job owner",
+      "profile": "ocs.jobs/0.1",
+      "claims": [
+        {"id":"restore","levels":["reference"],"expected":"Reopen or restore persistent work without losing the current revision, approval or receipt."},
+        {"id":"compensate","levels":["model","reference"],"expected":"Compensation is a new separately authorized operation which may itself fail."}
+      ]
+    },
+    "A-01": {
+      "role": "provider adapter",
+      "profile": "ocs.providers/0.1",
+      "claims": [
+        {"id":"identity","levels":["model","reference"],"expected":"Distinguish product, provider, route, method, account, organization, plan and pool across connections."},
+        {"id":"auth","levels":["reference"],"expected":"Describe applicable credential flows, bind callbacks to subject, issuer and origin, and reject expired or mismatched continuations."},
+        {"id":"custody","levels":["model","reference"],"expected":"Use scoped handles and protect secrets from unrelated accounts, surfaces and logs."},
+        {"id":"manage","levels":["reference"],"expected":"Connect, reauthenticate, enable, sign out and remove have distinct results; local removal cannot cancel a paid contract."}
+      ]
+    },
+    "A-02": {
+      "role": "provider adapter",
+      "profile": "ocs.providers/0.1",
+      "claims": [
+        {"id":"inventory","levels":["model","source-refinement","reference"],"expected":"Incomplete or differently scoped inventory cannot delete a known account or claim a total."},
+        {"id":"health","levels":["reference"],"expected":"Show reason, time, scope and action for unavailable, unverified, exhausted, or disabled routes."},
+        {"id":"probe","levels":["reference","deployment"],"expected":"A verified reply records the actual selected account, route, model and mode; distinguish probes, fallback and work."}
+      ]
+    },
+    "Q-01": {
+      "role": "provider adapter",
+      "profile": "ocs.providers/0.1",
+      "claims": [
+        {"id":"unknown","levels":["model","reference"],"expected":"Numeric zero, unavailable, stale, unlimited and percent-only data remain distinguishable."},
+        {"id":"aggregate","levels":["model","source-refinement","reference"],"expected":"Sum only independent compatible units, scope and periods; never count a shared pool twice."},
+        {"id":"reobserve","levels":["reference","deployment"],"expected":"Attribute window/reset observations to their source/time and reobserve expired windows."}
+      ]
+    },
+    "Q-02": {
+      "role": "provider adapter",
+      "profile": "ocs.providers/0.1",
+      "claims": [
+        {"id":"eligibility","levels":["model","reference"],"expected":"Offer a real reset only when the scoped right is eligible, with positive count or verified entitlement."},
+        {"id":"consequences","levels":["reference"],"expected":"Describe affected windows, expiry and cost; separate automatic recovery, local pause and spent grant."},
+        {"id":"read-only","levels":["reference","deployment"],"expected":"Observe or link the provider-supported route without spending a real reset to probe support."}
+      ]
+    },
+    "P-03": {
+      "role": "provider adapter",
+      "profile": "ocs.providers/0.1",
+      "claims": [
+        {"id":"meaning","levels":["model","reference"],"expected":"Distinguish public list, actual, contractual, unpublished and unknown prices without conflating a zero charge."},
+        {"id":"basis","levels":["reference","deployment"],"expected":"Record the observed official plan, currency, region, period, seat basis, terms, taxes and source/time when known."},
+        {"id":"shared","levels":["model","reference"],"expected":"Shared organization price is never multiplied by the number of connections."}
+      ]
+    },
+    "M-01": {
+      "role": "provider adapter",
+      "profile": "ocs.providers/0.1",
+      "claims": [
+        {"id":"complete","levels":["model","source-refinement","reference"],"expected":"Only a comparable complete revision can retire or replace the prior complete catalog."},
+        {"id":"axes","levels":["reference","deployment"],"expected":"Track listed, entitled, locally supported and actually verified options separately for the exact route."},
+        {"id":"eol","levels":["model","reference"],"expected":"Missing pages or a disappeared model cannot create an EOL notice; deduplicate official notices and preserve explicit selection."}
+      ]
+    },
+    "M-02": {
+      "role": "provider adapter",
+      "profile": "ocs.providers/0.1",
+      "claims": [
+        {"id":"invocation","levels":["model","source-refinement","reference"],"expected":"Allow only the exact authorized account, route, model, modality, parameters and speed/reasoning combination."},
+        {"id":"response","levels":["reference","deployment"],"expected":"Name requested, sent and independently confirmed options separately; never substitute another model silently."},
+        {"id":"specialized","levels":["reference"],"expected":"A specialized service exposes the actual operation it implements and rejects an unsupported modality."}
+      ]
+    },
+    "A-03": {
+      "role": "client",
+      "profile": "ocs.providers/0.1",
+      "claims": [
+        {"id":"counts","levels":["reference"],"expected":"Show scoped totals of accounts, enabled, working and attention-needed routes with units."},
+        {"id":"routing","levels":["reference"],"expected":"Identify affected models before disabling the last admitted route and retain unaffected choices."},
+        {"id":"usage","levels":["model","reference"],"expected":"Separate productive, probe, fallback and unattributed traffic in 7- and 30-day views with scope/freshness."},
+        {"id":"surface-parity","levels":["reference"],"expected":"Give human clients and programmatic consumers the same authoritative account and quota observations."}
+      ]
+    },
+    "G-01": {
+      "role": "agent runtime",
+      "profile": "ocs.agents/0.1",
+      "claims": [
+        {"id":"native","levels":["reference"],"expected":"Exchange UTF-8 text and one response on the public OCS call binding with a selected peer."},
+        {"id":"modalities","levels":["reference"],"expected":"Require explicit negotiated support for other media, representations and streams."}
+      ]
+    },
+    "G-02": {
+      "role": "agent runtime",
+      "profile": "ocs.agents/0.1",
+      "claims": [
+        {"id":"reply","levels":["model","reference"],"expected":"Correlate stable message IDs, context and jobs while preserving order and original sender provenance."},
+        {"id":"outcomes","levels":["reference"],"expected":"Represent clarification, authority, partial result, reply, and terminal outcome explicitly."},
+        {"id":"trust","levels":["model","reference"],"expected":"Quoted sender identity and peer content cannot supply user authorization or system policy."}
+      ]
+    },
+    "G-03": {
+      "role": "agent runtime",
+      "profile": "ocs.agents/0.1",
+      "claims": [
+        {"id":"budget","levels":["model","source-refinement","reference"],"expected":"Bound turns, fan-out, bytes, concurrency and cost; reserve a share before parallel delegation."},
+        {"id":"dedup","levels":["model","reference"],"expected":"Repeat delivery returns the prior reply, conflicting content is refused and an uncertain paid generation is not retried."},
+        {"id":"stop","levels":["model","reference"],"expected":"Finite turn/fuel or no-progress policy ends an unproductive loop with a structured reason."},
+        {"id":"privacy","levels":["reference"],"expected":"Share minimum scoped facts and handle unknown prices, per-model tokens and unsupported media honestly."}
+      ]
+    },
+    "G-04": {
+      "role": "operator",
+      "profile": "ocs.agents/0.1",
+      "claims": [
+        {"id":"two-way","levels":["reference"],"expected":"An independent caller obtains and confirms a private fixture fact through the public exchange."},
+        {"id":"faults","levels":["reference"],"expected":"Exercise clarification, partial input, duplicate, denial and cancellation on matched scope."},
+        {"id":"comparison","levels":["measurement","deployment"],"expected":"Compare direct, full-history and minimum-facts exchange for the same authorized task with bytes, quality, tokens, latency and price when observable."}
+      ]
+    },
+    "U-01": {
+      "role": "host/client",
+      "profile": "ocs.presentation/0.1",
+      "claims": [
+        {"id":"placement","levels":["reference"],"expected":"Owner selects slot, instance, features and scope before presenting the contribution."},
+        {"id":"headless","levels":["reference"],"expected":"The authoritative headless operation survives renderer failure; discovering a view grants no write."}
+      ]
+    },
+    "U-02": {
+      "role": "host/client",
+      "profile": "ocs.presentation/0.1",
+      "claims": [
+        {"id":"declarative","levels":["model","reference"],"expected":"Validate current values and intersect versioned labelled actions with manifest and actual grants."},
+        {"id":"web","levels":["reference"],"expected":"A custom web surface requires source integrity, scoped origin and checked event generation. Never expose privileged objects to the renderer."},
+        {"id":"alternative","levels":["reference"],"expected":"An unavailable mandatory control or safe embedding presents an explicit alternative or refusal."}
+      ]
+    },
+    "U-03": {
+      "role": "host/client",
+      "profile": "ocs.presentation/0.1",
+      "claims": [
+        {"id":"surface-event","levels":["model","source-refinement","reference"],"expected":"A surface request cannot approve a consequential operation or act after its generation retires."},
+        {"id":"close","levels":["reference"],"expected":"Closing unsubscribes and restores focus without cancelling an owned durable job."},
+        {"id":"accessibility","levels":["measurement","deployment"],"expected":"On the claimed client, labelled actions, quota freshness, eligibility and recovery are distinguishable textually and operable with keyboard at narrow and enlarged sizes."}
+      ]
+    },
+    "U-04": {
+      "role": "agent/client",
+      "profile": "ocs.presentation/0.1",
+      "claims": [
+        {"id":"discovery","levels":["reference"],"expected":"Expose machine-readable operations and bounded workflow instructions on selection."},
+        {"id":"negative","levels":["reference"],"expected":"Exercise direct, indirect, continuation and denied actions without granting rights from tool text."}
+      ]
+    },
+    "L-01": {
+      "role": "service owner",
+      "profile": "ocs.cloud/0.1",
+      "claims": [
+        {"id":"resource","levels":["model","reference"],"expected":"Return an owner-scoped authoritative state or durable job. Acceptance alone is not readiness."},
+        {"id":"lifecycle","levels":["reference"],"expected":"Expose only supported operations with their state ownership, placement and dependency."},
+        {"id":"policy","levels":["reference","deployment"],"expected":"Describe applicable capacity, data lifecycle, authorization, residency, metering and nonbillable or billed terms."}
+      ]
+    },
+    "L-02": {
+      "role": "service host",
+      "profile": "ocs.cloud/0.1",
+      "claims": [
+        {"id":"autonomy","levels":["model","reference"],"expected":"Independent owners can revoke a peer and retain their products; cross-domain access requires both grants."},
+        {"id":"partition","levels":["model","measurement"],"expected":"During partition preserve local authorized work and expose unresolved remote writes as unknown."}
+      ]
+    },
+    "L-03": {
+      "role": "platform host",
+      "profile": "ocs.platform/0.1",
+      "claims": [
+        {"id":"descriptors","levels":["reference"],"expected":"Validate platform, ABI revision, hardware or OS target, handle lifetime, admission and recovery."},
+        {"id":"confinement","levels":["model","reference"],"expected":"Refuse requested authority or confinement which the named native path cannot establish."},
+        {"id":"timing","levels":["model","reference"],"expected":"Reject an unqualified hard-deadline grant; a measured percentile supplies no worst-case timing proof."}
+      ]
+    },
+    "L-04": {
+      "role": "operator",
+      "profile": "ocs.platform/0.1",
+      "claims": [
+        {"id":"workload","levels":["measurement"],"expected":"Report the sampled workload, inputs, cache, concurrency, measurement interval and raw latency observations."},
+        {"id":"tail","levels":["measurement","deployment"],"expected":"Measure first usable response, tail latency and cancellation on the identified target."},
+        {"id":"recovery","levels":["measurement"],"expected":"Evaluate slow tenants and loss/recovery of a cell with explicit queue, error and native comparison bounds."}
+      ]
+    },
+    "L-05": {
+      "role": "adapter owner",
+      "profile": "ocs.platform/0.1",
+      "claims": [
+        {"id":"mapping","levels":["reference"],"expected":"State protocol, ABI, state and feature mappings with explicit representation loss or refusal."},
+        {"id":"cutover","levels":["model","reference"],"expected":"Preserve IDs, authority and in-flight state with only one active write owner through migration."}
+      ]
+    },
+    "L-06": {
+      "role": "product operator",
+      "profile": "ocs.cloud/0.1",
+      "claims": [
+        {"id":"terms","levels":["reference","deployment"],"expected":"Expose applicable entitlement owner, support, expiry, publication and continuity terms with attributed evidence."},
+        {"id":"meter","levels":["model","source-refinement","reference"],"expected":"Stable owner/tenant/meter/interval/replay identity cannot double-bill duplicates or backfill."},
+        {"id":"recovery","levels":["reference","deployment"],"expected":"Qualify scoped export/restore/revocation and disclose capacity needed to honor recovery."}
+      ]
+    },
+    "core.schema-resources": {
+      "role": "host",
+      "profile": "core",
+      "claims": [
+        {"id":"fragments","levels":["reference"],"expected":"Fragment-only references resolve in their owning resource. Relative references use the verified package root or declared base."},
+        {"id":"escape","levels":["reference"],"expected":"Reject escapes, ambiguous IDs and unresolved required resources. Virtual package URIs never trigger network I/O."},
+        {"id":"urns","levels":["schema","reference"],"expected":"Load exact immutable edition schema IDs from version.json before resolving references."}
+      ]
+    },
+    "core.package-distribution": {
+      "role": "package verifier",
+      "profile": "core",
+      "claims": [
+        {"id":"paths","levels":["reference"],"expected":"Enforce portable relative names, path uniqueness under case folding/NFC, file types and hierarchy before use."},
+        {"id":"inventory","levels":["reference"],"expected":"Verify exact membership and every SHA-256 before loading."},
+        {"id":"limits","levels":["reference"],"expected":"Bound archive count and compressed and expanded member and aggregate sizes."},
+        {"id":"atomic-install","levels":["model","reference"],"expected":"A failed staged install preserves the last admitted artifact."},
+        {"id":"authenticity","levels":["reference"],"expected":"Separately verify pinned whole artifact or trusted signature and decide permissions for untrusted distribution."},
+        {"id":"no-hook","levels":["reference"],"expected":"Inspection, installation and automatic update discovery execute no application hook and do not broaden grants."}
+      ]
+    },
+    "composition.outbound": {
+      "role": "host/executor",
+      "profile": "ocs.peers/0.1",
+      "claims": [
+        {"id":"channel","levels":["model","reference"],"expected":"A bound import fixes recipient and scope; caller-supplied configuration cannot change them."},
+        {"id":"callback","levels":["model","reference"],"expected":"Isolate directions and correlation. Give serial callback work its own channel or refuse a dependency cycle."},
+        {"id":"private","levels":["model","reference"],"expected":"Internal dependency replacement preserves the composite public result and authority under its declared scope."}
+      ]
+    },
+    "wire.error-table": {
+      "role": "host/executor",
+      "profile": "core",
+      "claims": [
+        {"id":"code-kind","levels":["schema","reference"],"expected":"Accept exactly the error-code and kind pairs published in the wire table, including parse, refusal, conflict, overload and unknown effect."}
+      ]
+    },
+    "interface.registry": {
+      "role": "host/executor",
+      "profile": "core",
+      "claims": [
+        {"id":"channels","levels":["schema","reference"],"expected":"Interpret each registered method, channel, exact version, condition and schema under its own profile."},
+        {"id":"write","levels":["model","reference"],"expected":"A write exported through a domain method still traverses exact approval and receipt controls."},
+        {"id":"notification","levels":["reference"],"expected":"A notification has no result and does not invoke unsupported controls."},
+        {"id":"conditional","levels":["reference"],"expected":"Conditional controls are available only when advertised; effects controls are required together."},
+        {"id":"broker","levels":["reference"],"expected":"Keep flow scope, expiring origin and sensitive fields in the trusted broker and reject a mismatched continuation."}
+      ]
+    },
+    "interface.intent": {
+      "role": "effect owner",
+      "profile": "ocs.effects/0.1",
+      "claims": [
+        {"id":"scope","levels":["model","reference"],"expected":"Intent equality binds issuer, subject, scope, identity, raw manifest pin, input, target, version and preconditions."},
+        {"id":"canonical","levels":["reference"],"expected":"Hash canonical UTF-8 intent. A changed price or grant changes the digest or invalidates commit."}
+      ]
+    },
+    "interface.http-stream": {
+      "role": "stream owner",
+      "profile": "ocs.stream/0.1",
+      "claims": [
+        {"id":"sse","levels":["reference"],"expected":"Authenticated POST opens an SSE stream with scoped credit/cancellation, ordered chunk envelopes and one final response."},
+        {"id":"control","levels":["reference"],"expected":"Authenticated notification POST returns 204 and a control after close cannot restart the stream."},
+        {"id":"disconnect","levels":["reference"],"expected":"A disconnected response remains unconfirmed and retained replay requires separate agreement."}
+      ]
+    },
+    "interface.pages": {
+      "role": "provider adapter",
+      "profile": "ocs.providers/0.1",
+      "claims": [
+        {"id":"pagination","levels":["model","reference"],"expected":"Publish a complete catalog or account inventory only after every comparable revision page arrives with no continuation."},
+        {"id":"gap","levels":["model","reference"],"expected":"A repeated token, changed scope or missing page yields a partial diagnostic and preserves the previous complete snapshot."}
+      ]
+    }
+  }
+}
