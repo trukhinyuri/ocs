@@ -128,7 +128,7 @@ class Client:
 
 
 class Deployment:
-    def __init__(self, base, name, trust, journal):
+    def __init__(self, base, name, trust, journal, *, federated=False):
         self.journal = journal
         self.base = Path(base)
         self.folder = self.base / name
@@ -150,9 +150,12 @@ class Deployment:
             self.auth[token] = conf
         self.proc = None
         self.port = 0
-        self.start()
+        self.federated = federated
+        self.neighbour = None
+        if not self.federated:
+            self.start()
 
-    def start(self):
+    def launch(self):
         self.proc = subprocess.Popen(
             [
                 sys.executable,
@@ -167,8 +170,10 @@ class Deployment:
                 str(self.peers),
                 "--port",
                 str(self.port),
+                *(["--peer-credentials-stdin"] if self.federated else []),
             ],
             env={**os.environ, "OCS_CELL_IDENTITIES": json.dumps(self.auth)},
+            stdin=subprocess.PIPE if self.federated else subprocess.DEVNULL,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             text=True,
@@ -178,22 +183,37 @@ class Deployment:
         if not line:
             raise RuntimeError("Cell failed: " + self.proc.stderr.read()[-240:])
         self.port = json.loads(line)["port"]
+
+    def connect(self):
+        if self.federated:
+            # Both independently bound ports are known before the cells serve. Restart
+            # provisions the same selected recipient from the observing process's memory.
+            credentials = {
+                "neighbour": {
+                    "endpoint": self.neighbour.endpoint,
+                    "tenant": "alice",
+                    "token": self.neighbour.secrets["peer"],
+                }
+            }
+            with self.proc.stdin as pipe:
+                pipe.write(json.dumps(credentials) + "\n")
         self.a, self.replacement, self.bob = [
             Client(self.port, self.secrets[key], self.journal)
             for key in ("primary", "replacement", "bob")
         ]
 
+    @property
+    def endpoint(self):
+        return f"http://127.0.0.1:{self.port}/ocs"
+
+    def start(self):
+        self.launch()
+        self.connect()
+
     def bind(self, other):
+        require(other is self.neighbour, "peer was not independently selected at startup")
         self.peers.write_text(
-            json.dumps(
-                {
-                    "neighbour": {
-                        "endpoint": f"http://127.0.0.1:{other.port}/ocs",
-                        "token": other.secrets["peer"],
-                        "tenant": "alice",
-                    }
-                }
-            )
+            json.dumps({"neighbour": {"endpoint": other.endpoint, "tenant": "alice"}})
         )
 
     def stop(self):
@@ -206,6 +226,8 @@ class Deployment:
                 self.proc.wait(timeout=5)
             self.proc.stdout.close()
             self.proc.stderr.close()
+            if self.proc.stdin is not None:
+                self.proc.stdin.close()
             self.proc = None
 
     def asset(self, tenant, rid):
@@ -304,7 +326,9 @@ def native(cx, other):
     ):
         refusal(
             "incompatible",
-            lambda: a.call("example.native.open", {**req, "platform": {**abi, **delta}}),
+            lambda change=delta: a.call(
+                "example.native.open", {**req, "platform": {**abi, **change}}
+            ),
         )
     issued = a.call("example.native.open", req)
     read = {"handle": issued["handle"], "offset": 0, "length": 128}
@@ -557,10 +581,17 @@ def run_sample(f):
         trust.write_bytes(secrets.token_bytes(32))
         trust.chmod(0o600)
         journal = Journal()
-        cx = Deployment(base, "a", trust, journal)
+        federated = f is federation
+        cx = Deployment(base, "a", trust, journal, federated=federated)
         other = None
         try:
-            other = Deployment(base, "b", trust, journal)
+            other = Deployment(base, "b", trust, journal, federated=federated)
+            if federated:
+                cx.neighbour, other.neighbour = other, cx
+                cx.launch()
+                other.launch()
+                cx.connect()
+                other.connect()
             observed = f(cx, other)
             return {**observed, "registeredExchanges": journal.snapshot()}
         finally:

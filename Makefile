@@ -1,4 +1,4 @@
-.PHONY: demo check check-reference qualify stand report package
+.PHONY: demo check check-reference check-safe-push check-safe-push-history check-safe-push-hosted-history check-safe-push-operating-catalog qualify stand report package
 
 OCS_BASELINE ?= 6f6e22842347806f2963ef1984d9ea592fdddaf0
 export OCS_BASELINE
@@ -14,10 +14,26 @@ check-reference:
 	uv run --locked python conformance/run.py --report out/conformance.json
 	uv run --locked python conformance/compatibility.py "$$OCS_BASELINE"
 
-check:
+check-safe-push:
+	uv run --locked python safe_push/check.py --report out/safe-push/check.json
+
+check-safe-push-history:
+	uv run --locked python safe_push/check.py --history-only --report out/safe-push/history.json
+
+check-safe-push-hosted-history:
+	uv run --locked python safe_push/check.py --hosted-refusal-only --report out/safe-push/hosted-history.json
+
+check-safe-push-operating-catalog:
+	uv run --locked python safe_push/check.py --operating-catalog-only --report out/safe-push/operating-catalog.json
+
+ifneq ($(strip $(OCS_HOSTED_REFUSAL_HISTORY)),)
+qualify: check-safe-push-hosted-history
+endif
+
+check: check-safe-push
 	uv run --locked python assurance/launch.py local --subject . --accepted "$$OCS_ASSURANCE_BASELINE"
 
-qualify:
+qualify: check-safe-push check-safe-push-history
 	uv run --locked python assurance/launch.py full --subject . --accepted "$$OCS_ASSURANCE_BASELINE"
 
 stand:
