@@ -7,6 +7,7 @@ import json
 import os
 import secrets
 import sqlite3
+import sys
 import threading
 import time
 from dataclasses import replace
@@ -198,6 +199,11 @@ def main():
     parser.add_argument("--directory", type=Path, required=True)
     parser.add_argument("--trust-key", type=Path, required=True)
     parser.add_argument("--peers", type=Path, required=True)
+    parser.add_argument(
+        "--peer-credentials-stdin",
+        action="store_true",
+        help="after the port announcement, read one bounded outbound credential map from a private pipe before serving",
+    )
     parser.add_argument("--port", type=int, default=0)
     args = parser.parse_args()
     key = args.trust_key.read_bytes()
@@ -208,6 +214,14 @@ def main():
         parser.error("supply configured synthetic identities")
     with Endpoint(Cell(args.directory, key, args.peers), actors, args.port) as endpoint:
         print(json.dumps({"host": "127.0.0.1", "port": endpoint.server_port}), flush=True)
+        if args.peer_credentials_stdin:
+            frame = sys.stdin.buffer.readline(FRAME + 1)
+            if len(frame) > FRAME or not frame.endswith(b"\n") or sys.stdin.buffer.read(1):
+                parser.error("expected one bounded private peer credential frame followed by EOF")
+            try:
+                endpoint.cell.provision_peers(read_json(frame))
+            except (ValueError, TypeError, RecursionError):
+                parser.error("invalid private peer credential frame")
         endpoint.serve_forever()
 
 
