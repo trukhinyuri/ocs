@@ -11,7 +11,7 @@
 | Connect existing software or independent hosts | [Composition](spec/composition.md) | Bind an explicit export while keeping data and authorization under their owners. |
 | Maintain provider integrations | [Provider adapter guide](docs/provider-adapter.md) | Map a connection, quota, model and tested capability to one account. |
 | Build a specialized integration | [Profiles](spec/profiles/README.md) | Select the guarantees your service actually needs. |
-| Change the standard | [Contribution guide](CONTRIBUTING.md) | Trace one requirement from specification to an observable test. |
+| Change the standard | [Requirement and scenario index](conformance/scenarios.json), [contribution guide](CONTRIBUTING.md) | Find the existing promises and exercise the accepted edition against a change. |
 
 The [edition manifest](version.json) indexes every normative document and schema. The [implementer guide](docs/implementer-guide.md) explains the host, package and test interfaces. The [compatibility guide](docs/compatibility.md) covers adoption and existing protocols. All specification text, schemas, examples, tests and reference code in this repository are licensed under Apache-2.0.
 

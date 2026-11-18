@@ -15,3 +15,17 @@ The working draft defines Core and eleven optional feature identifiers. Each imp
 | Cloud and platform | Tenant-scoped resource observation, platform qualification shape and rejection of a hard deadline without evidence | IAM boundaries, data residency, native ABI/lifetime, hardware timing, actual throughput and recovery under load |
 
 The black-box runner reports its own checks. The unit suite separately exercises schemas, documents, archive behavior, deterministic profile cases and authoritative fixture state. A valid record proves that a value can be represented. A deployment claim also needs observations from the actual target and a measured failure case. The edition has working-draft status.
+
+## Find a requirement and its evidence
+
+In the [scenario index](scenarios.json), look up the rule ID under its specification file and follow the listed scenario IDs. Each scenario names its scope, expected behavior and checks. A bare check ID refers to the wire corpus or the integration report. A `path#test_name` points to a fixture assertion. The `qualification` field records outstanding evidence. An empty check list means the behavior is specified and awaits a qualifying implementation.
+
+## Replay the accepted edition
+
+`make check` runs the existing suite, then reads the full `OCS_BASELINE` commit from local Git history. The default is the first working draft on commit `6f6e22842347806f2963ef1984d9ea592fdddaf0`. A checkout used for this command must contain that commit. Release automation can pass its independently selected full SHA with `make check OCS_BASELINE=<full-commit-id>`. A missing commit fails the check. The verifier reads Git objects locally.
+
+The verifier unpacks the published runner, corpus, wire schemas and fixtures in a temporary directory. The published caller exercises the candidate Python and Go executors. The candidate hosts and receiving peer also call the published status package over the admitted stdio and loopback paths. The full historical host suite includes a control run of the original Python package. A separate executor report addresses the actual Python implementation in the working tree. The published effect, dialogue, archive, record and Go fixture assertions also run. Inspect the two JSON reports under `out/baseline/<full-commit-id>/` for the individual results.
+
+Each working-edition rule needs a scenario. Each reported scenario needs an index entry and evidence for the rule it cites. While the baseline is supported, keep its rule and public case IDs. A case can gain steps or stronger assertions. Removing a published exchange or relaxing its expected result under the same ID fails the check. A private fixture can move with an updated evidence link. The verifier names changed locators and still runs the published fixtures. Record a decision and a migration for a changed meaning. Review a baseline change separately from the implementation it qualifies. For overlapping supported editions, run the same command once per accepted SHA.
+
+To check the verifier itself, use a disposable checkout. Make the Python status executor forget the negotiated session on invalid resource input. Remove `recover-after-input-error` from the working corpus and its evidence link from the index. Run `make check`. The published Python-executor report must still name that case as a failure. Restoring the implementation and the scenario must restore the passing result.

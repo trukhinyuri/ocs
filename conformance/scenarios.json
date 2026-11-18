@@ -1,0 +1,370 @@
+{
+  "requirements": {
+    "spec/core.md": {
+      "C-01": ["package-inspection"],
+      "C-02": ["package-inspection", "scoped-binding"],
+      "C-03": ["wire-values", "negotiated-session"],
+      "C-04": ["package-inspection", "scoped-binding"],
+      "C-05": ["schema-boundary", "status-call"],
+      "C-06": ["negotiated-session", "extension-evolution"],
+      "C-07": ["status-call", "peer-authority"],
+      "C-08": ["instance-lifecycle"],
+      "C-09": ["extension-evolution", "edition-compatibility"],
+      "C-10": ["wire-errors", "operational-evidence"]
+    },
+    "spec/wire.md": {
+      "W-01": ["wire-values"],
+      "W-02": ["wire-errors", "negotiated-session"],
+      "W-03": ["wire-budgets"],
+      "W-04": ["wire-budgets"],
+      "W-05": ["negotiated-session"],
+      "W-06": ["status-call", "negotiated-session"],
+      "W-07": ["wire-errors"],
+      "W-08": ["negotiated-session", "peer-authority"]
+    },
+    "spec/composition.md": {
+      "B-01": ["scoped-binding", "peer-authority"],
+      "B-02": ["scoped-binding", "schema-boundary"],
+      "B-03": ["peer-authority", "approved-effect"],
+      "B-04": ["peer-authority"],
+      "B-05": ["peer-loss", "wire-budgets"],
+      "B-06": ["operational-evidence", "catalog-change"],
+      "B-07": ["capacity-and-recovery"]
+    },
+    "spec/conformance.md": {
+      "T-01": ["edition-compatibility", "operational-evidence"],
+      "T-02": ["edition-compatibility"],
+      "T-03": ["edition-compatibility"],
+      "T-04": ["edition-compatibility", "distribution"]
+    },
+    "spec/profiles/README.md": {
+      "P-01": ["extension-evolution"],
+      "P-02": ["extension-evolution", "operational-evidence"]
+    },
+    "spec/profiles/interaction.md": {
+      "I-01": ["status-call", "wire-budgets"],
+      "I-02": ["stream-delivery"],
+      "I-03": ["event-delivery"],
+      "I-04": ["artifact-read"],
+      "I-05": ["instance-lifecycle"]
+    },
+    "spec/profiles/effects-and-jobs.md": {
+      "E-01": ["approved-effect"],
+      "E-02": ["approved-effect"],
+      "E-03": ["approved-effect", "recover-effect"],
+      "E-04": ["recover-effect"],
+      "J-01": ["durable-job"],
+      "J-02": ["durable-job", "recover-effect"]
+    },
+    "spec/profiles/providers.md": {
+      "A-01": ["account-inventory"],
+      "A-02": ["account-inventory"],
+      "Q-01": ["quota-and-price"],
+      "Q-02": ["quota-and-price", "recover-effect"],
+      "P-03": ["quota-and-price"],
+      "M-01": ["catalog-change"],
+      "M-02": ["model-invocation"],
+      "A-03": ["account-inventory", "operational-evidence"]
+    },
+    "spec/profiles/agents.md": {
+      "G-01": ["agent-dialogue"],
+      "G-02": ["agent-dialogue"],
+      "G-03": ["agent-dialogue"],
+      "G-04": ["agent-dialogue"]
+    },
+    "spec/profiles/presentation.md": {
+      "U-01": ["surface-actions"],
+      "U-02": ["surface-actions"],
+      "U-03": ["surface-actions", "instance-lifecycle"],
+      "U-04": ["agent-dialogue", "surface-actions"]
+    },
+    "spec/profiles/platforms.md": {
+      "L-01": ["cloud-resource"],
+      "L-02": ["peer-loss", "cloud-resource"],
+      "L-03": ["native-binding"],
+      "L-04": ["capacity-and-recovery", "native-binding"],
+      "L-05": ["extension-evolution"],
+      "L-06": ["service-obligations"]
+    }
+  },
+  "scenarios": {
+    "package-inspection": {
+      "scope": "Host inspecting a package before activation",
+      "expect": "Discover data-only and executable packages, verify their declared entries and reject duplicate exports.",
+      "checks": [
+        "conformance/test_contracts.py#test_data_packages_and_duplicate_exports"
+      ],
+      "qualification": "Publisher identity and confinement require deployment evidence."
+    },
+    "distribution": {
+      "scope": "Author and receiving host using a local archive",
+      "expect": "Produce identical verified archives from identical input. Reject tampered or unsafe members and preserve the prior artifact after a failed update.",
+      "checks": [
+        "conformance/test_packages.py#test_reproducible_round_trip",
+        "conformance/test_packages.py#test_tamper_missing_member_and_unlisted_file",
+        "conformance/test_packages.py#test_archive_entry_names_and_types",
+        "conformance/test_packages.py#test_rejected_update_preserves_prior_output"
+      ]
+    },
+    "scoped-binding": {
+      "scope": "Assembly owner resolving an import",
+      "expect": "Bind one exact compatible export and scope. Reject a missing peer, colliding identity or ambiguous binding.",
+      "checks": [
+        "conformance/test_contracts.py#test_static_bindings_pin_actual_packages_and_contracts"
+      ],
+      "qualification": "Required activation cycles and unrelated optional failures need an implementing host."
+    },
+    "schema-boundary": {
+      "scope": "Host admitting a package or accepting a reply",
+      "expect": "Resolve distributed schemas offline and validate a response before exposing its data.",
+      "checks": [
+        "conformance/test_contracts.py#test_schema_dialect_and_every_reference_offline",
+        "python-rejects-invalid-output",
+        "go-rejects-invalid-output"
+      ]
+    },
+    "wire-values": {
+      "scope": "Caller and executor exchanging portable JSON",
+      "expect": "Accept valid scalar values and refuse ambiguous encoding, duplicate keys, unsafe magnitudes, invalid dates and contract versions.",
+      "checks": [
+        "broken-json",
+        "duplicate-key",
+        "no-batch",
+        "no-surrogate",
+        "nonportable-exponent",
+        "malformed-version",
+        "conformance/test_contracts.py#test_portability_of_identifiers_times_and_numbers",
+        "reference/go/main_test.go#TestRejectAmbiguousFrames"
+      ]
+    },
+    "wire-errors": {
+      "scope": "Caller matching envelopes to requests",
+      "expect": "Return an attributable error for an invalid envelope or unknown method. An unnegotiated notification produces no reply or effect.",
+      "checks": [
+        "invalid-envelope",
+        "unknown-method",
+        "unnegotiated-notification"
+      ]
+    },
+    "negotiated-session": {
+      "scope": "Core caller and executor selecting a session and revision",
+      "expect": "Select a mutually supported version and verify the admitted descriptor. Refuse mandatory unknown features, stale pins and invalid call metadata.",
+      "checks": [
+        "negotiation",
+        "ordered-versions",
+        "no-version",
+        "unknown-feature",
+        "call-before-negotiation",
+        "wrong-descriptor",
+        "wrong-contract",
+        "empty-trace",
+        "invalid-feature-id",
+        "invalid-call-correlation",
+        "malformed-pin",
+        "renegotiation-invalidates-session"
+      ]
+    },
+    "status-call": {
+      "scope": "Python and Go implementations of a local resource read",
+      "expect": "Return the authorized resource, refuse invalid or ungranted input and accept a later valid call on the same negotiated session.",
+      "checks": [
+        "status-read",
+        "denied-resource",
+        "wrong-type",
+        "missing-input-member",
+        "recover-after-input-error",
+        "python-host-read",
+        "go-host-read"
+      ]
+    },
+    "wire-budgets": {
+      "scope": "Caller and executor applying a deadline or a frame limit",
+      "expect": "Reject an expired or malformed deadline and bound the work and bytes accepted at each hop.",
+      "checks": [
+        "expired-deadline",
+        "calendar-date"
+      ],
+      "qualification": "Qualify maximum frame size, backpressure and time spent in queues for each claimed transport."
+    },
+    "peer-authority": {
+      "scope": "Independently owned hosts using a scoped peer binding",
+      "expect": "A read succeeds on the selected peer. The wrong credential, wrong resource or proposed write under a read grant is refused.",
+      "checks": [
+        "host-and-peer-fixture-boot",
+        "read-through-independent-peer",
+        "python-host-scope",
+        "go-host-scope",
+        "peer-credential-denied",
+        "peer-denies-write-on-read-grant"
+      ],
+      "qualification": "The fixture uses loopback. Remote identity, revocation lag and transitive delegation require their own deployment checks."
+    },
+    "peer-loss": {
+      "scope": "Standalone host losing an optional peer",
+      "expect": "The authorized local read remains available after the peer stops.",
+      "checks": [
+        "local-owner-survives-peer-loss"
+      ],
+      "qualification": "Check reconciliation and authority expiry during an actual partition."
+    },
+    "approved-effect": {
+      "scope": "Account owner spending one synthetic reset credit",
+      "expect": "Preparation leaves the balance intact. Commit requires the exact intent, current authorization and unexpired preconditions.",
+      "checks": [
+        "conformance/test_effects.py#test_prepare_is_inert_stable_and_scoped",
+        "conformance/test_effects.py#test_changed_scope_grant_pin_and_expiry_are_denied",
+        "conformance/test_contracts.py#test_effect_key_receipt_and_platform_qualification"
+      ]
+    },
+    "recover-effect": {
+      "scope": "Account owner reconnecting after a lost acknowledgement",
+      "expect": "A duplicate or competing commit cannot consume the same credit twice. Reopen the local ledger and read the durable outcome.",
+      "checks": [
+        "conformance/test_effects.py#test_disconnect_then_reopen_and_replay",
+        "conformance/test_effects.py#test_concurrent_duplicate_and_competing_proposal"
+      ],
+      "qualification": "Recovery of an unknown external effect requires evidence from its authority."
+    },
+    "agent-dialogue": {
+      "scope": "Two processes exchanging native agent messages",
+      "expect": "Clarify, return and confirm a scoped fact within a bounded conversation. Reject conflicting delivery, excess budget, unauthorized input or an unsupported required modality.",
+      "checks": [
+        "conformance/test_agents.py#test_clarify_answer_and_return_fact",
+        "conformance/test_agents.py#test_conflicting_message_denial_and_required_modality"
+      ],
+      "qualification": "Model quality, cross-machine delivery and billed inference need a named deployment."
+    },
+    "artifact-read": {
+      "scope": "Recipient reading a scoped, versioned artifact",
+      "expect": "Read bounded byte ranges and verify the length and digest of the reassembled data.",
+      "checks": [
+        "conformance/test_profiles.py#test_artifact_byte_offsets_and_complete_digest"
+      ],
+      "qualification": "Authorize ranges and enforce expiry on the deployed reader."
+    },
+    "account-inventory": {
+      "scope": "Client viewing accounts for one provider and product",
+      "expect": "Keep complete and partial inventories distinct and preserve the origin of each account observation.",
+      "checks": [
+        "conformance/test_profiles.py#test_account_inventory_and_reset_eligibility",
+        "conformance/test_contracts.py#test_record_corpus"
+      ],
+      "qualification": "Verify sign-in, renewal, effective route and attribution with the selected provider."
+    },
+    "quota-and-price": {
+      "scope": "Client interpreting a quota, reset grant or plan price",
+      "expect": "Distinguish zero, unknown and contract pricing. An empty reset grant cannot claim eligibility.",
+      "checks": [
+        "conformance/test_contracts.py#test_provider_unavailable_price_quota_and_page",
+        "conformance/test_profiles.py#test_account_inventory_and_reset_eligibility"
+      ],
+      "qualification": "Measure freshness, shared-pool aggregation and actual charges at the source."
+    },
+    "catalog-change": {
+      "scope": "Client comparing complete and partial model catalogs",
+      "expect": "Retain evidence for incomplete pages and require an official source for an end-of-life notice.",
+      "checks": [
+        "conformance/test_contracts.py#test_provider_unavailable_price_quota_and_page"
+      ],
+      "qualification": "Exercise live changes to model identity, entitlement and parameter support."
+    },
+    "model-invocation": {
+      "scope": "Adapter serving an explicitly selected account, route, model and mode",
+      "expect": "Attribute the actual reply and reject silent substitution.",
+      "checks": [],
+      "qualification": "Qualify each supported mode and parameter combination against its real endpoint."
+    },
+    "surface-actions": {
+      "scope": "Host rendering a surface for a person or agent",
+      "expect": "Render validated state and bind actions to the same public operation and authority as the programmatic interface.",
+      "checks": [
+        "conformance/test_profiles.py#test_rendered_state_and_action_share_the_operation_contract"
+      ],
+      "qualification": "Test keyboard and assistive operation, stale generations, isolation and failure on each client."
+    },
+    "extension-evolution": {
+      "scope": "Independent author adding a capability or adapting existing software",
+      "expect": "Expose optional features through versioned contracts, reject unsupported mandatory semantics and preserve the guarantees of existing bindings.",
+      "checks": [
+        "conformance/test_contracts.py#test_public_profiles_and_operation_schemas",
+        "unknown-feature"
+      ],
+      "qualification": "Demonstrate essential behavior with independent consumers before requiring it in Core."
+    },
+    "edition-compatibility": {
+      "scope": "Maintainer or agent changing a supported contract",
+      "expect": "Keep rule and scenario identities traceable and exercise the published client expectations against the candidate and the candidate hosts against the published package.",
+      "checks": [
+        "conformance/test_contracts.py#test_edition_contains_every_normative_file",
+        "conformance/test_contracts.py#test_document_links_and_requirement_ids",
+        "conformance/test_compatibility.py#test_preserve_inputs_expectations_and_followup",
+        "conformance/test_compatibility.py#test_trace_requires_evidence_or_explicit_qualification"
+      ],
+      "qualification": "Edition replay covers the declared reference fixtures. Additional deployments and profiles need their own evidence."
+    },
+    "instance-lifecycle": {
+      "scope": "Host draining an instance, hook or surface",
+      "expect": "Revocation prevents new dispatch. Retired generations release resources and cannot act on current state.",
+      "checks": [],
+      "qualification": "Exercise disablement, crash, hook reentry and replacement on a lifecycle implementation."
+    },
+    "operational-evidence": {
+      "scope": "Operator interpreting health, conformance or usage",
+      "expect": "Attribute observations to the actual target, scope, revision and time, distinguish probes from work and preserve evidence gaps.",
+      "checks": [
+        "conformance/test_contracts.py#test_record_corpus"
+      ],
+      "qualification": "Verify aggregation, confidentiality, retention and actual support in the reporting deployment."
+    },
+    "stream-delivery": {
+      "scope": "Producer and slow consumer on a negotiated stream",
+      "expect": "Enforce credit, ordered progress, cancellation and one terminal outcome.",
+      "checks": [],
+      "qualification": "Exercise a real stream binding across slow consumers, reconnects and sequence gaps."
+    },
+    "event-delivery": {
+      "scope": "Subscriber recovering a scoped cursor",
+      "expect": "Deduplicate identical delivery and expose a gap when retained history is insufficient.",
+      "checks": [
+        "conformance/test_contracts.py#test_record_corpus"
+      ],
+      "qualification": "Only the event record is exercised. Qualify acknowledgement, ordering and replay on the selected event binding."
+    },
+    "durable-job": {
+      "scope": "Job owner handling continuation, cancellation or restart",
+      "expect": "Resume from the owned revision, preserve effects and prevent a terminal job from reopening.",
+      "checks": [
+        "conformance/test_contracts.py#test_record_corpus"
+      ],
+      "qualification": "The waiting-job record is exercised. Qualify crash recovery and competing continuations on the job implementation."
+    },
+    "cloud-resource": {
+      "scope": "Tenant observing a product lifecycle across owners",
+      "expect": "Attribute an authoritative state, condition and revision to the resource. Preserve recovery and ownership across placement changes.",
+      "checks": [
+        "conformance/test_contracts.py#test_record_corpus"
+      ],
+      "qualification": "Qualify provisioning, residency, durability and tenant isolation on the deployed service."
+    },
+    "native-binding": {
+      "scope": "Platform owner admitting a native component",
+      "expect": "A hard timing claim includes a qualified worst-case bound, a target interface and a recovery path.",
+      "checks": [
+        "conformance/test_contracts.py#test_effect_key_receipt_and_platform_qualification"
+      ],
+      "qualification": "Validate ABI, handle lifetime and timing on the named platform."
+    },
+    "capacity-and-recovery": {
+      "scope": "Independent cells, tenants and a constrained native path",
+      "expect": "Bound resource use and demonstrate recovery and timing for a named workload and failure domain.",
+      "checks": [],
+      "qualification": "Measure throughput, queue growth, latency and recovery under the declared load and loss of a cell."
+    },
+    "service-obligations": {
+      "scope": "Operator of a metered or commercial service",
+      "expect": "Maintain accountable terms, ownership, retention and idempotent meter attribution across upgrades and recovery.",
+      "checks": [],
+      "qualification": "Verify metering, billing, support and continuity against the actual offering."
+    }
+  }
+}
