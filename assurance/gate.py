@@ -13,6 +13,8 @@ from collections import Counter, defaultdict
 from datetime import datetime, timezone
 from pathlib import Path
 
+from jsonschema import Draft202012Validator, FormatChecker
+
 HOME_TREE = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(HOME_TREE / "assurance"))
 from controls import checks as policy_controls
@@ -317,6 +319,18 @@ def collect(oracle, subject, kind, accepted, destination, stand):
     run("provider", "assurance/provider/check.py")
     run("interaction", "assurance/interaction/probe.py")
     run("platform", "assurance/platform/probe.py")
+    run("external", "assurance/external/check.py")
+    if "platform" in reports and "interaction" in reports:
+        run(
+            "profile-artifacts",
+            "assurance/interaction/verify_artifacts.py",
+            "--subject-root",
+            subject,
+            "--interaction-report",
+            reports["interaction"][1],
+            "--platform-report",
+            reports["platform"][1],
+        )
     run("wire", "assurance/wire/check.py", "--subject-root", subject)
     run("core", "assurance/core/check.py")
     run("admission", "assurance/admission/check.py")
@@ -555,6 +569,9 @@ def collect(oracle, subject, kind, accepted, destination, stand):
         "scope": previous_scope,
         **admitted,
     }
+    Draft202012Validator(
+        load(oracle / "assurance/result.schema.json"), format_checker=FormatChecker()
+    ).validate(result)
     save(destination / "report.json", result)
     print(
         f"{kind}: {satisfied}/{applicable} evidence obligations; local denominator {required_local}; {len(working)} normative declaration locations.",

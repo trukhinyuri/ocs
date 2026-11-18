@@ -1,0 +1,53 @@
+{
+  "format": "ocs.external-enrollment/1",
+  "scope": {
+    "edition": "0.1.0-draft.1",
+    "property": "example.mask.intersection/1",
+    "packageId": "org.example.mask",
+    "packageVersion": "1.0.0",
+    "operation": "example.authorize",
+    "contractVersion": "1.0.0",
+    "role": "executor",
+    "binding": "wasm32/ocs_grant",
+    "features": [
+      "ocs.platform/0.1"
+    ],
+    "platform": "WebAssembly MVP sealed i32 export",
+    "level": "artifact-refinement",
+    "assumptions": [
+      "Wasm validation, function invocation and i32.and implement the specified stack semantics for the sealed byte format.",
+      "The reviewed prefix describes a single import-free function with two i32 parameters and one i32 result.",
+      "The operator-selected proof checker, approved Lean toolchain, local operating system and hardware execute their admitted semantics.",
+      "The submitted C file identifies the source associated with this artifact. The claim concerns the actual Wasm bytes."
+    ],
+    "suite": "ocs.external.mask/1"
+  },
+  "statement": {
+    "path": "Grant.lean",
+    "sha256": "5c345ce3bab6238e6c8c7c804ebfc25c103895e9820e4edea56262ae3e3dd5b0"
+  },
+  "subjectSha256": "9183b1f43754f9d306a4a4c374a761966dce425b3527d6aff8c9ba0f10414bfd",
+  "artifactSha256": "cc155e32c782deab6d6d2f5d4398762a0f92b1d7c466f184e298c27dd013f0c5",
+  "checker": {
+    "engine": "python-stdlib",
+    "program": {
+      "path": "wasm_verifier.py",
+      "sha256": "bd6e61f4544d2631636f2d53ce93bcf363f2c1720583c9ff8b288f4e9aa5d349"
+    },
+    "arguments": [],
+    "resources": {
+      "kernel": {
+        "path": "../wire/toolchain.json",
+        "sha256": "984bbb9506fa273c4240de94649938d17a1ba1c72bb30e8a0edcca1c203ec61e"
+      }
+    }
+  },
+  "bounds": {
+    "source": 65536,
+    "artifact": 256,
+    "bundle": 65536,
+    "seconds": 75,
+    "verifier": 16777216,
+    "resource": 1048576
+  }
+}

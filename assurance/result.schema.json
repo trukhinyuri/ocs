@@ -1,0 +1,284 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "OCS reference qualification dossier",
+  "type": "object",
+  "properties": {
+    "format": {
+      "const": "ocs.qualification/1"
+    },
+    "kind": {
+      "enum": [
+        "local",
+        "full"
+      ]
+    },
+    "status": {
+      "enum": [
+        "pass",
+        "fail"
+      ]
+    },
+    "acceptedVerifier": {
+      "type": "string",
+      "minLength": 1
+    },
+    "startedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "finishedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "subject": {
+      "type": "object",
+      "properties": {
+        "revision": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40,64}$"
+        },
+        "treeSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "dirty": {
+          "type": "boolean"
+        },
+        "fileCount": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "revision",
+        "treeSha256",
+        "dirty",
+        "fileCount"
+      ]
+    },
+    "accounting": {
+      "type": "object"
+    },
+    "applicableEvidenceSlots": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "acceptedEvidenceSlots": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "requiredLocalSlots": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "obligations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "source": {
+            "type": "string",
+            "minLength": 1
+          },
+          "property": {
+            "type": "string",
+            "minLength": 1
+          },
+          "subjectRole": {
+            "type": "string",
+            "minLength": 1
+          },
+          "profile": {
+            "type": "string",
+            "minLength": 1
+          },
+          "scenarios": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "minItems": 1
+          },
+          "levels": {
+            "type": "object",
+            "propertyNames": {
+              "enum": [
+                "schema",
+                "model",
+                "source-refinement",
+                "reference",
+                "runtime-observation",
+                "artifact-observation",
+                "measurement",
+                "deployment"
+              ]
+            },
+            "minProperties": 1,
+            "additionalProperties": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "enum": [
+                    "accepted",
+                    "open"
+                  ]
+                },
+                "evidence": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              },
+              "required": [
+                "status",
+                "evidence"
+              ]
+            }
+          }
+        },
+        "required": [
+          "id",
+          "source",
+          "property",
+          "subjectRole",
+          "profile",
+          "scenarios",
+          "levels"
+        ]
+      },
+      "minItems": 1
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "claims": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "minItems": 1,
+            "uniqueItems": true
+          },
+          "level": {
+            "enum": [
+              "schema",
+              "model",
+              "source-refinement",
+              "reference",
+              "runtime-observation",
+              "artifact-observation",
+              "measurement",
+              "deployment"
+            ]
+          },
+          "scope": {
+            "type": "string",
+            "minLength": 1
+          },
+          "assumptions": {
+            "type": "array"
+          },
+          "subject": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "reportSha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "report": {
+            "type": "string",
+            "minLength": 1
+          },
+          "replay": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "theorem": {
+            "type": [
+              "string",
+              "array",
+              "null"
+            ]
+          },
+          "result": {
+            "const": "pass"
+          }
+        },
+        "required": [
+          "id",
+          "claims",
+          "level",
+          "scope",
+          "assumptions",
+          "subject",
+          "report",
+          "reportSha256",
+          "replay",
+          "result"
+        ]
+      }
+    },
+    "openRequired": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "failures": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "byScenario": {
+      "type": "object"
+    },
+    "byProfile": {
+      "type": "object"
+    },
+    "byLevel": {
+      "type": "object"
+    }
+  },
+  "required": [
+    "format",
+    "kind",
+    "status",
+    "acceptedVerifier",
+    "startedAt",
+    "finishedAt",
+    "subject",
+    "accounting",
+    "applicableEvidenceSlots",
+    "acceptedEvidenceSlots",
+    "requiredLocalSlots",
+    "obligations",
+    "evidence",
+    "openRequired",
+    "failures",
+    "byScenario",
+    "byProfile",
+    "byLevel"
+  ]
+}

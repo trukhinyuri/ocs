@@ -74,6 +74,12 @@ def obligations(catalog, scenario_index):
         for file in scenario_index["requirements"].values()
         for rule, names in file.items()
     }
+    expected = set(scenario_links) | set(catalog["extraLocators"])
+    if set(catalog["groups"]) != expected:
+        raise ValueError(
+            "normative rules lacking atomic criteria or unknown groups: "
+            + ", ".join(sorted(expected ^ set(catalog["groups"])))
+        )
     scenario_links.update(
         {
             "core.schema-resources": {"schema-boundary", "package-inspection"},
@@ -103,6 +109,12 @@ def obligations(catalog, scenario_index):
                 "scenarios": sorted(scenario_links[rule]),
                 **row,
             }
+    represented = {s for row in results.values() for s in row["scenarios"]}
+    if represented != set(scenario_index["scenarios"]):
+        raise ValueError(
+            "unaccounted or unknown reference scenario: "
+            + ", ".join(sorted(represented ^ set(scenario_index["scenarios"])))
+        )
     return results
 
 
@@ -484,9 +496,9 @@ def admit_reports(catalog, reports, subject, require_stand, required_checks=None
     return {
         "obligations": result,
         "evidence": rows,
-        "byLevel": dict(totals),
-        "byProfile": dict(profile),
-        "byScenario": dict(scenarios),
+        "byLevel": {k: {**v, "applicable": sum(v.values())} for k, v in totals.items()},
+        "byProfile": {k: {**v, "applicable": sum(v.values())} for k, v in profile.items()},
+        "byScenario": {k: {**v, "applicable": sum(v.values())} for k, v in scenarios.items()},
         "scenarioCounting": "Overlapping evidence slots in linked normative rules. Individual property receipts identify their precise subjects.",
         "openRequired": missing,
         "failures": unexpected,

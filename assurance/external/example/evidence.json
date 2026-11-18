@@ -1,0 +1,60 @@
+{
+  "format": "ocs.external-evidence/1",
+  "scope": {
+    "edition": "0.1.0-draft.1",
+    "property": "example.mask.intersection/1",
+    "packageId": "org.example.mask",
+    "packageVersion": "1.0.0",
+    "operation": "example.authorize",
+    "contractVersion": "1.0.0",
+    "role": "executor",
+    "binding": "wasm32/ocs_grant",
+    "features": [
+      "ocs.platform/0.1"
+    ],
+    "platform": "WebAssembly MVP sealed i32 export",
+    "level": "artifact-refinement",
+    "assumptions": [
+      "Wasm validation, function invocation and i32.and implement the specified stack semantics for the sealed byte format.",
+      "The reviewed prefix describes a single import-free function with two i32 parameters and one i32 result.",
+      "The operator-selected proof checker, approved Lean toolchain, local operating system and hardware execute their admitted semantics.",
+      "The submitted C file identifies the source associated with this artifact. The claim concerns the actual Wasm bytes."
+    ],
+    "suite": "ocs.external.mask/1"
+  },
+  "statementSha256": "5c345ce3bab6238e6c8c7c804ebfc25c103895e9820e4edea56262ae3e3dd5b0",
+  "subjectSha256": "9183b1f43754f9d306a4a4c374a761966dce425b3527d6aff8c9ba0f10414bfd",
+  "artifactSha256": "cc155e32c782deab6d6d2f5d4398762a0f92b1d7c466f184e298c27dd013f0c5",
+  "certificate": {
+    "format": "ocs.wasm-stack/1",
+    "bindingSha256": "6d7b34beef2f113198dcd64fb9dd7310fb8c878bbe2685869d5da76a47058de7",
+    "instructions": [
+      "offered",
+      "imported",
+      "band"
+    ],
+    "frames": [
+      [
+        "offered"
+      ],
+      [
+        "imported",
+        "offered"
+      ],
+      [
+        [
+          "and",
+          "offered",
+          "imported"
+        ]
+      ]
+    ],
+    "final": [
+      [
+        "and",
+        "offered",
+        "imported"
+      ]
+    ]
+  }
+}
