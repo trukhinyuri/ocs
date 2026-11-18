@@ -16,6 +16,8 @@ During cutover, compare read results on the same authorized resource. Keep one o
 
 ## Preserve extensions during a migration
 
+For the draft-1 reference, preserve the trusted grant, immutable descriptor revision, persisted receipt and state owner during cutover. Read a prior-edition database with the candidate before activating its writer. A rollback must retain the same approved intent and consumed credit. The qualification dossier records the version, change notes, migration procedure and digest of the supported normative bundle.
+
 Inventory both the user-facing contribution and its underlying authority. Commands, keyboard shortcuts, composer actions and context menus can bind one existing operation in several host-owned slots. A status indicator or inspector reads observed state. A file viewer or theme contributes admitted data or a surface. A background observer, importer, scheduler, knowledge source or workflow runs only under its own selected scope. Preserve capabilities such as cancellation, order, scope, revisions, artifact permissions and cleanup. A receiving host can leave an unimplemented optional slot unavailable and explain which client supports it.
 
 For a service descriptor also map plan publication, distribution channels and update authority, tenant entitlement, data export, durability, recovery, meter and billing ownership, operator support and the partition policy. Bind each lifecycle action to its real state owner and a measured result. Existing product-specific capabilities can remain namespaced. The [cloud and platform profile](../spec/profiles/platforms.md) names the evidence needed when claiming those guarantees.

@@ -1,0 +1,32 @@
+{
+  "python": {
+    "not strings(params['protocols']) or not params['protocols'] or (not strings(params['requiredFeatures']))": "!f.protocols || !f.features",
+    "'traceId' in params['meta'] and (not (isinstance(params['meta']['traceId'], str) and params['meta']['traceId']))": "!f.trace",
+    "any((not re.fullmatch('[a-z][a-z0-9-]*(?:\\\\.[a-z][a-z0-9-]*)+/[0-9]+\\\\.[0-9]+', f) for f in params['requiredFeatures']))": "!f.featureNames",
+    "'0.1' not in params['protocols'] or params['requiredFeatures']": "!f.coreOffered || !f.noRequired",
+    "any((not (isinstance(meta[key], str) and meta[key]) for key in ('traceId', 'parentCallId', 'idempotencyKey') if key in meta))": "!f.correlations",
+    "not isinstance(meta['manifestDigest'], str) or not re.fullmatch('[0-9a-f]{64}', meta['manifestDigest'])": "!f.pinSyntax",
+    "not isinstance(params['operation'], str) or len(params['operation']) > 160 or (not NAME.fullmatch(params['operation']))": "!f.nameSyntax",
+    "not isinstance(params['version'], str) or len(params['version']) > 128 or (not VERSION.fullmatch(params['version']))": "!f.versionSyntax",
+    "not self.ready or meta['protocol'] != '0.1'": "!{state} || !f.protocolMatches",
+    "meta['manifestDigest'] != DIGEST": "!f.pinMatches",
+    "params['operation'] != 'example.status.read'": "!f.operationMatches",
+    "params['version'] != '1.0.0'": "!f.versionMatches",
+    "not isinstance(value, dict) or set(value) != {'resourceId'} or (not isinstance(value.get('resourceId'), str)) or (not 1 <= len(value['resourceId']) <= 80)": "!f.inputValid",
+    "value['resourceId'] != 'demo'": "!f.granted"
+  },
+  "go": {
+    "!keys(p, []string{\"protocols\", \"requiredFeatures\", \"meta\"}) || !keys(meta, []string{\"deadline\"}, \"traceId\")": "!f.shape || !f.metadata",
+    "v, ok := meta[\"traceId\"]; ok && !nonempty(v)": "!f.trace",
+    "!valid || len(protocols) == 0 || !validFeatures": "!f.protocols || !f.features || !f.featureNames",
+    "!protocols[\"0.1\"] || len(features) > 0": "!f.coreOffered || !f.noRequired",
+    "!keys(p, []string{\"operation\", \"version\", \"input\", \"meta\"}) || !keys(meta, []string{\"protocol\", \"manifestDigest\", \"deadline\"}, \"traceId\", \"parentCallId\", \"idempotencyKey\")": "!f.shape || !f.metadata",
+    "!hexDigest.MatchString(pin) || !operationName.MatchString(op) || len(op) > 160 || !versionOK(version)": "!f.pinSyntax || !f.nameSyntax || !f.versionSyntax",
+    "!s.ready || meta[\"protocol\"] != \"0.1\"": "!{state} || !f.protocolMatches",
+    "pin != executorPin": "!f.pinMatches",
+    "op != \"example.status.read\"": "!f.operationMatches",
+    "version != \"1.0.0\"": "!f.versionMatches",
+    "!keys(in, []string{\"resourceId\"}) || !ok || utf8.RuneCountInString(id) > 80 || id == \"\"": "!f.inputValid",
+    "id != \"demo\"": "!f.granted"
+  }
+}

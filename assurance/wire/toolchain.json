@@ -1,0 +1,41 @@
+{
+  "axioms": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "builds": {
+    "Linux/aarch64": {
+      "asset": "lean-4.36.0-rc2-linux_aarch64.tar.zst",
+      "assetSha256": "7ac84c80ddd19dfbe4277bc50ee916fca0fec36500d30dadaae9c5e904ec618d",
+      "files": {
+        "bin/lean": "7b4cb514b778abaf46e1b79f2514754e45b0d9afa31af9ed87aa9865d3dc9219",
+        "bin/leanchecker": "a9c9e6e08e0070bdee5235a5426a5911ef2572cc0dd6c8d77911e3152a6c7a06",
+        "bin/leanexport": "0d918179573ee9cfe9c353d96c1c487790f739c3d5a83f790f278c7d23a25053",
+        "bin/nanoda_bin": "a3a26cd8d1c672d1cd038b8373c446409e0e9bbf7f3cdb7adbfa6146cf4e489f",
+        "lib/lean/libInit_shared.so": "dfc50c77afe135cf7849dce179b44ed159867d3fbda2508c88b11ff547a2bd24",
+        "lib/lean/libLake_shared.so": "df4d0916d4a99ba4ccd90cb184afd891d9db25275918877a49c4a1f16e1ba56c",
+        "lib/lean/libleanshared.so": "0195176cd0d7099727848fd3572f5514e1c774d9b146750c78aa445b8e4b84d1",
+        "lib/lean/libleanshared_1.so": "ab78439979a312edfd93143d8ccd810adf7d725e205a52cbb9aa0cb88b857a09",
+        "lib/lean/libleanshared_2.so": "dcf0b81a8acb5276e82b3d66ceb8034d70b3a6666c4941db9a313bc319a9ffa8"
+      }
+    },
+    "Linux/x86_64": {
+      "asset": "lean-4.36.0-rc2-linux.tar.zst",
+      "assetSha256": "0a0a3208617e9eab92f1041efa83ad94d405e69d172fb654a62dbfa9fbc5313b",
+      "files": {
+        "bin/lean": "db7f559d05795e7af52e42bc966c90240a39dcb9712161c54c97afa546e20c00",
+        "bin/leanchecker": "2b2ff08805ace61c935b023f8114ac3f7f1d3bc79cb4e8c47ef7801a5af58798",
+        "bin/leanexport": "8298d4412a1f8986b5dbfd1d9925211778d8d320fc47b72040c8fdfdd5b603d5",
+        "bin/nanoda_bin": "8241c5e6baa29490aa118d382f97961b208ae730fdb96545c2abed74c9ece5a8",
+        "lib/lean/libInit_shared.so": "eeedc97ceed1a50fbc88d1fbbae0a50e4771b2187aa55730937f82dee9985dcc",
+        "lib/lean/libLake_shared.so": "27718458b7640484c9839e05675f8688e6d224d15409874761b3d10abca6957e",
+        "lib/lean/libleanshared.so": "45ca8702609c15d5f6b0e18e2968881c883733139773af24e7005496fae73e3c",
+        "lib/lean/libleanshared_1.so": "9950455d80c620fcacc4e22a4c3490a78020f1880a1fd4f88bc39cf187ec5be8",
+        "lib/lean/libleanshared_2.so": "f98feef07ea4ae2ea88295ae465d6d640a443880d1255a0b25acdf7567ccf060"
+      }
+    }
+  },
+  "commit": "b35cb10cf2ced51a2fd1880cfdbf75c71ab7a35a",
+  "release": "leanprover/lean4:v4.36.0-rc2"
+}

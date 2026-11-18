@@ -221,9 +221,15 @@ func stdio(ctx context.Context, entry string) (exchange, func(), error) {
 	reader := bufio.NewReaderSize(stdout, frameLimit+1)
 	send := func(msg []byte) ([]byte, error) {
 		if _, e := stdin.Write(append(msg, '\n')); e != nil {
+			if deadline := ctx.Err(); deadline != nil {
+				return nil, deadline
+			}
 			return nil, e
 		}
 		raw, e := reader.ReadSlice('\n')
+		if deadline := ctx.Err(); deadline != nil {
+			return nil, deadline
+		}
 		if e != nil {
 			return nil, e
 		}
@@ -267,7 +273,7 @@ func network(ctx context.Context, endpoint, token string) (exchange, func(), err
 	return send, transport.CloseIdleConnections, nil
 }
 
-func status(manifest, resource, peer string) (object, error) {
+func status(manifest, resource, peer string) (result object, finalErr error) {
 	if resource != "demo" {
 		return nil, errors.New("denied: resource outside fixture grant")
 	}
@@ -282,8 +288,9 @@ func status(manifest, resource, peer string) (object, error) {
 	if fmt.Sprintf("%x", sha256.Sum256(raw)) != statusPin {
 		return nil, errors.New("unsupported descriptor pin")
 	}
-	until := time.Now().UTC().Add(5 * time.Second)
-	deadline := until.Format("2006-01-02T15:04:05.000Z")
+	until := time.Now().Add(5 * time.Second)
+	wallDeadline := until.UTC()
+	deadline := wallDeadline.Format("2006-01-02T15:04:05.000Z")
 	ctx, cancel := context.WithDeadline(context.Background(), until)
 	defer cancel()
 	var send exchange
@@ -307,7 +314,13 @@ func status(manifest, resource, peer string) (object, error) {
 			return nil, e
 		}
 	}
-	defer closeFn()
+	defer func() {
+		closeFn()
+		now := time.Now()
+		if finalErr == nil && (!now.Before(until) || !now.UTC().Before(wallDeadline)) {
+			result, finalErr = nil, context.DeadlineExceeded
+		}
+	}()
 	desc, e := invoke(send, "1", "ocs.describe", object{"protocols": []string{"0.1"}, "requiredFeatures": []string{}, "meta": object{"deadline": deadline}}, frameLimit)
 	if e != nil {
 		return nil, e

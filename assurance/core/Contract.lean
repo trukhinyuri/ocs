@@ -133,4 +133,83 @@ def extendedStatus : VersionedContract Nat Nat :=
 
 def atEffect (_prior now : Grant) := admits now
 
+/-- A trusted binding compares separately authenticated publisher evidence
+    with the selected deployment/manifest. The display label is never a key. -/
+structure PackageBinding where
+  issuer : String
+  domain : String
+  packageId : String
+  revision : String
+  digest : String
+  deriving DecidableEq
+
+def bindAuthenticated (trusted observed : PackageBinding) (authenticated : Bool) :=
+  authenticated && decide (trusted = observed)
+
+inductive ObjectNamespace where | account | resource | conversation | operation | display
+  deriving DecidableEq
+
+structure ScopedIdentifier where
+  kind : ObjectNamespace
+  token : String
+  deriving DecidableEq
+
+structure EffectRecord where
+  owner : Nat
+  operationId : Nat
+  intentDigest : Nat
+  outcome : Outcome
+  deriving DecidableEq
+
+/-- A deadline can trigger observation by the owning authority. Only a receipt
+    for this exact intent may establish a new outcome. -/
+def reconcileAtDeadline (record : EffectRecord) (evidence : Option EffectRecord) : EffectRecord :=
+  match evidence with
+  | none => record
+  | some later =>
+    if (later.owner, later.operationId, later.intentDigest) =
+       (record.owner, record.operationId, record.intentDigest)
+    then {record with outcome := later.outcome} else record
+
+/-- A concrete causal responder returns a permitted terminal reply for every
+    admitted input. Option.none models silently refusing to make progress. -/
+def Serves {α β : Type} (respond : α → Option β) (contract : VersionedContract α β) : Prop :=
+  ∀ x, contract.inputs x → ∃ y, respond x = some y ∧ contract.results x y
+
+def ProductiveRefinement {α β : Type} (new old : VersionedContract α β)
+    (respond : α → Option β) : Prop := Refines new old ∧ Serves respond new
+
+def runCalls {α β : Type} (respond : α → Option β) : List α → Option (List (α × β))
+  | [] => some []
+  | x :: tail =>
+    match respond x, runCalls respond tail with
+    | some y, some rest => some ((x,y) :: rest)
+    | _, _ => none
+
+def statusServer (greatest : Nat) (resource : Nat) : Option Nat :=
+  if resource ≤ greatest then some resource else none
+
+structure ScopedImport where
+  operation : String
+  version : String
+  scope : String
+  deriving DecidableEq
+
+/-- The fixed assembly supplies a scope-indexed availability observation. -/
+def callableWithImports (required : List Bool) (uses : List ScopedImport)
+    (available : ScopedImport → Bool) := conditional required && uses.all available
+
+structure EssentialMeaning where
+  identity : String
+  revision : String
+  effect : String
+  modality : String
+  precision : String
+  authority : String
+  deriving DecidableEq
+
+def forwardLossless {α : Type} (required : List String) (supports : String → Bool)
+    (source destination : EssentialMeaning) (payload : α) : Option (EssentialMeaning × α) :=
+  if required.all supports && decide (source = destination) then some (source,payload) else none
+
 end OCS.Core

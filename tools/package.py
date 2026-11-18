@@ -165,10 +165,22 @@ def install(archive, directory, expected_digest):
             members.pop(INDEX)
             if members != files:
                 raise ValueError("immutable installed revision differs")
+        manifest = read_json(files["ocs.json"])
+        # The private store is one authenticated publisher domain. Identical
+        # IDs/versions cannot bind different archive bytes even across installs.
+        identities = directory / "identities"
+        identities.mkdir(mode=0o700, exist_ok=True)
+        revision = identities / digest(json.dumps([manifest["id"], manifest["version"]]).encode())
+        destination = "../" + expected_digest
+        try:
+            revision.symlink_to(destination)
+        except FileExistsError:
+            if not revision.is_symlink() or os.readlink(revision) != destination:
+                raise ValueError("published package revision already binds a different artifact")
         pointer = Path(tmp) / "pointer"
         pointer.symlink_to(expected_digest)
         os.replace(pointer, directory / "current")
-    return read_json(files["ocs.json"])
+    return manifest
 
 
 def main():

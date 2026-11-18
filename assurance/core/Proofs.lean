@@ -133,4 +133,113 @@ theorem extension_preserves_status : Refines extendedStatus statusContract := by
 theorem extended_status_realizable : Realizable extendedStatus :=
   ⟨id, fun _ h => ⟨h, rfl⟩⟩
 
+theorem authenticated_subject_exact (expected seen : PackageBinding) (auth : Bool) :
+    bindAuthenticated expected seen auth = true ↔
+    auth = true ∧ expected.issuer = seen.issuer ∧ expected.domain = seen.domain ∧
+    expected.packageId = seen.packageId ∧ expected.revision = seen.revision ∧
+    expected.digest = seen.digest := by
+  cases expected; cases seen
+  simp [bindAuthenticated]
+
+theorem scoped_identifiers_disjoint (a b : ObjectNamespace) (x y : String) (distinct : a ≠ b) :
+    (ScopedIdentifier.mk a x) ≠ (ScopedIdentifier.mk b y) := by
+  intro same
+  exact distinct (congrArg ScopedIdentifier.kind same)
+
+theorem timeout_keeps_scoped_intent (r : EffectRecord) (observation : Option EffectRecord) :
+    ((reconcileAtDeadline r observation).owner, (reconcileAtDeadline r observation).operationId,
+      (reconcileAtDeadline r observation).intentDigest) = (r.owner, r.operationId, r.intentDigest) := by
+  cases observation with
+  | none => rfl
+  | some other => simp only [reconcileAtDeadline]; split <;> rfl
+
+theorem timeout_empty_keeps_record (r : EffectRecord) : reconcileAtDeadline r none = r := rfl
+
+theorem foreign_receipt_inert (r peer : EffectRecord)
+    (other : (peer.owner,peer.operationId,peer.intentDigest) ≠ (r.owner,r.operationId,r.intentDigest)) :
+    reconcileAtDeadline r (some peer) = r := by simp [reconcileAtDeadline, other]
+
+theorem owner_receipt_establishes_outcome (r peer : EffectRecord)
+    (same : (peer.owner,peer.operationId,peer.intentDigest) = (r.owner,r.operationId,r.intentDigest)) :
+    (reconcileAtDeadline r (some peer)).outcome = peer.outcome := by simp [reconcileAtDeadline, same]
+
+theorem old_traces_complete {α β : Type} (new old : VersionedContract α β) (respond : α → Option β)
+    (compatible : ProductiveRefinement new old respond) (inputs : List α)
+    (admitted : ∀ x ∈ inputs, old.inputs x) :
+    ∃ trace, runCalls respond inputs = some trace ∧ trace.map Prod.fst = inputs ∧
+             ∀ pair ∈ trace, old.results pair.1 pair.2 := by
+  induction inputs with
+  | nil => exact ⟨[], rfl, rfl, by simp⟩
+  | cons x tail ih =>
+    have hx := admitted x (by simp)
+    obtain ⟨y, answered, satisfies⟩ := compatible.2 x (compatible.1.1 x hx)
+    obtain ⟨rest, executed, correlated, valid⟩ := ih (fun z hz => admitted z (by simp [hz]))
+    refine ⟨(x,y)::rest, by simp [runCalls, answered, executed], by simp [correlated], ?_⟩
+    intro pair member
+    rcases List.mem_cons.mp member with same | inside
+    · subst pair; exact compatible.1.2 x y hx satisfies
+    · exact valid pair inside
+
+theorem silence_is_incompatible :
+    ¬ ProductiveRefinement statusContract statusContract (fun _ => none) := by
+  intro satisfied
+  obtain ⟨value, answered, _allowed⟩ := satisfied.2 0 (by rfl)
+  cases answered
+
+theorem mixed_generation_contract :
+    ProductiveRefinement extendedStatus statusContract (statusServer 1) ∧
+    Serves (statusServer 0) statusContract ∧
+    (∀ common, statusContract.inputs common →
+       statusServer 1 common = some common ∧ statusServer 0 common = some common ∧
+       extendedStatus.results common common ∧ statusContract.results common common) ∧
+    statusServer 1 1 = some 1 ∧ statusServer 0 1 = none := by
+  constructor
+  · refine ⟨extension_preserves_status, ?_⟩
+    intro x h
+    change x ≤ 1 at h
+    exact ⟨x, by simp [statusServer,h], ⟨h,rfl⟩⟩
+  constructor
+  · intro x h
+    change x = 0 at h
+    subst x
+    exact ⟨0, rfl, ⟨rfl,rfl⟩⟩
+  constructor
+  · intro x h
+    change x = 0 at h
+    subst x; exact ⟨rfl, rfl, ⟨by decide, rfl⟩, ⟨rfl, rfl⟩⟩
+  · decide
+
+theorem per_export_imports_exact (req : List Bool) (uses : List ScopedImport) (available : ScopedImport → Bool) :
+    callableWithImports req uses available = true ↔
+      (∀ r ∈ req, r = true) ∧ (∀ key ∈ uses, available key = true) := by
+  simp [callableWithImports, conditional]
+
+theorem isolated_optional_failure (req : List Bool) (enabled : ∀ r ∈ req, r = true) (missing : ScopedImport)
+    (available : ScopedImport → Bool) (absent : available missing = false) :
+    callableWithImports req [] available = true ∧ callableWithImports req [missing] available = false := by
+  have ready : conditional req = true := List.all_eq_true.mpr enabled
+  simp [callableWithImports, ready, absent]
+
+theorem lossless_forward_exact {α : Type} (req : List String) (supports : String → Bool)
+    (source destination : EssentialMeaning) (payload : α) :
+    forwardLossless req supports source destination payload = some (source,payload) ↔
+      source = destination ∧ ∀ feature ∈ req, supports feature = true := by
+  by_cases same : source = destination
+  · subst destination; simp [forwardLossless]
+  · simp [forwardLossless,same]
+
+theorem refuses_essential_loss {α : Type} (req : List String) (supports : String → Bool)
+    (source destination : EssentialMeaning) (payload : α)
+    (loss : source ≠ destination ∨ ∃ feature ∈ req, supports feature = false) :
+    forwardLossless req supports source destination payload = none := by
+  rcases loss with mismatch | ⟨key, member, no⟩
+  · simp [forwardLossless,mismatch]
+  · have absent : req.all supports = false := by
+      cases h : req.all supports with
+      | false => rfl
+      | true =>
+        have yes := (List.all_eq_true.mp h) key member
+        simp [no] at yes
+    simp [forwardLossless,absent]
+
 end OCS.Core

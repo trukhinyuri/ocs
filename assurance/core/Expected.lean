@@ -171,4 +171,83 @@ example : Realizable extendedStatus := by
   apply extended_status_realizable <;> assumption
 #print axioms OCS.Core.extended_status_realizable
 
+example (expected seen : PackageBinding) (auth : Bool) :
+    bindAuthenticated expected seen auth = true ↔
+    auth = true ∧ expected.issuer = seen.issuer ∧ expected.domain = seen.domain ∧
+    expected.packageId = seen.packageId ∧ expected.revision = seen.revision ∧
+    expected.digest = seen.digest := by apply authenticated_subject_exact
+#print axioms OCS.Core.authenticated_subject_exact
+
+example (a b : ObjectNamespace) (x y : String) (distinct : a ≠ b) :
+    (ScopedIdentifier.mk a x) ≠ (ScopedIdentifier.mk b y) := by
+  apply scoped_identifiers_disjoint <;> assumption
+#print axioms OCS.Core.scoped_identifiers_disjoint
+
+example (r : EffectRecord) (observation : Option EffectRecord) :
+    ((reconcileAtDeadline r observation).owner, (reconcileAtDeadline r observation).operationId,
+      (reconcileAtDeadline r observation).intentDigest) = (r.owner, r.operationId, r.intentDigest) := by
+  apply timeout_keeps_scoped_intent
+#print axioms OCS.Core.timeout_keeps_scoped_intent
+
+example (r : EffectRecord) : reconcileAtDeadline r none = r := by apply timeout_empty_keeps_record
+#print axioms OCS.Core.timeout_empty_keeps_record
+
+example (r peer : EffectRecord)
+    (other : (peer.owner,peer.operationId,peer.intentDigest) ≠ (r.owner,r.operationId,r.intentDigest)) :
+    reconcileAtDeadline r (some peer) = r := by apply foreign_receipt_inert <;> assumption
+#print axioms OCS.Core.foreign_receipt_inert
+
+example (r peer : EffectRecord)
+    (same : (peer.owner,peer.operationId,peer.intentDigest) = (r.owner,r.operationId,r.intentDigest)) :
+    (reconcileAtDeadline r (some peer)).outcome = peer.outcome := by
+  apply owner_receipt_establishes_outcome <;> assumption
+#print axioms OCS.Core.owner_receipt_establishes_outcome
+
+example {α β : Type} (new old : VersionedContract α β) (respond : α → Option β)
+    (compatible : ProductiveRefinement new old respond) (inputs : List α)
+    (admitted : ∀ x ∈ inputs, old.inputs x) :
+    ∃ trace, runCalls respond inputs = some trace ∧ trace.map Prod.fst = inputs ∧
+             ∀ pair ∈ trace, old.results pair.1 pair.2 := by
+  apply old_traces_complete <;> assumption
+#print axioms OCS.Core.old_traces_complete
+
+example : ¬ ProductiveRefinement statusContract statusContract (fun _ => none) := by
+  apply silence_is_incompatible
+#print axioms OCS.Core.silence_is_incompatible
+
+example : ProductiveRefinement extendedStatus statusContract (statusServer 1) ∧
+    Serves (statusServer 0) statusContract ∧
+    (∀ common, statusContract.inputs common →
+       statusServer 1 common = some common ∧ statusServer 0 common = some common ∧
+       extendedStatus.results common common ∧ statusContract.results common common) ∧
+    statusServer 1 1 = some 1 ∧ statusServer 0 1 = none := by
+  apply mixed_generation_contract
+#print axioms OCS.Core.mixed_generation_contract
+
+example (req : List Bool) (uses : List ScopedImport) (available : ScopedImport → Bool) :
+    callableWithImports req uses available = true ↔
+      (∀ r ∈ req, r = true) ∧ (∀ key ∈ uses, available key = true) := by
+  apply per_export_imports_exact
+#print axioms OCS.Core.per_export_imports_exact
+
+example (req : List Bool) (enabled : ∀ r ∈ req, r = true) (missing : ScopedImport)
+    (available : ScopedImport → Bool) (absent : available missing = false) :
+    callableWithImports req [] available = true ∧ callableWithImports req [missing] available = false := by
+  apply isolated_optional_failure <;> assumption
+#print axioms OCS.Core.isolated_optional_failure
+
+example {α : Type} (req : List String) (supports : String → Bool)
+    (source destination : EssentialMeaning) (payload : α) :
+    forwardLossless req supports source destination payload = some (source,payload) ↔
+      source = destination ∧ ∀ feature ∈ req, supports feature = true := by
+  apply lossless_forward_exact
+#print axioms OCS.Core.lossless_forward_exact
+
+example {α : Type} (req : List String) (supports : String → Bool)
+    (source destination : EssentialMeaning) (payload : α)
+    (loss : source ≠ destination ∨ ∃ feature ∈ req, supports feature = false) :
+    forwardLossless req supports source destination payload = none := by
+  apply refuses_essential_loss <;> assumption
+#print axioms OCS.Core.refuses_essential_loss
+
 end OCS.Core

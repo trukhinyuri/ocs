@@ -44,6 +44,19 @@ class BoundedServer(ThreadingMixIn, HTTPServer):
             raise
 
     def process_request_thread(self, request, address):
+        # A socket's timeout restarts after each received byte. A duplicate fd
+        # lets the absolute connection budget also bound incremental reads and TLS.
+        watchdog_socket = request.dup()
+
+        def expire():
+            try:
+                watchdog_socket.shutdown(socket.SHUT_RDWR)
+            except OSError:
+                pass
+
+        watchdog = threading.Timer(self.io_timeout, expire)
+        watchdog.daemon = True
+        watchdog.start()
         try:
             if self.tls is not None:
                 try:
@@ -53,6 +66,9 @@ class BoundedServer(ThreadingMixIn, HTTPServer):
                     return
             super().process_request_thread(request, address)
         finally:
+            watchdog.cancel()
+            watchdog.join()
+            watchdog_socket.close()
             self.slots.release()
 
     def handle_error(self, request, client_address):

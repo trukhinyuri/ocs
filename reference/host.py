@@ -26,6 +26,7 @@ class Failure(Exception):
 
 class Channel:
     def __init__(self, entry, budget):
+        self.end = time.monotonic() + budget
         self.process = subprocess.Popen(
             [sys.executable, "-I", str(entry)],
             cwd=entry.parent,
@@ -35,7 +36,6 @@ class Channel:
             stderr=subprocess.DEVNULL,
             bufsize=0,
         )
-        self.end = time.monotonic() + budget
         self.sequence = 0
         self.buffer = bytearray()
         self.limit = LIMIT
@@ -43,7 +43,7 @@ class Channel:
     def close(self):
         self.process.stdin.close()
         try:
-            self.process.wait(timeout=0.3)
+            self.process.wait(timeout=max(0.0, min(0.3, self.end - time.monotonic())))
         except subprocess.TimeoutExpired:
             self.process.kill()
             self.process.wait()
@@ -149,12 +149,16 @@ def status(manifest_path, resource, deadline=None, expected_pin=None):
         raise Failure(-33009, "input", "Invalid input.", pointer(exc)) from exc
     if resource != "demo":
         raise Failure(-33001, "denied", "No grant for this resource.")
-    expires = min(deadline if deadline is not None else time.time() + 5, time.time() + 5)
-    budget = expires - time.time()
+    monotonic_start = time.monotonic()
+    wall_start = time.time()
+    expires = min(deadline if deadline is not None else wall_start + 5, wall_start + 5)
+    budget = expires - wall_start
+    delivery_end = monotonic_start + budget
     if budget <= 0:
         raise Failure(-33005, "deadline", "Expired request.")
     stamp = utc_at(expires)
     channel = Channel(entry, budget)
+    channel.end = min(channel.end, delivery_end)
     try:
         desc = channel.request(
             "ocs.describe",
@@ -187,9 +191,13 @@ def status(manifest_path, resource, deadline=None, expected_pin=None):
             raise Failure(-32001, "output", "Invalid operation result.", pointer(exc)) from exc
         if result["data"]["resourceId"] != resource:
             raise Failure(-32001, "output", "Result belongs to another resource.")
-        return result["data"]
     finally:
         channel.close()
+    if time.monotonic() >= delivery_end or time.time() >= expires:
+        raise Failure(
+            -33005, "deadline", "Deadline elapsed before delivering the closed-session result."
+        )
+    return result["data"]
 
 
 def observed_status(manifest, resource, receipt):
